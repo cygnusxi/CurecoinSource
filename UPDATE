@@ -1,0 +1,14 @@
+Version 1.6 Download:
+windows setup exe: http://sdrv.ms/12pywCy
+.7z file: http://sdrv.ms/12pyESx
+
+Version 1.6
+- Add checkpoints
+- Fix error of block 7887
+- add more chinese translation
+- fix some little bugs
+
+Version 1.5
+- add function to see network hash speed (first implementation of this functions in all PoW+PoF coins)
+- add Chinese translation
+- fix several little bugs

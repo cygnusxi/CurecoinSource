@@ -1,0 +1,9 @@
+Building curecoin
+
+See doc/readme-qt.rst for instructions on building curecoin QT,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of curecoin.
+
+See doc/build-*.txt for instructions on building curecoind,
+the intended-for-services, no-graphical-interface, reference
+implementation of curecoin.

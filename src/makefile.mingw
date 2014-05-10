@@ -1,0 +1,110 @@
+# Copyright (c) 2009-2010 Satoshi Nakamoto
+# Distributed under the MIT/X11 software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+USE_UPNP:=1
+USE_IPV6:=1
+
+BOOST_SUFFIX?=-mgw46-mt-sd-1_54
+
+INCLUDEPATHS= \
+ -I"/c/boost_1_54_0" \
+ -I"/c/db-4.8.30.NC\build_unix" \
+ -I"/c/openssl-1.0.1e\include"
+
+LIBPATHS= \
+ -L"/c/boost_1_54_0\stage\lib" \
+ -L"/c/db-4.8.30.NC\build_unix" \
+ -L"/c/openssl-1.0.1e"
+
+LIBS= \
+ -l boost_system-mgw46-mt-sd-1_54 \
+ -l boost_filesystem-mgw46-mt-sd-1_54 \
+ -l boost_program_options-mgw46-mt-sd-1_54 \
+ -l boost_thread-mgw46-mt-sd-1_54 \
+ -l boost_chrono-mgw46-mt-sd-1_54 \
+ -l db_cxx \
+ -l ssl \
+ -l crypto
+
+DEFS=-DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE
+DEBUGFLAGS=-g
+CFLAGS=-mthreads -O2 -msse2 -w -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
+LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat
+
+TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
+
+ifndef USE_UPNP
+	override USE_UPNP = -
+endif
+ifneq (${USE_UPNP}, -)
+ INCLUDEPATHS += -I"/c/miniupnpc-1.6"
+ LIBPATHS += -L"/c/\miniupnpc-1.6"
+ LIBS += -l miniupnpc -l iphlpapi
+ DEFS += -DSTATICLIB -DUSE_UPNP=$(USE_UPNP)
+endif
+
+ifneq (${USE_IPV6}, -)
+	DEFS += -DUSE_IPV6=$(USE_IPV6)
+endif
+
+LIBS += -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
+
+# TODO: make the mingw builds smarter about dependencies, like the linux/osx builds are
+HEADERS = $(wildcard *.h)
+
+OBJS= \
+    obj/alert.o \
+    obj/version.o \
+    obj/checkpoints.o \
+    obj/netbase.o \
+    obj/addrman.o \
+    obj/crypter.o \
+    obj/key.o \
+    obj/db.o \
+    obj/init.o \
+    obj/irc.o \
+    obj/keystore.o \
+    obj/main.o \
+    obj/net.o \
+    obj/protocol.o \
+    obj/curecoinrpc.o \
+    obj/rpcdump.o \
+    obj/rpcnet.o \
+    obj/rpcmining.o \
+    obj/rpcwallet.o \
+    obj/rpcblockchain.o \
+    obj/rpcrawtransaction.o \
+    obj/script.o \
+    obj/sync.o \
+    obj/util.o \
+    obj/wallet.o \
+    obj/walletdb.o \
+    obj/noui.o \
+    obj/kernel.o
+
+all: curecoind.exe
+
+test check: test_curecoin.exe FORCE
+	test_curecoin.exe
+
+obj/%.o: %.cpp $(HEADERS)
+	g++ -c $(CFLAGS) -o $@ $<
+
+curecoind.exe: $(OBJS:obj/%=obj/%)
+	g++ $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
+
+TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
+
+obj-test/%.o: test/%.cpp $(HEADERS)
+	g++ -c $(TESTDEFS) $(CFLAGS) -o $@ $<
+
+test_curecoin.exe: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
+	g++ $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework $(LIBS)
+
+clean:
+	-del /Q curecoind test_curecoin
+	-del /Q obj\*
+	-del /Q obj-test\*
+
+FORCE:
