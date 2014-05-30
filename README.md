@@ -51,7 +51,7 @@ There are two Curecoin clients that you can choose: one with a nice graphical in
 
 ### Reporting bugs or getting assistance
 
-Since I package and maintain the Linux Curecoin clients, I'd appreciate reports if you encounter problems related to the compiling, packaging, or installation of the client. You can find me as an OP on Freenode's #curecoin IRC channel, you can open an issue ticket in this repo, or you can send me an email, and I'll do what I can to help.
+Since I (Jesse V) package and maintain the Linux Curecoin clients, I'd appreciate reports if you encounter problems related to the compiling, packaging, or installation of the client. You can find me as an OP on Freenode's #curecoin IRC channel, you can open an issue ticket in this repo, or you can send me an email, and I'll do what I can to help.
 
 General help for Curecoin can be found on the forums at http://www.curecoin.us/ or on #curecoin. I've found the community to be both enthusiastic and willing to assist so ask around, but if you have a highly technical question Cygnus-XI and vorksholk are both extremely knowledgeable and may be able to help in greater detail.
 
