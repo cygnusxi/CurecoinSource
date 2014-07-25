@@ -26,6 +26,7 @@ static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
         ( 0, uint256("00000ce427729d5393dbf9f464e7a1d2c039e393e881f93448516b1530b688fc"))
 		( 1, uint256("000000002f4984003de245a1666d8a8271ddf4236cf190bb9a2595dc4e7d4696"))
+        	( 11000, uint256("ea83da9e532a4e5e5b0fabea3e427c06b0e8b8b59e4ee3d926a2b0757b60d529"))
         ;
 
 
