@@ -42,7 +42,7 @@ Jesse V packaged the (now outdated) Linux Curecoin binaries, if you encounter pr
 
 ### Donations
 
-Stars on this repo are appreciatted as it helps improve the visibility of this repository. If you'd like to do more than that, tip cryptocurrency to:
+Stars on this repo are appreciated as it helps improve the visibility of this repository. If you'd like to do more than that, tip cryptocurrency to:
 
 
 CygnusXI - Curecoin Dev
