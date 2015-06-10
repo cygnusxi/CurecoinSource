@@ -3,15 +3,15 @@
 
 ### New to CureCoin?
 
-+If you are a newcomer, check out this [this website](http://curecoin.net/) which explains Curecoin in simple and everyday terms. You can find statistics on the current state of the Curecoin network [on this page](http://stats.curecoinfolding.com/).
-+
-+Joining the Curecoin network is easy:
-+
-+1. Install the [Folding@home software] (http://folding.stanford.edu/)
-+2. Pick a username & get a [passkey] (http://folding.stanford.edu/home/faq/faq-passkey/)
-+3. Enter "224497" as the team number to fold under
-+4. Register on [cryptobullionpools.com] (https://www.cryptobullionpools.com/) with the **exact** same username 
-+5. Expect your coins within 24 hours!
+If you are a newcomer, check out this [this website](http://curecoin.net/) which explains Curecoin in simple and everyday terms. You can find statistics on the current state of the Curecoin network [on this page](http://stats.curecoinfolding.com/).
+
+Joining the Curecoin network is easy:
+
+1. Install the [Folding@home software] (http://folding.stanford.edu/)
+2. Pick a username & get a [passkey] (http://folding.stanford.edu/home/faq/faq-passkey/)
+3. Enter "224497" as the team number to fold under
+4. Register on [cryptobullionpools.com] (https://www.cryptobullionpools.com/) with the **exact** same username 
+5. Expect your coins within 24 hours!
 
 ### System requirements
 
