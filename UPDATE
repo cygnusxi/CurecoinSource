@@ -1,14 +1,8 @@
-Version 1.6 Download:
-windows setup exe: http://sdrv.ms/12pywCy
-.7z file: http://sdrv.ms/12pyESx
+Version 1.3 Download:
+windows installer setup exe: http://1.curecoinmirror.com/Curecoin-Installer.exe
+windows portable: http://1.curecoinmirror.com/Curecoin-Qt.zip
+Mac wallet: http://1.curecoinmirror.com/curecoin-Qt.dmg
 
-Version 1.6
+Version 1.3
 - Add checkpoints
-- Fix error of block 7887
-- add more chinese translation
-- fix some little bugs
-
-Version 1.5
-- add function to see network hash speed (first implementation of this functions in all PoW+PoF coins)
-- add Chinese translation
-- fix several little bugs
+- Correct some GUI mismatches
