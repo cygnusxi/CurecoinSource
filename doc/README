@@ -2,7 +2,7 @@ curecoin 0.1.3.9 BETA
 
 Copyright (c) 2009-2012 Bitcoin Developers
 Copyright (c) 2011-2012 PPCoin Developers
-Copyright (c) 2013-2015 Curecoin Developers
+Copyright (c) 2013-2016 Curecoin Developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 This product includes software developed by the OpenSSL Project for use in
@@ -25,6 +25,6 @@ Unpack the files into a directory and run:
  curecoind (headless)
 
 
-See the documentation at the bitcoin wiki:
+See the documentation at the CureCoin website:
   https://www.curecoin.net
 for help and more information.
