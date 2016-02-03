@@ -36,7 +36,7 @@ There are two CureCoin clients that you can choose: one with a nice graphical in
 
     FOR THE HEADLESS CURECOIND:
 
-    > 1. **sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.1++-dev libminiupnpc-dev dh-make build-essential**
+    > 1. **sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential**
     > 2. **cd src/ && mkdir obj/ && make -f makefile.unix**
     > 4. **sudo make install** Alternatively, don't run that command and just place the binary wherever you want.
 
