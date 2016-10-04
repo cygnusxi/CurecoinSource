@@ -3,7 +3,7 @@
 
 ### New to CureCoin?
 
-If you are a newcomer, check out this [this website](http://curecoin.net/) which explains Curecoin in simple and everyday terms. You can find statistics on the current state of the Curecoin network [on this page](http://stats.curecoinfolding.com/).
+If you are a newcomer, check out this [this website](http://curecoin.net/) which explains Curecoin in simple and everyday terms. You can find statistics on the current state of the Curecoin research rates [on this page](http://folding.extremeoverclocking.com/team_summary.php?s=&t=224497) and blockchain status and info on the [Block Explorer](https://chainz.cryptoid.info/cure/)
 
 Joining the Curecoin network is easy:
 
@@ -15,9 +15,9 @@ Joining the Curecoin network is easy:
 
 ### System requirements
 
-1. The Linux operating system.
+1. Windows, Mac, Linux operating system - for Windows and Mac clients visit [this website](http://curecoin.net/)
 
-### Installation
+### Installation for Linux from source
 
 There are two CureCoin clients that you can choose: one with a nice graphical interface, and one that operates entirely in the command-line. The first is highly recommended and is a good choice for most users, but expert users may prefer the command-line (headless) client instead. The GUI client is known as "curecoin-qt" and the headless client is called "curecoind". Installing either one or both is extremely simple. Just follow these directions:
 
@@ -48,11 +48,7 @@ General help for CureCoin can be found on the forums at https://www.curecoin.net
 
 ### Donations
 
-Stars on this repo are appreciated as it helps improve the visibility of this repository. If you'd like to do more than that, tip cryptocurrency to:
+Stars on this repo are appreciated as it helps improve the visibility of this repository. If you'd like to do more than that you can tip curecoins on the curecoin.net homepage. 
 
 
 CygnusXI - CureCoin Dev
-
-CureCoin wallet B4nMZWxPs7mjUacHYf5wmtEEd489UpnExd
-
-Bitcoin wallet: 1G1Sac4sJXqTu2ZhPJFH86HVqs6YKFD4MW
