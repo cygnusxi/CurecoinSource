@@ -6,3 +6,7 @@ Mac wallet: http://1.curecoinmirror.com/curecoin-Qt.dmg
 Version 1.3
 - Add checkpoints
 - Correct some GUI mismatches
+
+Version 1.3.3
+- Add checkpoint
+- Update GUI and Logo
