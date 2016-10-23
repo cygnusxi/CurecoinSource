@@ -1,0 +1,63 @@
+Cliente Curecoin
+
+Cliente para la criptodivisa CureCoin 
+
+Nuevo en CureCoin?
+
+Si eres un recien llegado, échale un ojo a la pagina web que explica el funcionamiento de Curecoin en términos simples y cotidianos.
+
+Puede encontrar estadísticas sobre el estado actual de la investigación en esta página y el estado de la blockchain en el explorador de bloques.
+
+Unirse a la red Curecoin es fácil:
+
+Instala el software Folding@home
+Escoge un nombre de usuario y consigue una llave de paso
+Introduce el número "224497" como numero de equipo de plegado
+Registrate en cryptobullionpools.com con exactamente el mismo nombre de usuario
+Espere sus monedas en un plazo de 24 horas!
+
+Requisitos del sistema
+
+Sistema operativo Windows, Mac y GNU/Linux - Para el cliente de Windows and Mac visita la página web
+
+Instalación desde el código fuente en GNU/Linux 
+
+Hay dos clientes CureCoin que puedes escoger: uno con una bonita interfaz gráfica y otra que opera completamente en línea de comandos.
+
+La primera es muy recomendable y es una buena opción para la mayoría de los usuarios,
+pero los usuarios expertos pueden preferir el cliente de línea de comandos en su lugar.
+El cliente GUI se conoce como "curecoin-qt" y el cliente de línea de comandos se conoce como "curecoind". 
+Instalación de una o las dos es extremadamente simple. Sólo tienes que seguir estas instrucciones:
+
+Instalar desde el código fuente
+
+Esto implica la descarga de la fuente, la satisfacción de las dependencias, compilar el código, y luego instalar el software resultante.
+
+git clone https://github.com/cygnusxi/CurecoinSource.git
+
+PARA EL CLIENTE GUI - "curecoin-qt":
+
+sudo apt-get install qt4-qmake libqt4-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
+Desde el directorio principal, ejecute:
+qmake && make
+sudo make install 
+
+PARA EL CLIENTE EN LINEA DE COMANDOS - "curecoind":
+
+sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential
+cd src/ && mkdir obj/ && make -f makefile.unix
+sudo make install 
+libdb4.8 también debería funcionar si libdb5.1 es una version demasiado reciente para ti.
+Las nuevas versiones de Linux necesitarán libdb5.3++-dev
+
+Información sobre errores o conseguir asistencia
+
+La ayuda general para CureCoin se puede encontrar en los foros en https://www.curecoin.net/forum o en #curecoin en irc.freenode.
+El foro se recomienda para usuarios no frecuentes de IRC.
+
+Donativos
+Se agradecen las estrellas en el repositorio, ya que ayuda a mejorar la visibilidad del mismo.
+Si desea hacer más que eso puedes dejar una propina de curecoins en la página principal curecoin.net.
+
+CygnusXI - CureCoin Dev
+Traducido por @Drhimura 
