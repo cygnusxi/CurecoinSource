@@ -1,1 +1,1 @@
-Executable packeges for Windows, Linux, and Mac.
+Executable packages for Windows, Linux, and Mac.
