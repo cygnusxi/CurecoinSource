@@ -4,24 +4,29 @@ curecoin-Qt: Qt4 GUI for curecoin
 Build instructions
 ===================
 
-Debian
+##Debian
 -------
 
 First, make sure that the required packages for Qt4 development of your
 distribution are installed, for Debian and Ubuntu these are:
 
-::
+This involves downloading the source, meeting the dependencies, compiling the code, and then installing the resulting software.
 
-    apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev \
-        libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
-        libssl-dev libdb4.8++-dev
+git clone https://github.com/cygnusxi/CurecoinSource.git
 
-then execute the following:
+##FOR THE GUI CLIENT:
 
-::
+sudo apt-get install qt4-qmake libqt4-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
+From the main directory, run the following:
+qmake && make
+sudo make install Alternatively, don't run that command and just place the binary wherever you want.
 
-    qmake
-    make
+##FOR THE HEADLESS CURECOIND:
+
+sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential
+cd src/ && mkdir obj/ && make -f makefile.unix
+sudo make install Alternatively, don't run that command and just place the binary wherever you want.
+libdb4.8 should also work if libdb5.1 is too high a version for you. Newer versions of Linux will need libdb5.3++-dev
 
 Alternatively, install `Qt Creator`_ and open the `curecoin-qt.pro` file.
 
@@ -29,7 +34,7 @@ An executable named `curecoin-qt` will be built.
 
 .. _`Qt Creator`: http://qt.nokia.com/downloads/
 
-Windows
+##Windows
 --------
 
 Windows build instructions:
@@ -48,7 +53,7 @@ Windows build instructions:
 .. _`610945D0`: http://pgp.mit.edu:11371/pks/lookup?op=get&search=0x610945D0
 
 
-Mac OS X
+##Mac OS X
 --------
 
 - Download and install the `Qt Mac OS X SDK`_. It is recommended to also install Apple's Xcode with UNIX tools.
