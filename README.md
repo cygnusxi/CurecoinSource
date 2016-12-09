@@ -1,7 +1,7 @@
 #Curecoin Client
 ###Client for the CureCoin cryptocurrency
 
-### New to CureCoin?
+### Overview 
 
 If you are a newcomer, check out this [this website](http://curecoin.net/) which explains Curecoin in simple and everyday terms. You can find statistics on the current state of the Curecoin research rates [on this page](http://folding.extremeoverclocking.com/team_summary.php?s=&t=224497) and blockchain status and info on the [Block Explorer](https://chainz.cryptoid.info/cure/)
 
@@ -13,9 +13,9 @@ Joining the Curecoin network is easy:
 4. Register on [cryptobullionpools.com] (https://www.cryptobullionpools.com/) with the **exact** same username 
 5. Expect your coins within 24 hours!
 
-### System requirements
+### Standard Installation
 
-1. Windows, Mac, Linux operating system - for Windows and Mac clients visit [this website](http://curecoin.net/)
+1. Windows, Mac, Linux operating system - for client downloads visit [curecoin releases](https://github.com/cygnusxi/CurecoinSource/tree/master/releases)
 
 ### Installation for Linux from source
 
@@ -49,6 +49,3 @@ General help for CureCoin can be found on the forums at https://www.curecoin.net
 ### Donations
 
 Stars on this repo are appreciated as it helps improve the visibility of this repository. If you'd like to do more than that you can tip curecoins on the curecoin.net homepage. 
-
-
-CygnusXI - CureCoin Dev
