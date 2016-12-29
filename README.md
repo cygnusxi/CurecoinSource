@@ -15,7 +15,7 @@ Joining the Curecoin network is easy:
 
 ### Standard Installation
 
-1. Windows, Mac, Linux operating system - for client downloads visit [curecoin releases](https://github.com/cygnusxi/CurecoinSource/tree/master/releases)
+1. Windows, Mac, Linux operating system - for client downloads visit [curecoin releases](https://github.com/cygnusxi/CurecoinSource/releases)
 
 ### Installation for Linux from source
 
