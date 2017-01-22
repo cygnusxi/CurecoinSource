@@ -44,7 +44,7 @@ There are two CureCoin clients that you can choose: one with a nice graphical in
 
 ### Reporting bugs or getting assistance
 
-General help for CureCoin can be found on the forums at https://www.curecoin.net/forum or on #curecoin in irc.freenode. The forum is recommended for non frequent users of irc. 
+General help for CureCoin can be found on the forums at https://www.curecoin.net/forum or on Slack http://slack.curecoin.net:30000/ . The forum is recommended for non frequent users of irc. 
 
 ### Donations
 
