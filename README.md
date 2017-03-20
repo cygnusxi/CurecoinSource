@@ -32,7 +32,6 @@ There are two CureCoin clients that you can choose: one with a nice graphical in
     > 1. **sudo apt-get install qt4-qmake libqt4-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential**
     > 2. From the main directory, run the following:
     > 3. **qmake && make**
-    > 4. **sudo make install** Alternatively, don't run that command and just place the binary wherever you want.
 
     FOR THE HEADLESS CURECOIND:
 
