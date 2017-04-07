@@ -16,12 +16,12 @@ Joining the Curecoin network is easy:
 ### Standard Installation
 
 1. To see all version for Windows, Mac, Linux wallet downloads visit [curecoin releases](https://github.com/cygnusxi/CurecoinSource/releases)
-2. [Windows Download] (https://github.com/cygnusxi/CurecoinSource/releases/download/v1.3.4/CurecoinWindowsClientv1-3-4.zip)
-3. [Mac Download] (https://github.com/cygnusxi/CurecoinSource/releases/download/1.3.0/curecoin-0.1.3.0-mac.dmg)
+2. [Windows Download](https://github.com/cygnusxi/CurecoinSource/releases/download/v1.3.4/CurecoinWindowsClientv1-3-4.zip)
+3. [Mac Download](https://github.com/cygnusxi/CurecoinSource/releases/download/1.3.0/curecoin-0.1.3.0-mac.dmg)
 
 ### Installation for Linux from source
 
-There are two CureCoin clients that you can choose: one with a nice graphical interface, and one that operates entirely in the command-line. The first is highly recommended and is a good choice for most users, but expert users may prefer the command-line (headless) client instead. The GUI client is known as "curecoin-qt" and the headless client is called "curecoind". Installing either one or both is extremely simple. Just follow these directions:
+If you do not use Linux see previous section for a prebuilt wallet. There are two CureCoin Linux based clients that you can compile for yourself: one with a nice graphical interface, and one that operates entirely in the command-line. The first is highly recommended and is a good choice for most users, but expert users may prefer the command-line (headless) client instead. The GUI client is known as "curecoin-qt" and the headless client is called "curecoind". Installing either one or both is extremely simple. Just follow these directions:
 
 * **Install from source**
 
