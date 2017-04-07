@@ -1,5 +1,4 @@
-#Curecoin Client
-###Client for the CureCoin cryptocurrency
+## CureCoin Wallet 
 
 ### Overview 
 
@@ -7,10 +6,10 @@ If you are a newcomer, check out this [this website](http://curecoin.net/) which
 
 Joining the Curecoin network is easy:
 
-1. Install the [Folding@home software] (http://folding.stanford.edu/)
-2. Pick a username & get a [passkey] (http://folding.stanford.edu/home/faq/faq-passkey/)
+1. Install the [Folding@home software](http://folding.stanford.edu/)
+2. Pick a username & get a [passkey](http://folding.stanford.edu/home/faq/faq-passkey/)
 3. Enter "224497" as the team number to fold under
-4. Register on [cryptobullionpools.com] (https://www.cryptobullionpools.com/) with the **exact** same username 
+4. Register on [cryptobullionpools.com](https://www.cryptobullionpools.com/) with the **exact** same username 
 5. Expect your coins within 24 hours!
 
 ### Standard Installation
