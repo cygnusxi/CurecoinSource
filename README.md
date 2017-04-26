@@ -37,7 +37,8 @@ If you do not use Linux see previous section for a prebuilt wallet. There are tw
     FOR THE HEADLESS CURECOIND:
 
     > 1. **sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential**
-    > 2. **cd src/ && mkdir obj/ && make -f makefile.unix**
+    > 2. **cd src**
+    > 3. **make -f makefile.unix**
     > 4. **sudo make install** Alternatively, don't run that command and just place the binary wherever you want.
 
     libdb4.8 should also work if libdb5.1 is too high a version for you. Newer versions of Linux will need libdb5.3++-dev
