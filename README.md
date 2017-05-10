@@ -30,7 +30,7 @@ If you do not use Linux see previous section for a prebuilt wallet. There are tw
 
     FOR THE GUI CLIENT:
 
-    > 1. **sudo apt-get install qt4-qmake libqt4-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential**
+    > 1. **sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential**
     > 2. From the main directory, run the following:
     > 3. **qmake && make**
 
