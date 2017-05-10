@@ -1,4 +1,4 @@
-curecoin-Qt: Qt4 GUI for curecoin
+curecoin-Qt: Qt5 GUI for curecoin
 ================================
 
 Build instructions
@@ -7,7 +7,7 @@ Build instructions
 ##Debian
 -------
 
-First, make sure that the required packages for Qt4 development of your
+First, make sure that the required packages for Qt5 development of your
 distribution are installed, for Debian and Ubuntu these are:
 
 This involves downloading the source, meeting the dependencies, compiling the code, and then installing the resulting software.
@@ -16,7 +16,7 @@ git clone https://github.com/cygnusxi/CurecoinSource.git
 
 ##FOR THE GUI CLIENT:
 
-sudo apt-get install qt4-qmake libqt4-dev libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
+sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
 
 From the main directory, run the following:
 
