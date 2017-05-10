@@ -4,6 +4,12 @@ VERSION = 1.0.0
 INCLUDEPATH += src src/json src/qt
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES
 CONFIG += no_include_pwd
+QT += core gui network
+
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets printsupport
+    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
+}
 
 #uncomment the following section to enable building on windows:
 #windows:LIBS += -lshlwapi
