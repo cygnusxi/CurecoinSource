@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>573</width>
-    <height>342</height>
+    <height>456</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -226,6 +226,9 @@
        <property name="pixmap">
         <pixmap resource="../curecoin.qrc">:/images/wallet_bgcoin</pixmap>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
      </item>
      <item>
@@ -319,7 +322,7 @@
      <item>
       <widget class="QLabel" name="label_curecoin_Intro">
        <property name="text">
-        <string></string>
+        <string/>
        </property>
       </widget>
      </item>

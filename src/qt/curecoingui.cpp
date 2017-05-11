@@ -70,7 +70,7 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     rpcConsole(0)
 {
     resize(850, 550);
-    setWindowTitle(tr("curecoin") + " - " + tr("Wallet"));
+    setWindowTitle(tr("Curecoin") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/curecoin"));
     setWindowIcon(QIcon(":icons/curecoin"));
