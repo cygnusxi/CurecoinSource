@@ -1,4 +1,4 @@
-curecoin-Qt: Qt5 GUI for curecoin
+curecoin-qt: Qt5 GUI for Curecoin
 ================================
 
 Build instructions
