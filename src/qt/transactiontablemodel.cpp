@@ -360,9 +360,9 @@ QString TransactionTableModel::formatTxType(const TransactionRecord *wtx) const
     case TransactionRecord::SendToSelf:
         return tr("Payment to yourself");
     case TransactionRecord::StakeMint:
-        return tr("POFMined");
+        return tr("POS mined");
     case TransactionRecord::Generated:
-        return tr("POWMined");
+        return tr("POW mined");
     default:
         return QString();
     }

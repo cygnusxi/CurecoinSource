@@ -79,10 +79,10 @@
        <item>
         <widget class="QCheckBox" name="curecoinAtStartup">
          <property name="toolTip">
-          <string>Automatically start curecoin after logging in to the system.</string>
+          <string>Automatically start Curecoin after logging in to the system.</string>
          </property>
          <property name="text">
-          <string>&amp;Start curecoin on system login</string>
+          <string>&amp;Start Curecoin on system login</string>
          </property>
         </widget>
        </item>
