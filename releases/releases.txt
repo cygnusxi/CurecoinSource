@@ -1,3 +1,0 @@
-Executable packages for Windows, Linux, and Mac.
-
-For the lastest releases see https://github.com/cygnusxi/CurecoinSource/releases
