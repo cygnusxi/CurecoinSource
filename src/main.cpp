@@ -10,6 +10,7 @@
 #include "init.h"
 #include "ui_interface.h"
 #include "kernel.h"
+#include "wallet.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -76,7 +77,8 @@ int64 nHPSTimerStart;
 
 // Settings
 int64 nTransactionFee = MIN_TX_FEE;
-
+int64 nReserveBalance = 0;
+int64 nMinimumInputValue = 0;
 
 
 
