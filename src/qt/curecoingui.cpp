@@ -645,7 +645,7 @@ if (nLastCoinStakeSearchInterval && nWeight)
     else if (IsInitialBlockDownload())
         labelStakingIcon->setToolTip(tr("Not staking because wallet is syncing"));
     else if (!nWeight)
-        labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins 1:%1 2: %2").arg(nLastCoinStakeSearchInterval).arg(nWeight));
+        labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins"));
     else
         labelStakingIcon->setToolTip(tr("Not staking")); }
 }
