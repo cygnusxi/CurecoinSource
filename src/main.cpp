@@ -1056,6 +1056,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     // nRewardCoinYear = 1 / (posdiff ^ 1/4)
 
     CBigNum bnLowerBound = 1 * CENT; // Lower interest bound is 1% per year
+    if (nBestHeight > HF_BLOCK) bnLowerBound = 4 * CENT;
     CBigNum bnUpperBound = bnRewardCoinYearLimit;
     while (bnLowerBound + CENT <= bnUpperBound)
     {
@@ -2209,7 +2210,7 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot) const
 
 bool CBlock::AcceptBlock()
 {
-    // STS check version
+    // check version
     if (nVersion > CURRENT_VERSION)
         return DoS(100, error("AcceptBlock() : reject unknown block version %d", nVersion));
     // Check for duplicate
