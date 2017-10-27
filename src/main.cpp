@@ -1056,7 +1056,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     // nRewardCoinYear = 1 / (posdiff ^ 1/4)
 
     CBigNum bnLowerBound = 1 * CENT; // Lower interest bound is 1% per year
-    if (nBestHeight > HF_BLOCK) bnLowerBound = 4 * CENT;
+    if (nBestHeight > (int)HF_BLOCK) bnLowerBound = 4 * CENT;
     CBigNum bnUpperBound = bnRewardCoinYearLimit;
     while (bnLowerBound + CENT <= bnUpperBound)
     {
@@ -2225,7 +2225,7 @@ bool CBlock::AcceptBlock()
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
 
-    if (IsProofOfWork() && nHeight > HF_BLOCK)
+    if (IsProofOfWork() && nHeight > (int)HF_BLOCK)
         return DoS(100, error("AcceptBloock() : rejected pow block at height %d", nHeight));
 
     // Check proof-of-work or proof-of-stake
