@@ -1080,7 +1080,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
 
 static const int64 nTargetTimespan = 4 * 60 * 60;  // 4-hour
 void loop() { if (nBestHeight > (int)HF_BLOCK) nStakeTargetSpacing = 4 * 60; /* 4 minute target enforced */ }
-static const int64 nTargetSpacingWorkMax = 12 * nStakeTargetSpacing; // 2-hour
+static const int64 nTargetSpacingWorkMax = 12 * nStakeTargetSpacing; // 2-hour // 48 min if 'if' above true
 
 //
 // minimum amount of work that could possibly be required nTime after
