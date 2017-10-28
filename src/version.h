@@ -44,9 +44,9 @@ static const int BIP0031_VERSION = 60000;
 // "mempool" command, enhanced "getdata" behavior starts with this version:
 static const int MEMPOOL_GD_VERSION = 60002;
 
-#define DISPLAY_VERSION_MAJOR       1
-#define DISPLAY_VERSION_MINOR       9
-#define DISPLAY_VERSION_REVISION    4
+#define DISPLAY_VERSION_MAJOR       2
+#define DISPLAY_VERSION_MINOR       0
+#define DISPLAY_VERSION_REVISION    0
 #define DISPLAY_VERSION_BUILD       1
 
 #endif
