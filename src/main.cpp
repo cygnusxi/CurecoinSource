@@ -2876,7 +2876,7 @@ bool LoadExternalBlockFile(FILE* fileIn)
 extern map<uint256, CAlert> mapAlerts;
 extern CCriticalSection cs_mapAlerts;
 
-static string strMintMessage = "Info: Staking suspended due to locked wallet. Click 'Settings' then 'Unlock Wallet' to stake.";
+static string strMintMessage = "Click 'Settings' then 'Unlock Wallet' to stake.";
 static string strMintWarning;
 
 string GetWarnings(string strFor)
@@ -4488,7 +4488,7 @@ void curecoinMiner(CWallet *pwallet, bool fProofOfStake)
 
         while (pwallet->IsLocked())
         {
-            strMintWarning = strMintMessage;
+            //strMintWarning = strMintMessage;
             Sleep(1000);
         }
         strMintWarning = "";
