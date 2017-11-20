@@ -36,7 +36,7 @@ static const int64 MAX_MINT_PROOF_OF_WORK = 13 * COIN;	//Lucky number 13 Coins p
 static const int64 MAX_MINT_PROOF_OF_STAKE = 0.01 * MAX_MINT_PROOF_OF_WORK;	//1% annual interest reward the folders and holders
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 static const unsigned int MAX_TX_COMMENT_LEN = 268; // curecoin: 256 bytes + 12 little extra
-static const unsigned int HF_BLOCK = 200000; // hardfork's block height
+static const unsigned int HF_BLOCK = 202000; // hardfork's block height
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
