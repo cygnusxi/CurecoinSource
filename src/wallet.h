@@ -272,6 +272,8 @@ public:
 
     DBErrors LoadWallet(bool& fFirstRunRet);
 
+    DBErrors ZapWalletTx();
+
     bool SetAddressBookName(const CTxDestination& address, const std::string& strName);
 
     bool DelAddressBookName(const CTxDestination& address);
