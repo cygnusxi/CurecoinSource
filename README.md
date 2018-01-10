@@ -16,7 +16,7 @@ Joining the Curecoin network is easy:
 
 1. To see all version for Windows, Mac, Linux wallet downloads visit [curecoin releases](https://github.com/cygnusxi/CurecoinSource/releases)
 2. [Windows Download](https://github.com/cygnusxi/CurecoinSource/releases/tag/v1.9.4.1)
-3. [Mac Download](https://github.com/cygnusxi/CurecoinSource/releases/tag/v1.9.2.1)
+3. [Mac Download](https://github.com/cygnusxi/CurecoinSource/releases/tag/v1.9.4.1)
 
 ### Installation for Linux from source
 
