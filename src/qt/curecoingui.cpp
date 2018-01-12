@@ -308,6 +308,9 @@ void curecoinGUI::createMenuBar()
 #else
     // Get the main window's menu bar on other platforms
     appMenuBar = menuBar();
+#if QT_VERSION < QT_VERSION_CHECK(5, 3, 0)
+    appMenuBar->setNativeMenuBar(false);
+#endif
 #endif
 
     // Configure the menus
