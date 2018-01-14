@@ -34,9 +34,9 @@ QString curecoinUnits::name(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("CUR");
-    case mBTC: return QString("mCUR");
-    case uBTC: return QString::fromUtf8("μCUR");
+    case BTC: return QString("CURE");
+    case mBTC: return QString("mCURE");
+    case uBTC: return QString::fromUtf8("μCURE");
     default: return QString("???");
     }
 }
