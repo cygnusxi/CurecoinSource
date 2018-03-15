@@ -2228,7 +2228,7 @@ bool CBlock::AcceptBlock()
     int nHeight = pindexPrev->nHeight+1;
 
     if (IsProofOfWork() && nHeight > (int)HF_BLOCK)
-        return DoS(100, error("AcceptBloock() : rejected pow block at height %d", nHeight));
+        return DoS(100, error("AcceptBlock() : rejected pow block at height %d", nHeight));
 
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextTargetRequired(pindexPrev, IsProofOfStake()))
