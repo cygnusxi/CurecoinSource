@@ -1066,7 +1066,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             bnLowerBound = bnMidValue;
     }
     nRewardCoinYear = bnUpperBound.getuint64();
-    if (nBestHeight > (int)HF_BLOCK) min(nRewardCoinYear, (int)4 * MAX_MINT_PROOF_OF_STAKE); // 4% hardfork
+    if (nBestHeight > (int)HF_BLOCK) min(nRewardCoinYear, (int)0.04 * MAX_MINT_PROOF_OF_STAKE); // 4% hardfork
     else nRewardCoinYear = min(nRewardCoinYear, MAX_MINT_PROOF_OF_STAKE);
 
 
