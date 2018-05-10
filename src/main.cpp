@@ -1038,7 +1038,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     // Stage 2 of emission process is PoS-based. It will be active on mainNet since 20 Jun 2013.
 
     CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
-    if (nBestHeight > (int)HF_BLOCK) bnRewardCoinYearLimit = (int)0.04 * MAX_MINT_PROOF_OF_STAKE; // 4% hardfork
+    if (nBestHeight > (int)HF_BLOCK) bnRewardCoinYearLimit = (int)4 * MAX_MINT_PROOF_OF_STAKE; // 4% hardfork
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
     CBigNum bnTargetLimit = bnProofOfStakeLimit;
@@ -1066,7 +1066,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             bnLowerBound = bnMidValue;
     }
     nRewardCoinYear = bnUpperBound.getuint64();
-    if (nBestHeight > (int)HF_BLOCK) min(nRewardCoinYear, (int)0.04 * MAX_MINT_PROOF_OF_STAKE); // 4% hardfork
+    if (nBestHeight > (int)HF_BLOCK) min(nRewardCoinYear, (int)4 * MAX_MINT_PROOF_OF_STAKE); // 4% hardfork
     else nRewardCoinYear = min(nRewardCoinYear, MAX_MINT_PROOF_OF_STAKE);
 
 
