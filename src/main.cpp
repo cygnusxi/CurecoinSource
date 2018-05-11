@@ -1022,16 +1022,9 @@ int64 GetProofOfWorkReward(int nHeight, int64 nFees, uint256 prevHash)
             else if (nHeight < 4835520){
                      nSubsidy = 0.000003 * COIN;
             }
-			else if (nHeight < 5045760){
-                      nSubsidy = 0.000001 * COIN;
-            }
-			else if (nHeight == 5045760){
-                      nSubsidy = 0.000001 * COIN;
-            }
-			else if (nHeight > 5045760){
+            else {
                     nSubsidy = 0.000001 * COIN;
             }
-            
 
             return nSubsidy + nFees;
 }
@@ -1045,6 +1038,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     // Stage 2 of emission process is PoS-based. It will be active on mainNet since 20 Jun 2013.
 
     CBigNum bnRewardCoinYearLimit = MAX_MINT_PROOF_OF_STAKE; // Base stake mint rate, 100% year interest
+    if (nBestHeight > (int)HF_BLOCK) bnRewardCoinYearLimit = (int)4 * MAX_MINT_PROOF_OF_STAKE; // 4% hardfork
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
     CBigNum bnTargetLimit = bnProofOfStakeLimit;
@@ -1059,6 +1053,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     // nRewardCoinYear = 1 / (posdiff ^ 1/4)
 
     CBigNum bnLowerBound = 1 * CENT; // Lower interest bound is 1% per year
+    if (nBestHeight > (int)HF_BLOCK) bnLowerBound = 4 * CENT;
     CBigNum bnUpperBound = bnRewardCoinYearLimit;
     while (bnLowerBound + CENT <= bnUpperBound)
     {
@@ -1071,7 +1066,8 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             bnLowerBound = bnMidValue;
     }
     nRewardCoinYear = bnUpperBound.getuint64();
-    nRewardCoinYear = min(nRewardCoinYear, MAX_MINT_PROOF_OF_STAKE);
+    if (nBestHeight > (int)HF_BLOCK) min(nRewardCoinYear, (int)4 * MAX_MINT_PROOF_OF_STAKE); // 4% hardfork
+    else nRewardCoinYear = min(nRewardCoinYear, MAX_MINT_PROOF_OF_STAKE);
 
 
     int64 nSubsidy = nRewardCoinYear * nCoinAge * 33 / (365 * 33 + 8) ;
@@ -1083,7 +1079,8 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
 }
 
 static const int64 nTargetTimespan = 4 * 60 * 60;  // 4-hour
-static const int64 nTargetSpacingWorkMax = 12 * nStakeTargetSpacing; // 2-hour
+void loop() { if (nBestHeight > (int)HF_BLOCK) nStakeTargetSpacing = 4 * 60; /* 4 minute target enforced */ }
+static const int64 nTargetSpacingWorkMax = 12 * nStakeTargetSpacing; // 2-hour // 48 min if 'if' above true
 
 //
 // minimum amount of work that could possibly be required nTime after
@@ -1171,6 +1168,7 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
+    if (pindexLast->nHeight > (int)HF_BLOCK) nStakeTargetSpacing = 4 * 60; // 4 minute target enforced
     int64 nTargetSpacing = fProofOfStake? nStakeTargetSpacing : min(nTargetSpacingWorkMax, (int64) nStakeTargetSpacing * (1 + pindexLast->nHeight - pindexPrev->nHeight));
     int64 nInterval = nTargetTimespan / nTargetSpacing;
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
@@ -2001,6 +1999,7 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const
         CBlock block;
         if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
             return false; // unable to read block of previous transaction
+        if ( nBestHeight > (int)HF_BLOCK ) nStakeMinAge = 60 * 60; // 1 hour hotwire * 24 * 4; // 4 day min stake age hardfork
         if (block.GetBlockTime() + nStakeMinAge > nTime)
             continue; // only count coins meeting min age requirement
 
@@ -2212,6 +2211,10 @@ bool CBlock::CheckBlock(bool fCheckPOW, bool fCheckMerkleRoot) const
 
 bool CBlock::AcceptBlock()
 {
+    // check version
+    if (nVersion > CURRENT_VERSION)
+        return DoS(100, error("AcceptBlock() : reject unknown block version %d", nVersion));
+
     // Check for duplicate
     uint256 hash = GetHash();
     if (mapBlockIndex.count(hash))
@@ -2223,6 +2226,9 @@ bool CBlock::AcceptBlock()
         return DoS(10, error("AcceptBlock() : prev block not found"));
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
+
+    if (IsProofOfWork() && nHeight > (int)HF_BLOCK)
+        return DoS(100, error("AcceptBlock() : rejected pow block at height %d", nHeight));
 
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextTargetRequired(pindexPrev, IsProofOfStake()))
@@ -2648,7 +2654,10 @@ bool LoadBlockIndex(bool fAllowNew)
         block.nTime    = nChainStartTime;;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
         block.nNonce   = 25338;
-
+        if (fTestNet)
+        {
+            block.nNonce = 12577;
+        }
         if (IsCalculatingGenesisBlockHash && (block.GetHash() != hashGenesisBlock)) {
 			block.nNonce = 0;
 
@@ -2870,7 +2879,7 @@ bool LoadExternalBlockFile(FILE* fileIn)
 extern map<uint256, CAlert> mapAlerts;
 extern CCriticalSection cs_mapAlerts;
 
-static string strMintMessage = "Info: Staking suspended due to locked wallet. Click 'Settings' then 'Unlock Wallet' to stake.";
+static string strMintMessage = "Click 'Settings' then 'Unlock Wallet' to stake.";
 static string strMintWarning;
 
 string GetWarnings(string strFor)
@@ -3346,6 +3355,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 printf("  getblocks stopping at %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString().substr(0,20).c_str());
                 // ppcoin: tell downloading node about the latest block if it's
                 // without risk being rejected due to stake connection check
+                if ( nBestHeight > (int)HF_BLOCK ) nStakeMinAge = 60 * 60 * 24 * 4; // 4 day min stake age hardfork
                 if (hashStop != hashBestChain && pindex->GetBlockTime() + nStakeMinAge > pindexBest->GetBlockTime())
                     pfrom->PushInventory(CInv(MSG_BLOCK, hashBestChain));
                 break;
@@ -4481,7 +4491,7 @@ void curecoinMiner(CWallet *pwallet, bool fProofOfStake)
 
         while (pwallet->IsLocked())
         {
-            strMintWarning = strMintMessage;
+            //strMintWarning = strMintMessage;
             Sleep(1000);
         }
         strMintWarning = "";

@@ -45,7 +45,8 @@
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>
-        <file alias="splash">res/images/splash2.jpg</file>
+        <file alias="splash">res/images/splash.jpg</file>
+        <file alias="splash_testnet">res/images/splash_testnet.jpg</file>
         <file alias="wallet_bgcoin">res/images/wallet_bgcoin.png</file>
     </qresource>
     <qresource prefix="/movies">
@@ -71,8 +72,8 @@
         <file alias="es_CL">locale/curecoin_es_CL.qm</file>
         <file alias="et">locale/curecoin_et.qm</file>
         <file alias="eu_ES">locale/curecoin_eu_ES.qm</file>
-        <file alias="da">locale/curecoin_fa.qm</file>
-        <file alias="da_IR">locale/curecoin_fa_IR.qm</file>
+        <file alias="fa">locale/curecoin_fa.qm</file>
+        <file alias="fa_IR">locale/curecoin_fa_IR.qm</file>
         <file alias="fi">locale/curecoin_fi.qm</file>
         <file alias="fr">locale/curecoin_fr.qm</file>
         <file alias="fr_CA">locale/curecoin_fr_CA.qm</file>

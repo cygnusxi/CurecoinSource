@@ -196,7 +196,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    QSplashScreen splash(QPixmap(":/images/splash"), 0);
+    QString splashPath;
+    if (GetBoolArg("-testnet")) splashPath=":/images/splash_testnet";
+    else splashPath=":/images/splash";
+    QSplashScreen splash(QPixmap(splashPath), 0);
     if (GetBoolArg("-splash", true) && !GetBoolArg("-min"))
     {
         splash.show();

@@ -45,9 +45,9 @@ QString curecoinUnits::description(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("curecoins");
-    case mBTC: return QString("Milli-curecoins (1 / 1,000)");
-    case uBTC: return QString("Micro-curecoins (1 / 1,000,000)");
+    case BTC: return QString("Curecoins");
+    case mBTC: return QString("Milli-Curecoins (1 / 1,000)");
+    case uBTC: return QString("Micro-Curecoins (1 / 1,000,000)");
     default: return QString("???");
     }
 }

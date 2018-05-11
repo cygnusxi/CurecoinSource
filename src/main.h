@@ -36,6 +36,7 @@ static const int64 MAX_MINT_PROOF_OF_WORK = 13 * COIN;	//Lucky number 13 Coins p
 static const int64 MAX_MINT_PROOF_OF_STAKE = 0.01 * MAX_MINT_PROOF_OF_WORK;	//1% annual interest reward the folders and holders
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 static const unsigned int MAX_TX_COMMENT_LEN = 268; // curecoin: 256 bytes + 12 little extra
+static const unsigned int HF_BLOCK = 12961; // testing hotwire 220000; // hardfork's block height
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
@@ -48,7 +49,7 @@ static const int fHaveUPnP = false;
 #endif
 
 static const uint256 hashGenesisBlockOfficial("0x00000ce427729d5393dbf9f464e7a1d2c039e393e881f93448516b1530b688fc");
-static const uint256 hashGenesisBlockTestNet("0x");
+static const uint256 hashGenesisBlockTestNet("0x0000a25934ca63ddc77adf8fe033cfb5f847e5687943ad717bb95ff041a74eb7");
 
 static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
 
