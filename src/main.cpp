@@ -1999,7 +1999,7 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const
         CBlock block;
         if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
             return false; // unable to read block of previous transaction
-        if ( nBestHeight > (int)HF_BLOCK ) nStakeMinAge = 60 * 60; // 1 hour hotwire * 24 * 4; // 4 day min stake age hardfork
+        if ( nBestHeight > (int)HF_BLOCK ) nStakeMinAge = 60 * 60 * 24 * 4; // 4 day min stake age hardfork
         if (block.GetBlockTime() + nStakeMinAge > nTime)
             continue; // only count coins meeting min age requirement
 
