@@ -18,6 +18,11 @@ git clone https://github.com/cygnusxi/CurecoinSource.git
 
 sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
 
+For Debian 9 add:
+sudo apt-get install libssl1.0-dev libssl1.0.2 -y
+sudo rm /usr/lib/x86_64-linux-gnu/libGL.so
+sudo ln -s /usr/lib/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.so
+
 From the main directory, run the following:
 
 qmake && make
