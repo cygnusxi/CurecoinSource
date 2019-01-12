@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2013  The curecoin developer
+// Copyright (c) 2013-2019 The Curecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef curecoin_NET_H
@@ -314,7 +314,7 @@ public:
         }
     }
 
-    void AskFor(const CInv& inv)
+    void AskFor(const CInv& inv, bool fImmediateRetry = false)
     {
         // We're using mapAskFor as a priority queue,
         // the key is the earliest time the request can be sent
@@ -330,7 +330,10 @@ public:
         nLastTime = nNow;
 
         // Each retry is 2 minutes after the last
-        nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
+        if (fImmediateRetry)
+            nRequestTime = nNow;
+        else
+            nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
         mapAskFor.insert(std::make_pair(nRequestTime, inv));
     }
 

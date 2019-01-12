@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2013-2018  The Curecoin developers
+// Copyright (c) 2013-2019 The Curecoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -2333,6 +2333,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         if (!CheckProofOfStake(pblock->vtx[1], pblock->nBits, hashProofOfStake))
         {
             printf("WARNING: ProcessBlock(): check proof-of-stake failed for block %s\n", hash.ToString().c_str());
+
+            // peershares: ask for missing blocks
+            if (pfrom)
+                pfrom->PushGetBlocks(pindexBest, pblock->GetHash());
+
             return false; // do not error here as we expect this during initial block download
         }
         if (!mapProofOfStake.count(hash)) // add to mapProofOfStake
@@ -2723,6 +2728,12 @@ bool LoadBlockIndex(bool fAllowNew)
         }
         txdb.Close();
     }
+
+    if (!fTestNet){
+        //Update nStakeMinAge before CheckProofOfStake fails for 30 days min stake age reduced to 4 days after the hardfork
+        if ( nBestHeight > (int)HF_BLOCK ) nStakeMinAge = 60 * 60 * 24 * 4; // 4 day min stake age hardfork
+    }
+    //printf("nBestHeight: %u, nStakeMinAge: %u \n", nBestHeight, nStakeMinAge);
 
     return true;
 }
@@ -3243,7 +3254,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 printf("  got inventory: %s  %s\n", inv.ToString().c_str(), fAlreadyHave ? "have" : "new");
 
             if (!fAlreadyHave)
-                pfrom->AskFor(inv);
+                pfrom->AskFor(inv, IsInitialBlockDownload()); // peershares: immediate retry during initial download
             else if (inv.type == MSG_BLOCK && mapOrphanBlocks.count(inv.hash)) {
                 pfrom->PushGetBlocks(pindexBest, GetOrphanRoot(mapOrphanBlocks[inv.hash]));
             } else if (nInv == nLastBlock) {
@@ -3297,8 +3308,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                         // ppcoin: send latest proof-of-work block to allow the
                         // download node to accept as orphan (proof-of-stake
                         // block might be rejected by stake connection check)
+                        // peershares: send latest block
                         vector<CInv> vInv;
-                        vInv.push_back(CInv(MSG_BLOCK, GetLastBlockIndex(pindexBest, false)->GetBlockHash()));
+                        vInv.push_back(CInv(MSG_BLOCK, hashBestChain));
                         pfrom->PushMessage("inv", vInv);
                         pfrom->hashContinue = 0;
                     }
