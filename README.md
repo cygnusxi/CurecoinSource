@@ -35,7 +35,7 @@ If you do not use Linux, see previous section for a prebuilt wallet. There are t
     > 3. **qmake && make**
 
     ### FOR THE HEADLESS CURECOIND:
-    > 1. **sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential** &nbsp; &nbsp; &nbsp; &nbsp; {See: **NOTES** below}
+    > 1. **sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential** &nbsp; &nbsp; &nbsp; &nbsp;
     > 2. **cd src**
     > 3. **make -f makefile.unix**
     > 4. **sudo make install** &nbsp; &nbsp; {Alternatively, don't run that command, and just place the binary wherever you want}
