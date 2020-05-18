@@ -40,19 +40,10 @@ If you do not use Linux, see previous section for a prebuilt wallet. There are t
     > 3. **make -f makefile.unix**
     > 4. **sudo make install** &nbsp; &nbsp; {Alternatively, don't run that command, and just place the binary wherever you want}
 
-    ### NOTES:
-    - On new versions of Linux such as Ubuntu 18.04 or Debain 9, additionally install: "sudo apt-get install libssl1.0-dev"
-    - On older Linux versions, like Ubuntu 14.04, use: libdb4.8 or libdb5.1. Newer Ubuntu 16.04, use: libdb5.3++-dev.
-
 ### Linux Example: Typical CureCoin GUI Wallet Install Steps on Mint 19:
 ```
 sudo apt install git
 sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
-
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install libssl1.0-dev
-[Reboot]  -NOTE: 'libssl1.0-dev' needs to be installed *after* installing the other dependencies at the beginning. If the dependencies at the beginning fail, then make sure you have updates enabled and the PC is fully updated.
 
 mkdir curecoin
 cd curecoin
