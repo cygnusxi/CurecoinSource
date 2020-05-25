@@ -1,0 +1,21 @@
+# Build the docker image with "sudo docker build -t curecoinpi - < Dockerfile.RPi"
+# Run with "sudo docker run --rm --net=host --env="DISPLAY" -v $HOME/.curecoin:/root/.curecoin curecoinpi"
+
+FROM ubuntu:18.04
+
+MAINTAINER neogen556@yahoo.gr
+
+RUN apt update 
+RUN apt install -y git qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential 
+RUN apt install -y libssl1.0-dev
+
+RUN git clone https://github.com/cygnusxi/CurecoinSource.git 
+
+WORKDIR CurecoinSource
+
+RUN sed -e '/msse2/ s/^#*/#/' -i curecoin-qt.pro
+
+RUN qmake "USE_UPNP=-"
+RUN make
+
+ENTRYPOINT ["./curecoin-qt"]
