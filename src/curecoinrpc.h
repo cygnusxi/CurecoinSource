@@ -6,6 +6,10 @@
 #ifndef _curecoinRPC_H_
 #define _curecoinRPC_H_ 1
 
+#if BOOST_VERSION >= 106600
+#define BOOST_ASIO_ENABLE_OLD_SERVICES
+#endif
+
 #include <string>
 #include <list>
 #include <map>
