@@ -7,6 +7,11 @@
 #include "util.h"
 #include "sync.h"
 
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <vector>
+
 #ifndef WIN32
 #include <sys/fcntl.h>
 #endif
@@ -14,7 +19,6 @@
 #include "strlcpy.h"
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
 
-using namespace std;
 
 // Settings
 static proxyType proxyInfo[NET_MAX];
@@ -68,7 +72,7 @@ bool static LookupIntern(const char *pszName, std::vector<CNetAddr>& vIP, unsign
     }
 
     struct addrinfo aiHint;
-    memset(&aiHint, 0, sizeof(struct addrinfo));
+    std::memset(&aiHint, 0, sizeof(struct addrinfo));
 
     aiHint.ai_socktype = SOCK_STREAM;
     aiHint.ai_protocol = IPPROTO_TCP;
@@ -187,8 +191,8 @@ bool static Socks4(const CService &addrDest, SOCKET& hSocket)
         closesocket(hSocket);
         return error("Cannot get proxy destination address");
     }
-    memcpy(pszSocks4IP + 2, &addr.sin_port, 2);
-    memcpy(pszSocks4IP + 4, &addr.sin_addr, 4);
+    std::memcpy(pszSocks4IP + 2, &addr.sin_port, 2);
+    std::memcpy(pszSocks4IP + 4, &addr.sin_addr, 4);
     char* pszSocks4 = pszSocks4IP;
     int nSize = sizeof(pszSocks4IP);
 
@@ -215,7 +219,7 @@ bool static Socks4(const CService &addrDest, SOCKET& hSocket)
     return true;
 }
 
-bool static Socks5(string strDest, int port, SOCKET& hSocket)
+bool static Socks5(std::string strDest, int port, SOCKET& hSocket)
 {
     printf("SOCKS5 connecting %s\n", strDest.c_str());
     if (strDest.size() > 255)
@@ -244,7 +248,7 @@ bool static Socks5(string strDest, int port, SOCKET& hSocket)
         closesocket(hSocket);
         return error("Proxy failed to initialize");
     }
-    string strSocks5("\5\1");
+    std::string strSocks5("\5\1");
     strSocks5 += '\000'; strSocks5 += '\003';
     strSocks5 += static_cast<char>(std::min((int)strDest.size(), 255));
     strSocks5 += strDest;
@@ -513,9 +517,9 @@ bool ConnectSocket(const CService &addrDest, SOCKET& hSocketRet, int nTimeout)
 
 bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, int portDefault, int nTimeout)
 {
-    string strDest;
+    std::string strDest;
     int port = portDefault;
-    SplitHostPort(string(pszDest), port, strDest);
+    SplitHostPort(std::string(pszDest), port, strDest);
 
     SOCKET hSocket = INVALID_SOCKET;
 
@@ -548,12 +552,12 @@ bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest
 
 void CNetAddr::Init()
 {
-    memset(ip, 0, 16);
+    std::memset(ip, 0, 16);
 }
 
 void CNetAddr::SetIP(const CNetAddr& ipIn)
 {
-    memcpy(ip, ipIn.ip, sizeof(ip));
+    std::memcpy(ip, ipIn.ip, sizeof(ip));
 }
 
 static const unsigned char pchOnionCat[] = {0xFD,0x87,0xD8,0x7E,0xEB,0x43};
@@ -565,7 +569,7 @@ bool CNetAddr::SetSpecial(const std::string &strName)
         std::vector<unsigned char> vchAddr = DecodeBase32(strName.substr(0, strName.size() - 6).c_str());
         if (vchAddr.size() != 16-sizeof(pchOnionCat))
             return false;
-        memcpy(ip, pchOnionCat, sizeof(pchOnionCat));
+        std::memcpy(ip, pchOnionCat, sizeof(pchOnionCat));
         for (unsigned int i=0; i<16-sizeof(pchOnionCat); i++)
             ip[i + sizeof(pchOnionCat)] = vchAddr[i];
         return true;
@@ -574,7 +578,7 @@ bool CNetAddr::SetSpecial(const std::string &strName)
         std::vector<unsigned char> vchAddr = DecodeBase32(strName.substr(0, strName.size() - 11).c_str());
         if (vchAddr.size() != 16-sizeof(pchGarliCat))
             return false;
-        memcpy(ip, pchOnionCat, sizeof(pchGarliCat));
+        std::memcpy(ip, pchOnionCat, sizeof(pchGarliCat));
         for (unsigned int i=0; i<16-sizeof(pchGarliCat); i++)
             ip[i + sizeof(pchGarliCat)] = vchAddr[i];
         return true;
@@ -589,14 +593,14 @@ CNetAddr::CNetAddr()
 
 CNetAddr::CNetAddr(const struct in_addr& ipv4Addr)
 {
-    memcpy(ip,    pchIPv4, 12);
-    memcpy(ip+12, &ipv4Addr, 4);
+    std::memcpy(ip,    pchIPv4, 12);
+    std::memcpy(ip+12, &ipv4Addr, 4);
 }
 
 #ifdef USE_IPV6
 CNetAddr::CNetAddr(const struct in6_addr& ipv6Addr)
 {
-    memcpy(ip, &ipv6Addr, 16);
+    std::memcpy(ip, &ipv6Addr, 16);
 }
 #endif
 
@@ -623,7 +627,7 @@ unsigned int CNetAddr::GetByte(int n) const
 
 bool CNetAddr::IsIPv4() const
 {
-    return (memcmp(ip, pchIPv4, sizeof(pchIPv4)) == 0);
+    return (std::memcmp(ip, pchIPv4, sizeof(pchIPv4)) == 0);
 }
 
 bool CNetAddr::IsIPv6() const
@@ -657,7 +661,7 @@ bool CNetAddr::IsRFC3964() const
 bool CNetAddr::IsRFC6052() const
 {
     static const unsigned char pchRFC6052[] = {0,0x64,0xFF,0x9B,0,0,0,0,0,0,0,0};
-    return (memcmp(ip, pchRFC6052, sizeof(pchRFC6052)) == 0);
+    return (std::memcmp(ip, pchRFC6052, sizeof(pchRFC6052)) == 0);
 }
 
 bool CNetAddr::IsRFC4380() const
@@ -668,7 +672,7 @@ bool CNetAddr::IsRFC4380() const
 bool CNetAddr::IsRFC4862() const
 {
     static const unsigned char pchRFC4862[] = {0xFE,0x80,0,0,0,0,0,0};
-    return (memcmp(ip, pchRFC4862, sizeof(pchRFC4862)) == 0);
+    return (std::memcmp(ip, pchRFC4862, sizeof(pchRFC4862)) == 0);
 }
 
 bool CNetAddr::IsRFC4193() const
@@ -679,7 +683,7 @@ bool CNetAddr::IsRFC4193() const
 bool CNetAddr::IsRFC6145() const
 {
     static const unsigned char pchRFC6145[] = {0,0,0,0,0,0,0,0,0xFF,0xFF,0,0};
-    return (memcmp(ip, pchRFC6145, sizeof(pchRFC6145)) == 0);
+    return (std::memcmp(ip, pchRFC6145, sizeof(pchRFC6145)) == 0);
 }
 
 bool CNetAddr::IsRFC4843() const
@@ -689,12 +693,12 @@ bool CNetAddr::IsRFC4843() const
 
 bool CNetAddr::IsTor() const
 {
-    return (memcmp(ip, pchOnionCat, sizeof(pchOnionCat)) == 0);
+    return (std::memcmp(ip, pchOnionCat, sizeof(pchOnionCat)) == 0);
 }
 
 bool CNetAddr::IsI2P() const
 {
-    return (memcmp(ip, pchGarliCat, sizeof(pchGarliCat)) == 0);
+    return (std::memcmp(ip, pchGarliCat, sizeof(pchGarliCat)) == 0);
 }
 
 bool CNetAddr::IsLocal() const
@@ -705,7 +709,7 @@ bool CNetAddr::IsLocal() const
 
    // IPv6 loopback (::1/128)
    static const unsigned char pchLocal[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
-   if (memcmp(ip, pchLocal, 16) == 0)
+   if (std::memcmp(ip, pchLocal, 16) == 0)
        return true;
 
    return false;
@@ -725,12 +729,12 @@ bool CNetAddr::IsValid() const
     // header20 vectorlen3 addr26 addr26 addr26 header20 vectorlen3 addr26 addr26 addr26...
     // so if the first length field is garbled, it reads the second batch
     // of addr misaligned by 3 bytes.
-    if (memcmp(ip, pchIPv4+3, sizeof(pchIPv4)-3) == 0)
+    if (std::memcmp(ip, pchIPv4+3, sizeof(pchIPv4)-3) == 0)
         return false;
 
     // unspecified IPv6 address (::/128)
     unsigned char ipNone[16] = {};
-    if (memcmp(ip, ipNone, 16) == 0)
+    if (std::memcmp(ip, ipNone, 16) == 0)
         return false;
 
     // documentation IPv6 address
@@ -741,12 +745,12 @@ bool CNetAddr::IsValid() const
     {
         // INADDR_NONE
         uint32_t ipNone = INADDR_NONE;
-        if (memcmp(ip+12, &ipNone, 4) == 0)
+        if (std::memcmp(ip+12, &ipNone, 4) == 0)
             return false;
 
         // 0
         ipNone = 0;
-        if (memcmp(ip+12, &ipNone, 4) == 0)
+        if (std::memcmp(ip+12, &ipNone, 4) == 0)
             return false;
     }
 
@@ -810,31 +814,31 @@ std::string CNetAddr::ToString() const
 
 bool operator==(const CNetAddr& a, const CNetAddr& b)
 {
-    return (memcmp(a.ip, b.ip, 16) == 0);
+    return (std::memcmp(a.ip, b.ip, 16) == 0);
 }
 
 bool operator!=(const CNetAddr& a, const CNetAddr& b)
 {
-    return (memcmp(a.ip, b.ip, 16) != 0);
+    return (std::memcmp(a.ip, b.ip, 16) != 0);
 }
 
 bool operator<(const CNetAddr& a, const CNetAddr& b)
 {
-    return (memcmp(a.ip, b.ip, 16) < 0);
+    return (std::memcmp(a.ip, b.ip, 16) < 0);
 }
 
 bool CNetAddr::GetInAddr(struct in_addr* pipv4Addr) const
 {
     if (!IsIPv4())
         return false;
-    memcpy(pipv4Addr, ip+12, 4);
+    std::memcpy(pipv4Addr, ip+12, 4);
     return true;
 }
 
 #ifdef USE_IPV6
 bool CNetAddr::GetIn6Addr(struct in6_addr* pipv6Addr) const
 {
-    memcpy(pipv6Addr, ip, 16);
+    std::memcpy(pipv6Addr, ip, 16);
     return true;
 }
 #endif
@@ -918,7 +922,7 @@ uint64 CNetAddr::GetHash() const
 {
     uint256 hash = Hash(&ip[0], &ip[16]);
     uint64 nRet;
-    memcpy(&nRet, &hash, sizeof(nRet));
+    std::memcpy(&nRet, &hash, sizeof(nRet));
     return nRet;
 }
 
@@ -1116,7 +1120,7 @@ bool CService::GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const
             return false;
         *addrlen = sizeof(struct sockaddr_in);
         struct sockaddr_in *paddrin = (struct sockaddr_in*)paddr;
-        memset(paddrin, 0, *addrlen);
+        std::memset(paddrin, 0, *addrlen);
         if (!GetInAddr(&paddrin->sin_addr))
             return false;
         paddrin->sin_family = AF_INET;
@@ -1129,7 +1133,7 @@ bool CService::GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const
             return false;
         *addrlen = sizeof(struct sockaddr_in6);
         struct sockaddr_in6 *paddrin6 = (struct sockaddr_in6*)paddr;
-        memset(paddrin6, 0, *addrlen);
+        std::memset(paddrin6, 0, *addrlen);
         if (!GetIn6Addr(&paddrin6->sin6_addr))
             return false;
         paddrin6->sin6_family = AF_INET6;
@@ -1144,7 +1148,7 @@ std::vector<unsigned char> CService::GetKey() const
 {
      std::vector<unsigned char> vKey;
      vKey.resize(18);
-     memcpy(&vKey[0], ip, 16);
+     std::memcpy(&vKey[0], ip, 16);
      vKey[16] = port / 0x100;
      vKey[17] = port & 0x0FF;
      return vKey;

@@ -7,6 +7,9 @@
 #include "util.h"
 #include "netbase.h"
 
+#include <cstdio>
+#include <cstring>
+
 #ifndef WIN32
 # include <arpa/inet.h>
 #endif
@@ -20,8 +23,8 @@ static const char* ppszTypeName[] =
 
 CMessageHeader::CMessageHeader()
 {
-    memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
-    memset(pchCommand, 0, sizeof(pchCommand));
+    std::memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
+    std::memset(pchCommand, 0, sizeof(pchCommand));
     pchCommand[1] = 1;
     nMessageSize = -1;
     nChecksum = 0;
@@ -29,8 +32,8 @@ CMessageHeader::CMessageHeader()
 
 CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn)
 {
-    memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
-    strncpy(pchCommand, pszCommand, COMMAND_SIZE);
+    std::memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
+    std::strncpy(pchCommand, pszCommand, COMMAND_SIZE);
     nMessageSize = nMessageSizeIn;
     nChecksum = 0;
 }
@@ -46,7 +49,7 @@ std::string CMessageHeader::GetCommand() const
 bool CMessageHeader::IsValid() const
 {
     // Check start string
-    if (memcmp(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart)) != 0)
+    if (std::memcmp(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart)) != 0)
         return false;
 
     // Check the command string for errors

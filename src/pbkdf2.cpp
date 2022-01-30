@@ -1,6 +1,6 @@
 // Copyright (c) 2013 curecoin Developers
 
-#include <string.h>
+#include <cstring>
 #include "pbkdf2.h"
 
 static inline uint32_t be32dec(const void *pp)
@@ -38,20 +38,20 @@ void HMAC_SHA256_Init(HMAC_SHA256_CTX * ctx, const void * _K, size_t Klen)
 
     /* Inner SHA256 operation is SHA256(K xor [block of 0x36] || data). */
     SHA256_Init(&ctx->ictx);
-    memset(pad, 0x36, 64);
+    std::memset(pad, 0x36, 64);
     for (i = 0; i < Klen; i++)
         pad[i] ^= K[i];
     SHA256_Update(&ctx->ictx, pad, 64);
 
     /* Outer SHA256 operation is SHA256(K xor [block of 0x5c] || hash). */
     SHA256_Init(&ctx->octx);
-    memset(pad, 0x5c, 64);
+    std::memset(pad, 0x5c, 64);
     for (i = 0; i < Klen; i++)
         pad[i] ^= K[i];
     SHA256_Update(&ctx->octx, pad, 64);
 
     /* Clean the stack. */
-    memset(khash, 0, 32);
+    std::memset(khash, 0, 32);
 }
 
 /* Add bytes to the HMAC-SHA256 operation. */
@@ -76,7 +76,7 @@ void HMAC_SHA256_Final(unsigned char digest[32], HMAC_SHA256_CTX * ctx)
     SHA256_Final(digest, &ctx->octx);
 
     /* Clean the stack. */
-    memset(ihash, 0, 32);
+    std::memset(ihash, 0, 32);
 }
 
 /**
@@ -131,5 +131,5 @@ void PBKDF2_SHA256(const uint8_t * passwd, size_t passwdlen, const uint8_t * sal
     }
 
     /* Clean PShctx, since we never called _Final on it. */
-    memset(&PShctx, 0, sizeof(HMAC_SHA256_CTX));
+    std::memset(&PShctx, 0, sizeof(HMAC_SHA256_CTX));
 }
