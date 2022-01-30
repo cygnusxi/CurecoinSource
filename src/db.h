@@ -7,6 +7,8 @@
 
 #include "main.h"
 
+#include <cstdlib>
+#include <cstring>
 #include <map>
 #include <string>
 #include <vector>
@@ -127,7 +129,7 @@ protected:
         Dbt datValue;
         datValue.set_flags(DB_DBT_MALLOC);
         int ret = pdb->get(activeTxn, &datKey, &datValue, 0);
-        memset(datKey.get_data(), 0, datKey.get_size());
+        std::memset(datKey.get_data(), 0, datKey.get_size());
         if (datValue.get_data() == NULL)
             return false;
 
@@ -141,8 +143,8 @@ protected:
         }
 
         // Clear and free memory
-        memset(datValue.get_data(), 0, datValue.get_size());
-        free(datValue.get_data());
+        std::memset(datValue.get_data(), 0, datValue.get_size());
+        std::free(datValue.get_data());
         return (ret == 0);
     }
 
@@ -170,8 +172,8 @@ protected:
         int ret = pdb->put(activeTxn, &datKey, &datValue, (fOverwrite ? 0 : DB_NOOVERWRITE));
 
         // Clear memory in case it was a private key
-        memset(datKey.get_data(), 0, datKey.get_size());
-        memset(datValue.get_data(), 0, datValue.get_size());
+        std::memset(datKey.get_data(), 0, datKey.get_size());
+        std::memset(datValue.get_data(), 0, datValue.get_size());
         return (ret == 0);
     }
 
@@ -193,7 +195,7 @@ protected:
         int ret = pdb->del(activeTxn, &datKey, 0);
 
         // Clear memory
-        memset(datKey.get_data(), 0, datKey.get_size());
+        std::memset(datKey.get_data(), 0, datKey.get_size());
         return (ret == 0 || ret == DB_NOTFOUND);
     }
 
@@ -213,7 +215,7 @@ protected:
         int ret = pdb->exists(activeTxn, &datKey, 0);
 
         // Clear memory
-        memset(datKey.get_data(), 0, datKey.get_size());
+        std::memset(datKey.get_data(), 0, datKey.get_size());
         return (ret == 0);
     }
 
@@ -260,10 +262,10 @@ protected:
         ssValue.write((char*)datValue.get_data(), datValue.get_size());
 
         // Clear and free memory
-        memset(datKey.get_data(), 0, datKey.get_size());
-        memset(datValue.get_data(), 0, datValue.get_size());
-        free(datKey.get_data());
-        free(datValue.get_data());
+        std::memset(datKey.get_data(), 0, datKey.get_size());
+        std::memset(datValue.get_data(), 0, datValue.get_size());
+        std::free(datKey.get_data());
+        std::free(datValue.get_data());
         return 0;
     }
 

@@ -818,7 +818,7 @@ public:
         {
             // special case for inserting at the front when there's room
             nReadPos -= (last - first);
-            memcpy(&vch[nReadPos], &first[0], last - first);
+            std::memcpy(&vch[nReadPos], &first[0], last - first);
         }
         else
             vch.insert(it, first, last);
@@ -831,7 +831,7 @@ public:
         {
             // special case for inserting at the front when there's room
             nReadPos -= (last - first);
-            memcpy(&vch[nReadPos], &first[0], last - first);
+            std::memcpy(&vch[nReadPos], &first[0], last - first);
         }
         else
             vch.insert(it, first, last);
@@ -845,7 +845,7 @@ public:
         {
             // special case for inserting at the front when there's room
             nReadPos -= (last - first);
-            memcpy(&vch[nReadPos], &first[0], last - first);
+            std::memcpy(&vch[nReadPos], &first[0], last - first);
         }
         else
             vch.insert(it, first, last);
@@ -941,15 +941,15 @@ public:
             if (nReadPosNext > vch.size())
             {
                 setstate(std::ios::failbit, "CDataStream::read() : end of data");
-                memset(pch, 0, nSize);
+                std::memset(pch, 0, nSize);
                 nSize = vch.size() - nReadPos;
             }
-            memcpy(pch, &vch[nReadPos], nSize);
+            std::memcpy(pch, &vch[nReadPos], nSize);
             nReadPos = 0;
             vch.clear();
             return (*this);
         }
-        memcpy(pch, &vch[nReadPos], nSize);
+        std::memcpy(pch, &vch[nReadPos], nSize);
         nReadPos = nReadPosNext;
         return (*this);
     }

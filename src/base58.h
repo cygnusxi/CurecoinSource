@@ -15,6 +15,7 @@
 #ifndef curecoin_BASE58_H
 #define curecoin_BASE58_H
 
+#include <cstring>
 #include <string>
 #include <vector>
 #include "bignum.h"
@@ -150,7 +151,7 @@ inline bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRe
         return false;
     }
     uint256 hash = Hash(vchRet.begin(), vchRet.end()-4);
-    if (memcmp(&hash, &vchRet.end()[-4], 4) != 0)
+    if (std::memcmp(&hash, &vchRet.end()[-4], 4) != 0)
     {
         vchRet.clear();
         return false;
@@ -190,7 +191,7 @@ protected:
     {
         // zero the memory, as it may contain sensitive data
         if (!vchData.empty())
-            memset(&vchData[0], 0, vchData.size());
+            std::memset(&vchData[0], 0, vchData.size());
     }
 
     void SetData(int nVersionIn, const void* pdata, size_t nSize)
@@ -198,7 +199,7 @@ protected:
         nVersion = nVersionIn;
         vchData.resize(nSize);
         if (!vchData.empty())
-            memcpy(&vchData[0], pdata, nSize);
+            std::memcpy(&vchData[0], pdata, nSize);
     }
 
     void SetData(int nVersionIn, const unsigned char *pbegin, const unsigned char *pend)
@@ -220,8 +221,8 @@ public:
         nVersion = vchTemp[0];
         vchData.resize(vchTemp.size() - 1);
         if (!vchData.empty())
-            memcpy(&vchData[0], &vchTemp[1], vchData.size());
-        memset(&vchTemp[0], 0, vchTemp.size());
+            std::memcpy(&vchData[0], &vchTemp[1], vchData.size());
+        std::memset(&vchTemp[0], 0, vchTemp.size());
         return true;
     }
 
@@ -353,13 +354,13 @@ public:
         case PUBKEY_ADDRESS:
         case PUBKEY_ADDRESS_TEST: {
             uint160 id;
-            memcpy(&id, &vchData[0], 20);
+            std::memcpy(&id, &vchData[0], 20);
             return CKeyID(id);
         }
         case SCRIPT_ADDRESS:
         case SCRIPT_ADDRESS_TEST: {
             uint160 id;
-            memcpy(&id, &vchData[0], 20);
+            std::memcpy(&id, &vchData[0], 20);
             return CScriptID(id);
         }
         }
@@ -373,7 +374,7 @@ public:
         case PUBKEY_ADDRESS:
         case PUBKEY_ADDRESS_TEST: {
             uint160 id;
-            memcpy(&id, &vchData[0], 20);
+            std::memcpy(&id, &vchData[0], 20);
             keyID = CKeyID(id);
             return true;
         }
@@ -414,7 +415,7 @@ public:
     {
         CSecret vchSecret;
         vchSecret.resize(32);
-        memcpy(&vchSecret[0], &vchData[0], 32);
+        std::memcpy(&vchSecret[0], &vchData[0], 32);
         fCompressedOut = vchData.size() == 33;
         return vchSecret;
     }

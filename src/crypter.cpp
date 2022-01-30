@@ -5,6 +5,7 @@
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <vector>
+#include <cstring>
 #include <string>
 #ifdef WIN32
 #include <windows.h>
@@ -24,8 +25,8 @@ bool CCrypter::SetKeyFromPassphrase(const SecureString& strKeyData, const std::v
 
     if (i != (int)WALLET_CRYPTO_KEY_SIZE)
     {
-        memset(&chKey, 0, sizeof chKey);
-        memset(&chIV, 0, sizeof chIV);
+        std::memset(&chKey, 0, sizeof chKey);
+        std::memset(&chIV, 0, sizeof chIV);
         return false;
     }
 
@@ -38,8 +39,8 @@ bool CCrypter::SetKey(const CKeyingMaterial& chNewKey, const std::vector<unsigne
     if (chNewKey.size() != WALLET_CRYPTO_KEY_SIZE || chNewIV.size() != WALLET_CRYPTO_KEY_SIZE)
         return false;
 
-    memcpy(&chKey[0], &chNewKey[0], sizeof chKey);
-    memcpy(&chIV[0], &chNewIV[0], sizeof chIV);
+    std::memcpy(&chKey[0], &chNewKey[0], sizeof chKey);
+    std::memcpy(&chIV[0], &chNewIV[0], sizeof chIV);
 
     fKeySet = true;
     return true;
@@ -104,7 +105,7 @@ bool EncryptSecret(CKeyingMaterial& vMasterKey, const CSecret &vchPlaintext, con
 {
     CCrypter cKeyCrypter;
     std::vector<unsigned char> chIV(WALLET_CRYPTO_KEY_SIZE);
-    memcpy(&chIV[0], &nIV, WALLET_CRYPTO_KEY_SIZE);
+    std::memcpy(&chIV[0], &nIV, WALLET_CRYPTO_KEY_SIZE);
     if(!cKeyCrypter.SetKey(vMasterKey, chIV))
         return false;
     return cKeyCrypter.Encrypt((CKeyingMaterial)vchPlaintext, vchCiphertext);
@@ -114,7 +115,7 @@ bool DecryptSecret(const CKeyingMaterial& vMasterKey, const std::vector<unsigned
 {
     CCrypter cKeyCrypter;
     std::vector<unsigned char> chIV(WALLET_CRYPTO_KEY_SIZE);
-    memcpy(&chIV[0], &nIV, WALLET_CRYPTO_KEY_SIZE);
+    std::memcpy(&chIV[0], &nIV, WALLET_CRYPTO_KEY_SIZE);
     if(!cKeyCrypter.SetKey(vMasterKey, chIV))
         return false;
     return cKeyCrypter.Decrypt(vchCiphertext, *((CKeyingMaterial*)&vchPlaintext));

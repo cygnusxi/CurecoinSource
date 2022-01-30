@@ -13,13 +13,16 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
+#include <map>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
+
 #ifndef WIN32
 #include "sys/stat.h"
 #endif
-
-using namespace std;
-using namespace boost;
-
 
 unsigned int nWalletDBUpdated;
 
@@ -112,10 +115,10 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
 void CDBEnv::MakeMock()
 {
     if (fDbEnvInit)
-        throw runtime_error("CDBEnv::MakeMock(): already initialized");
+        throw std::runtime_error("CDBEnv::MakeMock(): already initialized");
 
     if (fShutdown)
-        throw runtime_error("CDBEnv::MakeMock(): during shutdown");
+        throw std::runtime_error("CDBEnv::MakeMock(): during shutdown");
 
     printf("CDBEnv::MakeMock()\n");
 
@@ -136,7 +139,7 @@ void CDBEnv::MakeMock()
                      DB_PRIVATE,
                      S_IRUSR | S_IWUSR);
     if (ret > 0)
-        throw runtime_error(strprintf("CDBEnv::MakeMock(): error %d opening database environment", ret));
+        throw std::runtime_error(strprintf("CDBEnv::MakeMock(): error %d opening database environment", ret));
 
     fDbEnvInit = true;
     fMockDb = true;
@@ -168,7 +171,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
     u_int32_t flags = DB_SALVAGE;
     if (fAggressive) flags |= DB_AGGRESSIVE;
 
-    stringstream strDump;
+    std::stringstream strDump;
 
     Db db(&dbenv, 0);
     int result = db.verify(strFile.c_str(), NULL, &strDump, flags);
@@ -186,7 +189,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
     // ... repeated
     // DATA=END
 
-    string strLine;
+    std::string strLine;
     while (!strDump.eof() && strLine != "HEADER=END")
         getline(strDump, strLine); // Skip past header
 
@@ -197,7 +200,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
         if (keyHex != "DATA_END")
         {
             getline(strDump, valueHex);
-            vResult.push_back(make_pair(ParseHex(keyHex),ParseHex(valueHex)));
+            vResult.push_back(std::make_pair(ParseHex(keyHex),ParseHex(valueHex)));
         }
     }
 
@@ -230,7 +233,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
     {
         LOCK(bitdb.cs_db);
         if (!bitdb.Open(GetDataDir()))
-            throw runtime_error("env open failed");
+            throw std::runtime_error("env open failed");
 
         strFile = pszFile;
         ++bitdb.mapFileUseCount[strFile];
@@ -245,7 +248,7 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
                 DbMpoolFile*mpf = pdb->get_mpf();
                 ret = mpf->set_flags(DB_MPOOL_NOFILE, 1);
                 if (ret != 0)
-                    throw runtime_error(strprintf("CDB() : failed to configure for no temp file backing for database %s", pszFile));
+                    throw std::runtime_error(strprintf("CDB() : failed to configure for no temp file backing for database %s", pszFile));
             }
 
             ret = pdb->open(NULL,      // Txn pointer
@@ -261,10 +264,10 @@ CDB::CDB(const char *pszFile, const char* pszMode) :
                 pdb = NULL;
                 --bitdb.mapFileUseCount[strFile];
                 strFile = "";
-                throw runtime_error(strprintf("CDB() : can't open database file %s, error %d", pszFile, ret));
+                throw std::runtime_error(strprintf("CDB() : can't open database file %s, error %d", pszFile, ret));
             }
 
-            if (fCreate && !Exists(string("version")))
+            if (fCreate && !Exists(std::string("version")))
             {
                 bool fTmp = fReadOnly;
                 fReadOnly = false;
@@ -311,7 +314,7 @@ void CDB::Close()
     }
 }
 
-void CDBEnv::CloseDb(const string& strFile)
+void CDBEnv::CloseDb(const std::string& strFile)
 {
     {
         LOCK(cs_db);
@@ -326,7 +329,7 @@ void CDBEnv::CloseDb(const string& strFile)
     }
 }
 
-bool CDBEnv::RemoveDb(const string& strFile)
+bool CDBEnv::RemoveDb(const std::string& strFile)
 {
     this->CloseDb(strFile);
 
@@ -335,7 +338,7 @@ bool CDBEnv::RemoveDb(const string& strFile)
     return (rc == 0);
 }
 
-bool CDB::Rewrite(const string& strFile, const char* pszSkip)
+bool CDB::Rewrite(const std::string& strFile, const char* pszSkip)
 {
     while (!fShutdown)
     {
@@ -350,7 +353,7 @@ bool CDB::Rewrite(const string& strFile, const char* pszSkip)
 
                 bool fSuccess = true;
                 printf("Rewriting %s...\n", strFile.c_str());
-                string strFileRes = strFile + ".rewrite";
+                std::string strFileRes = strFile + ".rewrite";
                 { // surround usage of db with extra {}
                     CDB db(strFile.c_str(), "r");
                     Db* pdbCopy = new Db(&bitdb.dbenv, 0);
@@ -439,10 +442,10 @@ void CDBEnv::Flush(bool fShutdown)
         return;
     {
         LOCK(cs_db);
-        map<string, int>::iterator mi = mapFileUseCount.begin();
+        std::map<std::string, int>::iterator mi = mapFileUseCount.begin();
         while (mi != mapFileUseCount.end())
         {
-            string strFile = (*mi).first;
+            std::string strFile = (*mi).first;
             int nRefCount = (*mi).second;
             printf("%s refcount=%d\n", strFile.c_str(), nRefCount);
             if (nRefCount == 0)
@@ -462,7 +465,7 @@ void CDBEnv::Flush(bool fShutdown)
             else
                 mi++;
         }
-        printf("DBFlush(%s)%s ended %15"PRI64d"ms\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " db not started", GetTimeMillis() - nStart);
+        printf("DBFlush(%s)%s ended %15" PRI64d "ms\n", fShutdown ? "true" : "false", fDbEnvInit ? "" : " db not started", GetTimeMillis() - nStart);
         if (fShutdown)
         {
             char** listp;
@@ -488,13 +491,13 @@ bool CTxDB::ReadTxIndex(uint256 hash, CTxIndex& txindex)
 {
     assert(!fClient);
     txindex.SetNull();
-    return Read(make_pair(string("tx"), hash), txindex);
+    return Read(std::make_pair(std::string("tx"), hash), txindex);
 }
 
 bool CTxDB::UpdateTxIndex(uint256 hash, const CTxIndex& txindex)
 {
     assert(!fClient);
-    return Write(make_pair(string("tx"), hash), txindex);
+    return Write(std::make_pair(std::string("tx"), hash), txindex);
 }
 
 bool CTxDB::AddTxIndex(const CTransaction& tx, const CDiskTxPos& pos, int nHeight)
@@ -504,7 +507,7 @@ bool CTxDB::AddTxIndex(const CTransaction& tx, const CDiskTxPos& pos, int nHeigh
     // Add to tx index
     uint256 hash = tx.GetHash();
     CTxIndex txindex(pos, tx.vout.size());
-    return Write(make_pair(string("tx"), hash), txindex);
+    return Write(std::make_pair(std::string("tx"), hash), txindex);
 }
 
 bool CTxDB::EraseTxIndex(const CTransaction& tx)
@@ -512,13 +515,13 @@ bool CTxDB::EraseTxIndex(const CTransaction& tx)
     assert(!fClient);
     uint256 hash = tx.GetHash();
 
-    return Erase(make_pair(string("tx"), hash));
+    return Erase(std::make_pair(std::string("tx"), hash));
 }
 
 bool CTxDB::ContainsTx(uint256 hash)
 {
     assert(!fClient);
-    return Exists(make_pair(string("tx"), hash));
+    return Exists(std::make_pair(std::string("tx"), hash));
 }
 
 bool CTxDB::ReadDiskTx(uint256 hash, CTransaction& tx, CTxIndex& txindex)
@@ -549,47 +552,47 @@ bool CTxDB::ReadDiskTx(COutPoint outpoint, CTransaction& tx)
 
 bool CTxDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
-    return Write(make_pair(string("blockindex"), blockindex.GetBlockHash()), blockindex);
+    return Write(std::make_pair(std::string("blockindex"), blockindex.GetBlockHash()), blockindex);
 }
 
 bool CTxDB::ReadHashBestChain(uint256& hashBestChain)
 {
-    return Read(string("hashBestChain"), hashBestChain);
+    return Read(std::string("hashBestChain"), hashBestChain);
 }
 
 bool CTxDB::WriteHashBestChain(uint256 hashBestChain)
 {
-    return Write(string("hashBestChain"), hashBestChain);
+    return Write(std::string("hashBestChain"), hashBestChain);
 }
 
 bool CTxDB::ReadBestInvalidTrust(CBigNum& bnBestInvalidTrust)
 {
-    return Read(string("bnBestInvalidTrust"), bnBestInvalidTrust);
+    return Read(std::string("bnBestInvalidTrust"), bnBestInvalidTrust);
 }
 
 bool CTxDB::WriteBestInvalidTrust(CBigNum bnBestInvalidTrust)
 {
-    return Write(string("bnBestInvalidTrust"), bnBestInvalidTrust);
+    return Write(std::string("bnBestInvalidTrust"), bnBestInvalidTrust);
 }
 
 bool CTxDB::ReadSyncCheckpoint(uint256& hashCheckpoint)
 {
-    return Read(string("hashSyncCheckpoint"), hashCheckpoint);
+    return Read(std::string("hashSyncCheckpoint"), hashCheckpoint);
 }
 
 bool CTxDB::WriteSyncCheckpoint(uint256 hashCheckpoint)
 {
-    return Write(string("hashSyncCheckpoint"), hashCheckpoint);
+    return Write(std::string("hashSyncCheckpoint"), hashCheckpoint);
 }
 
-bool CTxDB::ReadCheckpointPubKey(string& strPubKey)
+bool CTxDB::ReadCheckpointPubKey(std::string& strPubKey)
 {
-    return Read(string("strCheckpointPubKey"), strPubKey);
+    return Read(std::string("strCheckpointPubKey"), strPubKey);
 }
 
-bool CTxDB::WriteCheckpointPubKey(const string& strPubKey)
+bool CTxDB::WriteCheckpointPubKey(const std::string& strPubKey)
 {
-    return Write(string("strCheckpointPubKey"), strPubKey);
+    return Write(std::string("strCheckpointPubKey"), strPubKey);
 }
 
 CBlockIndex static * InsertBlockIndex(uint256 hash)
@@ -598,15 +601,15 @@ CBlockIndex static * InsertBlockIndex(uint256 hash)
         return NULL;
 
     // Return existing
-    map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
+    std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(hash);
     if (mi != mapBlockIndex.end())
         return (*mi).second;
 
     // Create new
     CBlockIndex* pindexNew = new CBlockIndex();
     if (!pindexNew)
-        throw runtime_error("LoadBlockIndex() : new CBlockIndex failed");
-    mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
+        throw std::runtime_error("LoadBlockIndex() : new CBlockIndex failed");
+    mi = mapBlockIndex.insert(std::make_pair(hash, pindexNew)).first;
     pindexNew->phashBlock = &((*mi).first);
 
     return pindexNew;
@@ -621,12 +624,12 @@ bool CTxDB::LoadBlockIndex()
         return true;
 
     // Calculate bnChainTrust
-    vector<pair<int, CBlockIndex*> > vSortedByHeight;
+    std::vector<std::pair<int, CBlockIndex*> > vSortedByHeight;
     vSortedByHeight.reserve(mapBlockIndex.size());
     BOOST_FOREACH(const PAIRTYPE(uint256, CBlockIndex*)& item, mapBlockIndex)
     {
         CBlockIndex* pindex = item.second;
-        vSortedByHeight.push_back(make_pair(pindex->nHeight, pindex));
+        vSortedByHeight.push_back(std::make_pair(pindex->nHeight, pindex));
     }
     sort(vSortedByHeight.begin(), vSortedByHeight.end());
     BOOST_FOREACH(const PAIRTYPE(int, CBlockIndex*)& item, vSortedByHeight)
@@ -636,7 +639,7 @@ bool CTxDB::LoadBlockIndex()
         // ppcoin: calculate stake modifier checksum
         pindex->nStakeModifierChecksum = GetStakeModifierChecksum(pindex);
         if (!CheckStakeModifierCheckpoints(pindex->nHeight, pindex->nStakeModifierChecksum))
-            return error("CTxDB::LoadBlockIndex() : Failed stake modifier checkpoint height=%d, modifier=0x%016"PRI64x, pindex->nHeight, pindex->nStakeModifier);
+            return error("CTxDB::LoadBlockIndex() : Failed stake modifier checkpoint height=%d, modifier=0x%016" PRI64x, pindex->nHeight, pindex->nStakeModifier);
     }
 
     // Load hashBestChain pointer to end of best chain
@@ -672,7 +675,7 @@ bool CTxDB::LoadBlockIndex()
         nCheckDepth = nBestHeight;
     printf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
     CBlockIndex* pindexFork = NULL;
-    map<pair<unsigned int, unsigned int>, CBlockIndex*> mapBlockPos;
+    std::map<std::pair<unsigned int, unsigned int>, CBlockIndex*> mapBlockPos;
     for (CBlockIndex* pindex = pindexBest; pindex && pindex->pprev; pindex = pindex->pprev)
     {
         if (fRequestShutdown || pindex->nHeight < nBestHeight-nCheckDepth)
@@ -689,7 +692,7 @@ bool CTxDB::LoadBlockIndex()
         // check level 2: verify transaction index validity
         if (nCheckLevel>1)
         {
-            pair<unsigned int, unsigned int> pos = make_pair(pindex->nFile, pindex->nBlockPos);
+            std::pair<unsigned int, unsigned int> pos = std::make_pair(pindex->nFile, pindex->nBlockPos);
             mapBlockPos[pos] = pindex;
             BOOST_FOREACH(const CTransaction &tx, block.vtx)
             {
@@ -722,7 +725,7 @@ bool CTxDB::LoadBlockIndex()
                         {
                             if (!txpos.IsNull())
                             {
-                                pair<unsigned int, unsigned int> posFind = make_pair(txpos.nFile, txpos.nBlockPos);
+                                std::pair<unsigned int, unsigned int> posFind = std::make_pair(txpos.nFile, txpos.nBlockPos);
                                 if (!mapBlockPos.count(posFind))
                                 {
                                     printf("LoadBlockIndex(): *** found bad spend at %d, hashBlock=%s, hashTx=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString().c_str(), hashTx.ToString().c_str());
@@ -807,7 +810,7 @@ bool CTxDB::LoadBlockIndexGuts()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(string("blockindex"), uint256(0));
+            ssKey << std::make_pair(std::string("blockindex"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -819,7 +822,7 @@ bool CTxDB::LoadBlockIndexGuts()
         // Unserialize
 
         try {
-        string strType;
+        std::string strType;
         ssKey >> strType;
         if (strType == "blockindex" && !fRequestShutdown)
         {
@@ -855,7 +858,7 @@ bool CTxDB::LoadBlockIndexGuts()
 
             // ppcoin: build setStakeSeen
             if (pindexNew->IsProofOfStake())
-                setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+                setStakeSeen.insert(std::make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
         }
         else
         {
@@ -934,7 +937,7 @@ bool CAddrDB::Read(CAddrMan& addr)
     // use file size to size memory buffer
     int fileSize = GetFilesize(filein);
     int dataSize = fileSize - sizeof(uint256);
-    vector<unsigned char> vchData;
+    std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
 

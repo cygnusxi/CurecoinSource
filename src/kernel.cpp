@@ -7,7 +7,11 @@
 #include "kernel.h"
 #include "db.h"
 
-using namespace std;
+#include <algorithm>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 extern int nStakeMaxAge;
 extern int nStakeTargetSpacing;
@@ -38,7 +42,7 @@ int64 GetWeight(int64 nIntervalBeginning, int64 nIntervalEnd)
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
 
-    return min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64)nStakeMaxAge);
+    return std::min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64)nStakeMaxAge);
 }
 
 // Get the last stake modifier and its generation time from a given block
@@ -75,8 +79,8 @@ static int64 GetStakeModifierSelectionInterval()
 // already selected blocks in vSelectedBlocks, and with timestamp up to
 // nSelectionIntervalStop.
 static bool SelectBlockFromCandidates(
-    vector<pair<int64, uint256> >& vSortedByTimestamp,
-    map<uint256, const CBlockIndex*>& mapSelectedBlocks,
+    std::vector<std::pair<int64, uint256> >& vSortedByTimestamp,
+    std::map<uint256, const CBlockIndex*>& mapSelectedBlocks,
     int64 nSelectionIntervalStop, uint64 nStakeModifierPrev,
     const CBlockIndex** pindexSelected)
 {
@@ -149,20 +153,20 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModif
         return error("ComputeNextStakeModifier: unable to get last modifier");
     if (fDebug)
     {
-        printf("ComputeNextStakeModifier: prev modifier=0x%016"PRI64x" time=%s\n", nStakeModifier, DateTimeStrFormat(nModifierTime).c_str());
+        printf("ComputeNextStakeModifier: prev modifier=0x%016" PRI64x " time=%s\n", nStakeModifier, DateTimeStrFormat(nModifierTime).c_str());
     }
     if (nModifierTime / nModifierInterval >= pindexPrev->GetBlockTime() / nModifierInterval)
         return true;
 
     // Sort candidate blocks by timestamp
-    vector<pair<int64, uint256> > vSortedByTimestamp;
+    std::vector<std::pair<int64, uint256> > vSortedByTimestamp;
     vSortedByTimestamp.reserve(64 * nModifierInterval / nStakeTargetSpacing);
     int64 nSelectionInterval = GetStakeModifierSelectionInterval();
     int64 nSelectionIntervalStart = (pindexPrev->GetBlockTime() / nModifierInterval) * nModifierInterval - nSelectionInterval;
     const CBlockIndex* pindex = pindexPrev;
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart)
     {
-        vSortedByTimestamp.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
+        vSortedByTimestamp.push_back(std::make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
         pindex = pindex->pprev;
     }
     int nHeightFirstCandidate = pindex ? (pindex->nHeight + 1) : 0;
@@ -172,8 +176,8 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModif
     // Select 64 blocks from candidate blocks to generate stake modifier
     uint64 nStakeModifierNew = 0;
     int64 nSelectionIntervalStop = nSelectionIntervalStart;
-    map<uint256, const CBlockIndex*> mapSelectedBlocks;
-    for (int nRound=0; nRound<min(64, (int)vSortedByTimestamp.size()); nRound++)
+    std::map<uint256, const CBlockIndex*> mapSelectedBlocks;
+    for (int nRound=0; nRound<std::min(64, (int)vSortedByTimestamp.size()); nRound++)
     {
         // add an interval section to the current selection round
         nSelectionIntervalStop += GetStakeModifierSelectionIntervalSection(nRound);
@@ -183,7 +187,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModif
         // write the entropy bit of the selected block
         nStakeModifierNew |= (((uint64)pindex->GetStakeEntropyBit()) << nRound);
         // add the selected block from candidates to selected list
-        mapSelectedBlocks.insert(make_pair(pindex->GetBlockHash(), pindex));
+        mapSelectedBlocks.insert(std::make_pair(pindex->GetBlockHash(), pindex));
         if (fDebug && GetBoolArg("-printstakemodifier"))
             printf("ComputeNextStakeModifier: selected round %d stop=%s height=%d bit=%d\n",
                 nRound, DateTimeStrFormat(nSelectionIntervalStop).c_str(), pindex->nHeight, pindex->GetStakeEntropyBit());
@@ -192,7 +196,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModif
     // Print selection map for visualization of the selected blocks
     if (fDebug && GetBoolArg("-printstakemodifier"))
     {
-        string strSelectionMap = "";
+        std::string strSelectionMap = "";
         // '-' indicates proof-of-work blocks not selected
         strSelectionMap.insert(0, pindexPrev->nHeight - nHeightFirstCandidate + 1, '-');
         pindex = pindexPrev;
@@ -213,7 +217,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64& nStakeModif
     }
     if (fDebug)
     {
-        printf("ComputeNextStakeModifier: new modifier=0x%016"PRI64x" time=%s\n", nStakeModifierNew, DateTimeStrFormat(pindexPrev->GetBlockTime()).c_str());
+        printf("ComputeNextStakeModifier: new modifier=0x%016" PRI64x " time=%s\n", nStakeModifierNew, DateTimeStrFormat(pindexPrev->GetBlockTime()).c_str());
     }
 
     nStakeModifier = nStakeModifierNew;
@@ -294,7 +298,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
     // v0.3 protocol kernel hash weight starts from 0 at the 30-day min age
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
-    int64 nTimeWeight = min((int64)nTimeTx - txPrev.nTime, (int64)nStakeMaxAge) - nStakeMinAge;
+    int64 nTimeWeight = std::min((int64)nTimeTx - txPrev.nTime, (int64)nStakeMaxAge) - nStakeMinAge;
     CBigNum bnCoinDayWeight = CBigNum(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
 
     // Calculate hash
@@ -311,12 +315,12 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
     hashProofOfStake = Hash(ss.begin(), ss.end());
     if (fPrintProofOfStake)
     {
-        printf("CheckStakeKernelHash() : using modifier 0x%016"PRI64x" at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
+        printf("CheckStakeKernelHash() : using modifier 0x%016" PRI64x " at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
             nStakeModifier, nStakeModifierHeight,
             DateTimeStrFormat(nStakeModifierTime).c_str(),
             mapBlockIndex[blockFrom.GetHash()]->nHeight,
             DateTimeStrFormat(blockFrom.GetBlockTime()).c_str());
-        printf("CheckStakeKernelHash() : check protocol=%s modifier=0x%016"PRI64x" nTimeBlockFrom=%u nTxPrevOffset=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n",
+        printf("CheckStakeKernelHash() : check protocol=%s modifier=0x%016" PRI64x " nTimeBlockFrom=%u nTxPrevOffset=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n",
             "0.3",
             nStakeModifier,
             nTimeBlockFrom, nTxPrevOffset, txPrev.nTime, prevout.n, nTimeTx,
@@ -328,12 +332,12 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
         return false;
     if (fDebug && !fPrintProofOfStake)
     {
-        printf("CheckStakeKernelHash() : using modifier 0x%016"PRI64x" at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
+        printf("CheckStakeKernelHash() : using modifier 0x%016" PRI64x " at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
             nStakeModifier, nStakeModifierHeight, 
             DateTimeStrFormat(nStakeModifierTime).c_str(),
             mapBlockIndex[blockFrom.GetHash()]->nHeight,
             DateTimeStrFormat(blockFrom.GetBlockTime()).c_str());
-        printf("CheckStakeKernelHash() : pass protocol=%s modifier=0x%016"PRI64x" nTimeBlockFrom=%u nTxPrevOffset=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n",
+        printf("CheckStakeKernelHash() : pass protocol=%s modifier=0x%016" PRI64x " nTimeBlockFrom=%u nTxPrevOffset=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n",
             "0.3",
             nStakeModifier,
             nTimeBlockFrom, nTxPrevOffset, txPrev.nTime, prevout.n, nTimeTx,
