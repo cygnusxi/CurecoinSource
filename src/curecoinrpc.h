@@ -4,10 +4,12 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef _curecoinRPC_H_
-#define _curecoinRPC_H_ 1
+#define _curecoinRPC_H_
 
 #if BOOST_VERSION >= 106600
+#ifndef BOOST_ASIO_ENABLE_OLD_SERVICES
 #define BOOST_ASIO_ENABLE_OLD_SERVICES
+#endif
 #endif
 
 #include <string>
