@@ -7,6 +7,10 @@
 
 #include "uint256.h"
 
+#include <map>
+#include <vector>
+#include <string>
+
 #ifndef WIN32
 #include <sys/types.h>
 #include <sys/time.h>
@@ -15,9 +19,6 @@
 #include <processthreadsapi.h>
 typedef int util_pid_t; /* define for Windows compatibility */
 #endif
-#include <map>
-#include <vector>
-#include <string>
 
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -217,7 +218,11 @@ boost::filesystem::path GetDefaultDataDir();
 const boost::filesystem::path &GetDataDir(bool fNetSpecific = true);
 boost::filesystem::path GetConfigFile();
 boost::filesystem::path GetPidFile();
+#ifdef WIN32
 void CreatePidFile(const boost::filesystem::path &path, util_pid_t pid);
+#else
+void CreatePidFile(const boost::filesystem::path &path, pid_t pid);
+#endif
 void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);

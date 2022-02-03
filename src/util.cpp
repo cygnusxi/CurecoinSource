@@ -1113,6 +1113,7 @@ boost::filesystem::path GetPidFile()
     return pathPidFile;
 }
 
+#ifdef WIN32
 void CreatePidFile(const boost::filesystem::path &path, util_pid_t pid)
 {
     FILE* file = fopen(path.string().c_str(), "w");
@@ -1122,6 +1123,17 @@ void CreatePidFile(const boost::filesystem::path &path, util_pid_t pid)
         fclose(file);
     }
 }
+#else
+void CreatePidFile(const boost::filesystem::path &path, pid_t pid)
+{
+    FILE* file = fopen(path.string().c_str(), "w");
+    if (file)
+    {
+        fprintf(file, "%d\n", pid);
+        fclose(file);
+    }
+}
+#endif
 
 bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest)
 {
