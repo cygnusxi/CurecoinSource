@@ -22,10 +22,6 @@
 #warning Compiling without BOOST_INTERPROCESS_HAS_WINDOWS_KERNEL_BOOTTIME and BOOST_INTERPROCESS_HAS_KERNEL_BOOTTIME uncommented in boost/interprocess/detail/tmp_dir_helpers.hpp or using a boost version before 1.49 may have unintended results see svn.boost.org/trac/boost/ticket/5392
 #endif
 
-using namespace boost;
-using namespace boost::interprocess;
-using namespace boost::posix_time;
-
 #if defined MAC_OSX || defined __FreeBSD__
 // URI handling not implemented on OSX yet
 
@@ -93,14 +89,14 @@ static void ipcThread2(void* pArg)
 {
     printf("ipcThread started\n");
 
-    message_queue* mq = (message_queue*)pArg;
+    boost::interprocess::message_queue* mq = (boost::interprocess::message_queue*)pArg;
     char buffer[MAX_URI_LENGTH + 1] = "";
     size_t nSize = 0;
     unsigned int nPriority = 0;
 
     while (true)
     {
-        ptime d = boost::posix_time::microsec_clock::universal_time() + millisec(100);
+        boost::posix_time::ptime d = boost::posix_time::microsec_clock::universal_time() + boost::posix_time::millisec(100);
         if (mq->timed_receive(&buffer, sizeof(buffer), nSize, nPriority, d))
         {
             uiInterface.ThreadSafeHandleURI(std::string(buffer, nSize));
@@ -112,25 +108,25 @@ static void ipcThread2(void* pArg)
     }
 
     // Remove message queue
-    message_queue::remove(curecoinURI_QUEUE_NAME);
+    boost::interprocess::message_queue::remove(curecoinURI_QUEUE_NAME);
     // Cleanup allocated memory
     delete mq;
 }
 
 void ipcInit(int argc, char *argv[])
 {
-    message_queue* mq = NULL;
+    boost::interprocess::message_queue* mq = NULL;
     char buffer[MAX_URI_LENGTH + 1] = "";
     size_t nSize = 0;
     unsigned int nPriority = 0;
 
     try {
-        mq = new message_queue(open_or_create, curecoinURI_QUEUE_NAME, 2, MAX_URI_LENGTH);
+        mq = new boost::interprocess::message_queue(boost::interprocess::open_or_create, curecoinURI_QUEUE_NAME, 2, MAX_URI_LENGTH);
 
         // Make sure we don't lose any curecoin: URIs
         for (int i = 0; i < 2; i++)
         {
-            ptime d = boost::posix_time::microsec_clock::universal_time() + millisec(1);
+            boost::posix_time::ptime d = boost::posix_time::microsec_clock::universal_time() + boost::posix_time::millisec(1);
             if (mq->timed_receive(&buffer, sizeof(buffer), nSize, nPriority, d))
             {
                 uiInterface.ThreadSafeHandleURI(std::string(buffer, nSize));
@@ -140,12 +136,12 @@ void ipcInit(int argc, char *argv[])
         }
 
         // Make sure only one curecoin instance is listening
-        message_queue::remove(curecoinURI_QUEUE_NAME);
+        boost::interprocess::message_queue::remove(curecoinURI_QUEUE_NAME);
         delete mq;
 
-        mq = new message_queue(open_or_create, curecoinURI_QUEUE_NAME, 2, MAX_URI_LENGTH);
+        mq = new boost::interprocess::message_queue(boost::interprocess::open_or_create, curecoinURI_QUEUE_NAME, 2, MAX_URI_LENGTH);
     }
-    catch (interprocess_exception &ex) {
+    catch (boost::interprocess::interprocess_exception &ex) {
         printf("ipcInit() - boost interprocess exception #%d: %s\n", ex.get_error_code(), ex.what());
         return;
     }
