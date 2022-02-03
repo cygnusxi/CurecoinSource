@@ -12,7 +12,8 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #else
-typedef int pid_t; /* define for Windows compatibility */
+#include <processthreadsapi.h>
+typedef int util_pid_t; /* define for Windows compatibility */
 #endif
 #include <map>
 #include <vector>
@@ -28,6 +29,7 @@ typedef int pid_t; /* define for Windows compatibility */
 #include <openssl/ripemd.h>
 
 #include "netbase.h" // for AddTimeData
+
 
 typedef long long  int64;
 typedef unsigned long long  uint64;
@@ -215,7 +217,7 @@ boost::filesystem::path GetDefaultDataDir();
 const boost::filesystem::path &GetDataDir(bool fNetSpecific = true);
 boost::filesystem::path GetConfigFile();
 boost::filesystem::path GetPidFile();
-void CreatePidFile(const boost::filesystem::path &path, pid_t pid);
+void CreatePidFile(const boost::filesystem::path &path, util_pid_t pid);
 void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
@@ -591,7 +593,7 @@ bool NewThread(void(*pfn)(void*), void* parg);
 #ifdef WIN32
 inline void SetThreadPriority(int nPriority)
 {
-    SetThreadPriority(GetCurrentThread(), nPriority);
+  SetThreadPriority(GetCurrentThread(), nPriority);
 }
 #else
 

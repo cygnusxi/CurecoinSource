@@ -67,7 +67,6 @@ namespace boost {
 #endif
 
 
-
 std::map<std::string, std::string> mapArgs;
 std::map<std::string, std::vector<std::string> > mapMultiArgs;
 bool fDebug = false;
@@ -1114,7 +1113,7 @@ boost::filesystem::path GetPidFile()
     return pathPidFile;
 }
 
-void CreatePidFile(const boost::filesystem::path &path, pid_t pid)
+void CreatePidFile(const boost::filesystem::path &path, util_pid_t pid)
 {
     FILE* file = fopen(path.string().c_str(), "w");
     if (file)

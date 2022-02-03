@@ -478,7 +478,7 @@ bool AppInit2()
         }
         if (pid > 0)
         {
-            CreatePidFile(GetPidFile(), pid);
+	    CreatePidFile(GetPidFile(), pid);
             return true;
         }
 
