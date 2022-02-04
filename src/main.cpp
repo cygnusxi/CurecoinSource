@@ -11,6 +11,7 @@
 #include "ui_interface.h"
 #include "kernel.h"
 #include "wallet.h"
+#include "util.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -4537,9 +4538,9 @@ void curecoinMiner(CWallet *pwallet, bool fProofOfStake)
                 }
                 strMintWarning = "";
                 printf("CPUMiner : proof-of-stake block found %s\n", pblock->GetHash().ToString().c_str());
-                SetThreadPriority(THREAD_PRIORITY_NORMAL);
+		SetThreadPriority(THREAD_PRIORITY_NORMAL);
                 CheckWork(pblock.get(), *pwalletMain, reservekey);
-                SetThreadPriority(THREAD_PRIORITY_LOWEST);
+		SetThreadPriority(THREAD_PRIORITY_LOWEST);
             }
             Sleep(500);
             continue;
@@ -4589,9 +4590,9 @@ void curecoinMiner(CWallet *pwallet, bool fProofOfStake)
                     pblock->nNonce = ByteReverse(nNonceFound);
                     assert(hash == pblock->GetHash());
 
-                    SetThreadPriority(THREAD_PRIORITY_NORMAL);
+		    SetThreadPriority(THREAD_PRIORITY_NORMAL);
                     CheckWork(pblock.get(), *pwalletMain, reservekey);
-                    SetThreadPriority(THREAD_PRIORITY_LOWEST);
+		    SetThreadPriority(THREAD_PRIORITY_LOWEST);
                     break;
                 }
             }

@@ -1738,14 +1738,17 @@ bool BindListenPort(const CService &addrBind, std::string& strError)
     // some systems don't have IPV6_V6ONLY but are always v6only; others do have the option
     // and enable it by default or not. Try to enable it, if possible.
     if (addrBind.IsIPv6()) {
+#ifndef WIN32
 #ifdef IPV6_V6ONLY
         setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&nOne, sizeof(int));
 #endif
-#ifdef WIN32
+#else
         int nProtLevel = 10 /* PROTECTION_LEVEL_UNRESTRICTED */;
         int nParameterId = 23 /* IPV6_PROTECTION_LEVEl */;
         // this call is allowed to fail
+#ifdef IPV6_V6ONLY
         setsockopt(hListenSocket, IPPROTO_IPV6, nParameterId, (const char*)&nProtLevel, sizeof(int));
+#endif
 #endif
     }
 #endif
