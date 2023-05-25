@@ -98,7 +98,7 @@ int ECDSA_SIG_recover_key_GFp(EC_KEY *eckey, ECDSA_SIG *ecsig, const unsigned ch
     if (!BN_bin2bn(msg, msglen, e)) { ret=-1; goto err; }
     if (8*msglen > n) BN_rshift(e, e, 8-(n & 7));
     zero = BN_CTX_get(ctx);
-    if (!BN_zero(zero)) { ret=-1; goto err; }
+    BN_zero_ex(zero);
     if (!BN_mod_sub(e, zero, e, order, ctx)) { ret=-1; goto err; }
     rr = BN_CTX_get(ctx);
     ECDSA_SIG_get0(ecsig, (const BIGNUM **)&s, 0);
