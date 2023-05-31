@@ -1,8 +1,8 @@
-// Copyright (c) 2012 The curecoin developers
+// Copyright (c) 2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef curecoin_MRUSET_H
-#define curecoin_MRUSET_H
+#ifndef BITCOIN_MRUSET_H
+#define BITCOIN_MRUSET_H
 
 #include <set>
 #include <deque>
@@ -51,7 +51,7 @@ public:
     size_type max_size(size_type s)
     {
         if (s)
-            while (queue.size() > s)
+            while (queue.size() >= s)
             {
                 set.erase(queue.front());
                 queue.pop_front();

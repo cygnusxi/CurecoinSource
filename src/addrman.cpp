@@ -4,10 +4,7 @@
 
 #include "addrman.h"
 
-#include <algorithm>
-#include <map>
-#include <set>
-#include <vector>
+using namespace std;
 
 int CAddrInfo::GetTriedBucket(const std::vector<unsigned char> &nKey) const
 {
@@ -105,11 +102,12 @@ CAddrInfo* CAddrMan::Create(const CAddress &addr, const CNetAddr &addrSource, in
     return &mapInfo[nId];
 }
 
-void CAddrMan::SwapRandom(unsigned int nRndPos1, unsigned int nRndPos2)
+void CAddrMan::SwapRandom(int nRndPos1, int nRndPos2)
 {
     if (nRndPos1 == nRndPos2)
         return;
 
+    assert(nRndPos1 >= 0 && nRndPos2 >= 0);
     assert(nRndPos1 < vRandom.size() && nRndPos2 < vRandom.size());
 
     int nId1 = vRandom[nRndPos1];
@@ -151,7 +149,7 @@ int CAddrMan::SelectTried(int nKBucket)
 
 int CAddrMan::ShrinkNew(int nUBucket)
 {
-    assert(nUBucket >= 0 && (unsigned int)nUBucket < vvNew.size());
+    assert(nUBucket >= 0 && nUBucket < vvNew.size());
     std::set<int> &vNew = vvNew[nUBucket];
 
     // first look for deletable items
@@ -190,7 +188,7 @@ int CAddrMan::ShrinkNew(int nUBucket)
     }
     assert(mapInfo.count(nOldest) == 1);
     CAddrInfo &info = mapInfo[nOldest];
-    if (--info.nRefCount == 0)
+    if (--info.nRefCount == 0) 
     {
         SwapRandom(info.nRandomPos, vRandom.size()-1);
         vRandom.pop_back();
@@ -244,7 +242,7 @@ void CAddrMan::MakeTried(CAddrInfo& info, int nId, int nOrigin)
     infoOld.nRefCount = 1;
     // do not update nTried, as we are going to move something else there immediately
 
-    // check whether there is place in that one,
+    // check whether there is place in that one, 
     if (vNew.size() < ADDRMAN_NEW_BUCKET_SIZE)
     {
         // if so, move it back there
@@ -327,7 +325,7 @@ bool CAddrMan::Add_(const CAddress &addr, const CNetAddr& source, int64 nTimePen
         bool fCurrentlyOnline = (GetAdjustedTime() - addr.nTime < 24 * 60 * 60);
         int64 nUpdateInterval = (fCurrentlyOnline ? 60 * 60 : 24 * 60 * 60);
         if (addr.nTime && (!pinfo->nTime || pinfo->nTime < addr.nTime - nUpdateInterval - nTimePenalty))
-            pinfo->nTime = std::max((int64)0, addr.nTime - nTimePenalty);
+            pinfo->nTime = max((int64)0, addr.nTime - nTimePenalty);
 
         // add services
         pinfo->nServices |= addr.nServices;
@@ -352,7 +350,7 @@ bool CAddrMan::Add_(const CAddress &addr, const CNetAddr& source, int64 nTimePen
             return false;
     } else {
         pinfo = Create(addr, source, &nId);
-        pinfo->nTime = std::max((int64)0, (int64)pinfo->nTime - nTimePenalty);
+        pinfo->nTime = max((int64)0, (int64)pinfo->nTime - nTimePenalty);
 //        printf("Added %s [nTime=%fhr]\n", pinfo->ToString().c_str(), (GetAdjustedTime() - pinfo->nTime) / 3600.0);
         nNew++;
         fNew = true;
@@ -413,7 +411,7 @@ CAddress CAddrMan::Select_(int nUnkBias)
             fChanceFactor *= 1.2;
         }
     } else {
-        // use a new node
+        // use an new node
         double fChanceFactor = 1.0;
         while(1)
         {

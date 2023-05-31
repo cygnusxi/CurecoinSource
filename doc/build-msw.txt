@@ -1,15 +1,13 @@
 Copyright (c) 2009-2012 Bitcoin Developers
-Copyright (c) 2011-2012 Litecoin Developers
-Copyright (c) 2013 curecoin Developers
 Distributed under the MIT/X11 software license, see the accompanying
-file COPYING or http://www.opensource.org/licenses/mit-license.php.
+file license.txt or http://www.opensource.org/licenses/mit-license.php.
 This product includes software developed by the OpenSSL Project for use in
 the OpenSSL Toolkit (http://www.openssl.org/).  This product includes
 cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP
 software written by Thomas Bernard.
 
 
-See readme-qt.rst for instructions on building curecoin-QT, the
+See readme-qt.rst for instructions on building Bitcoin QT, the
 graphical user interface.
 
 WINDOWS BUILD NOTES
@@ -26,10 +24,10 @@ Dependencies
 Libraries you need to download separately and build:
 
                 default path               download
-OpenSSL         \openssl-1.0.1e        http://www.openssl.org/source/
-Berkeley DB     \db-4.8.30.NC          http://www.oracle.com/technology/software/products/berkeley-db/index.html
-Boost           \boost-1.54.0          http://www.boost.org/users/download/
-miniupnpc       \miniupnpc-1.6         http://miniupnp.tuxfamily.org/files/
+OpenSSL         \openssl-1.0.1b-mgw        http://www.openssl.org/source/
+Berkeley DB     \db-4.8.30.NC-mgw          http://www.oracle.com/technology/software/products/berkeley-db/index.html
+Boost           \boost-1.47.0-mgw          http://www.boost.org/users/download/
+miniupnpc       \miniupnpc-1.6-mgw         http://miniupnp.tuxfamily.org/files/
 
 Their licenses:
 OpenSSL        Old BSD license with the problematic advertising requirement
@@ -50,14 +48,14 @@ MSYS shell:
 un-tar sources with MSYS 'tar xfz' to avoid issue with symlinks (OpenSSL ticket 2377)
 change 'MAKE' env. variable from 'C:\MinGW32\bin\mingw32-make.exe' to '/c/MinGW32/bin/mingw32-make.exe'
 
-cd /c/openssl-1.0.1e
+cd /c/openssl-1.0.1b-mgw
 ./config
 make
 
 Berkeley DB
 -----------
 MSYS shell:
-cd /c/db-4.8.30.NC/build_unix
+cd /c/db-4.8.30.NC-mgw/build_unix
 sh ../dist/configure --enable-mingw --enable-cxx
 make
 
@@ -65,7 +63,7 @@ Boost
 -----
 DOS prompt:
 downloaded boost jam 3.1.18
-cd \boost-1.54.0
+cd \boost-1.47.0-mgw
 bjam toolset=gcc --build-type=complete stage
 
 MiniUPnPc
@@ -73,14 +71,14 @@ MiniUPnPc
 UPnP support is optional, make with USE_UPNP= to disable it.
 
 MSYS shell:
-cd /c/miniupnpc-1.6
+cd /c/miniupnpc-1.6-mgw
 make -f Makefile.mingw
 mkdir miniupnpc
 cp *.h miniupnpc/
 
-curecoin
+Bitcoin
 -------
 DOS prompt:
-cd \curecoin\src
+cd \bitcoin\src
 mingw32-make -f makefile.mingw
-strip curecoind.exe
+strip bitcoind.exe

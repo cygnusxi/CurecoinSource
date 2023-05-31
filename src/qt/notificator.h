@@ -27,7 +27,7 @@ public:
     {
         Information,         /**< Informational message */
         Warning,             /**< Notify user of potential problem */
-        Critical             /**< An error occurred */
+        Critical             /**< An error occured */
     };
 
 public slots:
@@ -61,7 +61,7 @@ private:
     void notifyDBus(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout);
 #endif
     void notifySystray(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout);
-#ifdef Q_OS_MAC
+#ifdef Q_WS_MAC
     void notifyGrowl(Class cls, const QString &title, const QString &text, const QIcon &icon);
 #endif
 };

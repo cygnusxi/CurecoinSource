@@ -12,7 +12,6 @@ namespace Ui {
 }
 class WalletModel;
 class TxViewDelegate;
-class TransactionFilterProxy;
 
 /** Overview ("home") page widget */
 class OverviewPage : public QWidget
@@ -24,10 +23,9 @@ public:
     ~OverviewPage();
 
     void setModel(WalletModel *model);
-    void showOutOfSyncWarning(bool fShow);
 
 public slots:
-    void setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBalance, qint64 immatureBalance);
+    void setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBalance);
     void setNumTransactions(int count);
 
 signals:
@@ -39,14 +37,11 @@ private:
     qint64 currentBalance;
     qint64 currentStake;
     qint64 currentUnconfirmedBalance;
-    qint64 currentImmatureBalance;
 
     TxViewDelegate *txdelegate;
-    TransactionFilterProxy *filter;
 
 private slots:
-    void updateDisplayUnit();
-    void handleTransactionClicked(const QModelIndex &index);
+    void displayUnitChanged();
 };
 
 #endif // OVERVIEWPAGE_H

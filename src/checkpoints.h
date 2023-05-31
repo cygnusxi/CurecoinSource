@@ -1,8 +1,9 @@
-// Copyright (c) 2013  The curecoin developer
+// Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2011-2013 The PPCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef curecoin_CHECKPOINT_H
-#define  curecoin_CHECKPOINT_H
+#ifndef BITCOIN_CHECKPOINT_H
+#define  BITCOIN_CHECKPOINT_H
 
 #include <map>
 #include "net.h"

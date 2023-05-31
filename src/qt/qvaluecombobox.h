@@ -2,20 +2,19 @@
 #define QVALUECOMBOBOX_H
 
 #include <QComboBox>
-#include <QVariant>
 
 /* QComboBox that can be used with QDataWidgetMapper to select ordinal values from a model. */
 class QValueComboBox : public QComboBox
 {
     Q_OBJECT
-    Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged USER true)
+    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged USER true)
 public:
     explicit QValueComboBox(QWidget *parent = 0);
 
-    QVariant value() const;
-    void setValue(const QVariant &value);
+    int value() const;
+    void setValue(int value);
 
-    /** Specify model role to use as ordinal value (defaults to Qt::UserRole) */
+    /** Specify model role to use as ordinal value */
     void setRole(int role);
 
 signals:

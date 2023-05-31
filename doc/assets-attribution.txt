@@ -26,7 +26,7 @@ Site: http://findicons.com/icon/93743/blocks_gnome_netstatus_0
 
 Icon: src/qt/res/icons/transaction*.png
 Designer: md2k7
-Site: https://bitcointalk.org/index.php?topic=15276.0
+Site: https://forum.bitcoin.org/index.php?topic=15276.0
 License: You are free to do with these icons as you wish, including selling,
  copying, modifying etc.
 
@@ -38,10 +38,10 @@ Designer: http://www.everaldo.com
 Icon Pack: Crystal SVG
 License: LGPL
 
-Icon: src/qt/res/icons/curecoin.png, src/qt/res/icons/toolbar.png
-Designer: Mao
+Icon: src/qt/res/icons/bitcoin.png, src/qt/res/icons/toolbar.png
+Designer: Bitboy (optimized for 16x16 by Wladimir van der Laan)
 License: Public Domain
-Site:
+Site: http://forum.bitcoin.org/?topic=1756.0
 
 Icon:  scripts/img/reload.xcf (modified),src/qt/res/movies/update_spinner.mng
 Icon Pack: Kids
@@ -49,7 +49,8 @@ Designer: Everaldo (Everaldo Coelho)
 License: GNU/GPL 
 Site: http://findicons.com/icon/17102/reload?id=17102
 
-Icon: src/qt/res/icons/debugwindow.png
-Designer: Vignoni David
-Site: http://www.oxygen-icons.org/
-License: Oxygen icon theme is dual licensed. You may copy it under the Creative Common Attribution-ShareAlike 3.0 License or the GNU Library General Public License.
+Image: src/qt/res/images/splash2.jpg (Wallet image)
+Designer: Crobbo (forum)
+Site: https://bitcointalk.org/index.php?topic=32273.0
+License: Public domain
+

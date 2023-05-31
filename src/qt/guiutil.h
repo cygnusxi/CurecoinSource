@@ -2,8 +2,6 @@
 #define GUIUTIL_H
 
 #include <QString>
-#include <QObject>
-#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 class QFont;
@@ -15,7 +13,7 @@ class QAbstractItemView;
 QT_END_NAMESPACE
 class SendCoinsRecipient;
 
-/** Utility functions used by the curecoin Qt UI.
+/** Utility functions used by the Bitcoin Qt UI.
  */
 namespace GUIUtil
 {
@@ -23,17 +21,17 @@ namespace GUIUtil
     QString dateTimeStr(const QDateTime &datetime);
     QString dateTimeStr(qint64 nTime);
 
-    // Render curecoin addresses in monospace font
-    QFont curecoinAddressFont();
+    // Render bitcoin addresses in monospace font
+    QFont bitcoinAddressFont();
 
     // Set up widgets for address and amounts
     void setupAddressWidget(QLineEdit *widget, QWidget *parent);
     void setupAmountWidget(QLineEdit *widget, QWidget *parent);
 
-    // Parse "curecoin:" URI into recipient object, return true on successful parsing
-    // See curecoin URI definition discussion here: https://bitcointalk.org/index.php?topic=33490.0
-    bool parsecurecoinURI(const QUrl &uri, SendCoinsRecipient *out);
-    bool parsecurecoinURI(QString uri, SendCoinsRecipient *out);
+    // Parse "bitcoin:" URI into recipient object, return true on succesful parsing
+    // See Bitcoin URI definition discussion here: https://bitcointalk.org/index.php?topic=33490.0
+    bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out);
+    bool parseBitcoinURI(QString uri, SendCoinsRecipient *out);
 
     // HTML escaping for rich text controls
     QString HtmlEscape(const QString& str, bool fMultiLine=false);
@@ -47,7 +45,7 @@ namespace GUIUtil
      */
     void copyEntryData(QAbstractItemView *view, int column, int role=Qt::EditRole);
 
-    /** Get save filename, mimics QFileDialog::getSaveFileName, except that it appends a default suffix
+    /** Get save file name, mimics QFileDialog::getSaveFileName, except that it appends a default suffix
         when no suffix is provided by the user.
 
       @param[in] parent  Parent window (or 0)
@@ -70,50 +68,6 @@ namespace GUIUtil
 
     // Determine whether a widget is hidden behind other windows
     bool isObscured(QWidget *w);
-
-    // Open debug.log
-    void openDebugLogfile();
-
-    /** Qt event filter that intercepts ToolTipChange events, and replaces the tooltip with a rich text
-      representation if needed. This assures that Qt can word-wrap long tooltip messages.
-      Tooltips longer than the provided size threshold (in characters) are wrapped.
-     */
-    class ToolTipToRichTextFilter : public QObject
-    {
-        Q_OBJECT
-
-    public:
-        explicit ToolTipToRichTextFilter(int size_threshold, QObject *parent = 0);
-
-    protected:
-        bool eventFilter(QObject *obj, QEvent *evt);
-
-    private:
-        int size_threshold;
-    };
-
-    bool GetStartOnSystemStartup();
-    bool SetStartOnSystemStartup(bool fAutoStart);
-
-    /** Help message for curecoin-Qt, shown with --help. */
-    class HelpMessageBox : public QMessageBox
-    {
-        Q_OBJECT
-
-    public:
-        HelpMessageBox(QWidget *parent = 0);
-
-        /** Show message box or print help message to standard output, based on operating system. */
-        void showOrPrint();
-
-        /** Print help message to console */
-        void printToConsole();
-
-    private:
-        QString header;
-        QString coreOptions;
-        QString uiOptions;
-    };
 
 } // namespace GUIUtil
 

@@ -4,32 +4,15 @@
 #include "addresstablemodel.h"
 #include "transactiontablemodel.h"
 
-#include "alert.h"
 #include "main.h"
-#include "ui_interface.h"
 
 #include <QDateTime>
-#include <QTimer>
-
-static const int64 nClientStartupTime = GetTime();
 
 ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
     QObject(parent), optionsModel(optionsModel),
-    cachedNumBlocks(0), cachedNumBlocksOfPeers(0), pollTimer(0)
+    cachedNumConnections(0), cachedNumBlocks(0)
 {
     numBlocksAtStartup = -1;
-
-    pollTimer = new QTimer(this);
-    pollTimer->setInterval(MODEL_UPDATE_DELAY);
-    pollTimer->start();
-    connect(pollTimer, SIGNAL(timeout()), this, SLOT(updateTimer()));
-
-    subscribeToCoreSignals();
-}
-
-ClientModel::~ClientModel()
-{
-    unsubscribeFromCoreSignals();
 }
 
 int ClientModel::getNumConnections() const
@@ -53,70 +36,27 @@ QDateTime ClientModel::getLastBlockDate() const
     return QDateTime::fromTime_t(pindexBest->GetBlockTime());
 }
 
-void ClientModel::updateTimer()
+void ClientModel::update()
 {
-    // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
-    // Periodically check and update with a timer.
+    int newNumConnections = getNumConnections();
     int newNumBlocks = getNumBlocks();
-    int newNumBlocksOfPeers = getNumBlocksOfPeers();
+    QString newStatusBar = getStatusBarWarnings();
 
-    if(cachedNumBlocks != newNumBlocks || cachedNumBlocksOfPeers != newNumBlocksOfPeers)
+    if(cachedNumConnections != newNumConnections)
+        emit numConnectionsChanged(newNumConnections);
+    if(cachedNumBlocks != newNumBlocks || cachedStatusBar != newStatusBar)
     {
-        cachedNumBlocks = newNumBlocks;
-        cachedNumBlocksOfPeers = newNumBlocksOfPeers;
-
-        emit numBlocksChanged(newNumBlocks, newNumBlocksOfPeers);
-    }
-}
-
-void ClientModel::updateNumConnections(int numConnections)
-{
-    emit numConnectionsChanged(numConnections);
-}
-
-void ClientModel::updateAlert(const QString &hash, int status)
-{
-    // Show error message notification for new alert
-    if(status == CT_NEW)
-    {
-        uint256 hash_256;
-        hash_256.SetHex(hash.toStdString());
-        CAlert alert = CAlert::getAlertByHash(hash_256);
-        if(!alert.IsNull())
-        {
-            emit error(tr("Network Alert"), QString::fromStdString(alert.strStatusBar), false);
-        }
+        // Simply emit a numBlocksChanged for now in case the status message changes,
+        // so that the view updates the status bar.
+        // TODO: It should send a notification.
+        //    (However, this might generate looped notifications and needs to be thought through and tested carefully)
+        //    error(tr("Network Alert"), newStatusBar);
+        emit numBlocksChanged(newNumBlocks);
     }
 
-    // Emit a numBlocksChanged when the status message changes,
-    // so that the view recomputes and updates the status bar.
-    emit numBlocksChanged(getNumBlocks(), getNumBlocksOfPeers());
-}
-
-double ClientModel::GetDifficulty() const
-{
-    // Floating point number that is a multiple of the minimum difficulty,
-    // minimum difficulty = 1.0.
-
-    if (pindexBest == NULL)
-        return 1.0;
-    int nShift = (pindexBest->nBits >> 24) & 0xff;
-
-    double dDiff =
-        (double)0x0000ffff / (double)(pindexBest->nBits & 0x00ffffff);
-
-    while (nShift < 29)
-    {
-        dDiff *= 256.0;
-        nShift++;
-    }
-    while (nShift > 29)
-    {
-        dDiff /= 256.0;
-        nShift--;
-    }
-
-    return dDiff;
+    cachedNumConnections = newNumConnections;
+    cachedNumBlocks = newNumBlocks;
+    cachedStatusBar = newStatusBar;
 }
 
 bool ClientModel::isTestNet() const
@@ -157,51 +97,4 @@ QString ClientModel::formatBuildDate() const
 QString ClientModel::clientName() const
 {
     return QString::fromStdString(CLIENT_NAME);
-}
-
-QString ClientModel::formatClientStartupTime() const
-{
-    return QDateTime::fromTime_t(nClientStartupTime).toString();
-}
-
-// Handlers for core signals
-static void NotifyBlocksChanged(ClientModel *clientmodel)
-{
-    // This notification is too frequent. Don't trigger a signal.
-    // Don't remove it, though, as it might be useful later.
-}
-
-static void NotifyNumConnectionsChanged(ClientModel *clientmodel, int newNumConnections)
-{
-    // Too noisy: OutputDebugStringF("NotifyNumConnectionsChanged %i\n", newNumConnections);
-    QMetaObject::invokeMethod(clientmodel, "updateNumConnections", Qt::QueuedConnection,
-                              Q_ARG(int, newNumConnections));
-}
-
-static void NotifyAlertChanged(ClientModel *clientmodel, const uint256 &hash, ChangeType status)
-{
-    OutputDebugStringF("NotifyAlertChanged %s status=%i\n", hash.GetHex().c_str(), status);
-    QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection,
-                              Q_ARG(QString, QString::fromStdString(hash.GetHex())),
-                              Q_ARG(int, status));
-}
-
-void ClientModel::subscribeToCoreSignals()
-{
-    // Connect signals to client
-    uiInterface.NotifyBlocksChanged.connect(boost::bind(NotifyBlocksChanged, this));
-    uiInterface.NotifyNumConnectionsChanged.connect(boost::bind(NotifyNumConnectionsChanged, this,
-                                                    boost::placeholders::_1));
-    uiInterface.NotifyAlertChanged.connect(boost::bind(NotifyAlertChanged, this, boost::placeholders::_1,
-                                                       boost::placeholders::_2));
-}
-
-void ClientModel::unsubscribeFromCoreSignals()
-{
-    // Disconnect signals from client
-    uiInterface.NotifyBlocksChanged.disconnect(boost::bind(NotifyBlocksChanged, this));
-    uiInterface.NotifyNumConnectionsChanged.disconnect(boost::bind(NotifyNumConnectionsChanged, this,
-                                                                   boost::placeholders::_1));
-    uiInterface.NotifyAlertChanged.disconnect(boost::bind(NotifyAlertChanged, this, boost::placeholders::_1,
-                                                          boost::placeholders::_2));
 }

@@ -1,9 +1,10 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2013  The curecoin developer
+// Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2012 The PPCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef curecoin_SERIALIZE_H
-#define curecoin_SERIALIZE_H
+#ifndef BITCOIN_SERIALIZE_H
+#define BITCOIN_SERIALIZE_H
 
 #include <string>
 #include <vector>
@@ -154,6 +155,7 @@ template<typename Stream> inline void Serialize(Stream& s, bool a, int, int=0)  
 template<typename Stream> inline void Unserialize(Stream& s, bool& a, int, int=0) { char f; READDATA(s, f); a=f; }
 
 
+
 #ifndef THROW_WITH_STACKTRACE
 #define THROW_WITH_STACKTRACE(exception)  \
 {                                         \
@@ -248,6 +250,7 @@ uint64 ReadCompactSize(Stream& is)
 #define FLATDATA(obj)   REF(CFlatData((char*)&(obj), (char*)&(obj) + sizeof(obj)))
 
 /** Wrapper for serializing arrays and POD.
+ * There's a clever template way to make arrays serialize normally, but MSVC6 doesn't support it.
  */
 class CFlatData
 {
@@ -813,12 +816,11 @@ public:
 
     void insert(iterator it, const_iterator first, const_iterator last)
     {
-        assert(last - first >= 0);
-        if (it == vch.begin() + nReadPos && (unsigned int)(last - first) <= nReadPos)
+        if (it == vch.begin() + nReadPos && last - first <= nReadPos)
         {
             // special case for inserting at the front when there's room
             nReadPos -= (last - first);
-            std::memcpy(&vch[nReadPos], &first[0], last - first);
+            memcpy(&vch[nReadPos], &first[0], last - first);
         }
         else
             vch.insert(it, first, last);
@@ -826,12 +828,11 @@ public:
 
     void insert(iterator it, std::vector<char>::const_iterator first, std::vector<char>::const_iterator last)
     {
-        assert(last - first >= 0);
-        if (it == vch.begin() + nReadPos && (unsigned int)(last - first) <= nReadPos)
+        if (it == vch.begin() + nReadPos && last - first <= nReadPos)
         {
             // special case for inserting at the front when there's room
             nReadPos -= (last - first);
-            std::memcpy(&vch[nReadPos], &first[0], last - first);
+            memcpy(&vch[nReadPos], &first[0], last - first);
         }
         else
             vch.insert(it, first, last);
@@ -840,12 +841,11 @@ public:
 #if !defined(_MSC_VER) || _MSC_VER >= 1300
     void insert(iterator it, const char* first, const char* last)
     {
-        assert(last - first >= 0);
-        if (it == vch.begin() + nReadPos && (unsigned int)(last - first) <= nReadPos)
+        if (it == vch.begin() + nReadPos && last - first <= nReadPos)
         {
             // special case for inserting at the front when there's room
             nReadPos -= (last - first);
-            std::memcpy(&vch[nReadPos], &first[0], last - first);
+            memcpy(&vch[nReadPos], &first[0], last - first);
         }
         else
             vch.insert(it, first, last);
@@ -941,15 +941,15 @@ public:
             if (nReadPosNext > vch.size())
             {
                 setstate(std::ios::failbit, "CDataStream::read() : end of data");
-                std::memset(pch, 0, nSize);
+                memset(pch, 0, nSize);
                 nSize = vch.size() - nReadPos;
             }
-            std::memcpy(pch, &vch[nReadPos], nSize);
+            memcpy(pch, &vch[nReadPos], nSize);
             nReadPos = 0;
             vch.clear();
             return (*this);
         }
-        std::memcpy(pch, &vch[nReadPos], nSize);
+        memcpy(pch, &vch[nReadPos], nSize);
         nReadPos = nReadPosNext;
         return (*this);
     }
@@ -1013,6 +1013,57 @@ public:
         return (*this);
     }
 };
+
+#ifdef TESTCDATASTREAM
+// VC6sp6
+// CDataStream:
+// n=1000       0 seconds
+// n=2000       0 seconds
+// n=4000       0 seconds
+// n=8000       0 seconds
+// n=16000      0 seconds
+// n=32000      0 seconds
+// n=64000      1 seconds
+// n=128000     1 seconds
+// n=256000     2 seconds
+// n=512000     4 seconds
+// n=1024000    8 seconds
+// n=2048000    16 seconds
+// n=4096000    32 seconds
+// stringstream:
+// n=1000       1 seconds
+// n=2000       1 seconds
+// n=4000       13 seconds
+// n=8000       87 seconds
+// n=16000      400 seconds
+// n=32000      1660 seconds
+// n=64000      6749 seconds
+// n=128000     27241 seconds
+// n=256000     109804 seconds
+#include <iostream>
+int main(int argc, char *argv[])
+{
+    vector<unsigned char> vch(0xcc, 250);
+    printf("CDataStream:\n");
+    for (int n = 1000; n <= 4500000; n *= 2)
+    {
+        CDataStream ss;
+        time_t nStart = time(NULL);
+        for (int i = 0; i < n; i++)
+            ss.write((char*)&vch[0], vch.size());
+        printf("n=%-10d %d seconds\n", n, time(NULL) - nStart);
+    }
+    printf("stringstream:\n");
+    for (int n = 1000; n <= 4500000; n *= 2)
+    {
+        stringstream ss;
+        time_t nStart = time(NULL);
+        for (int i = 0; i < n; i++)
+            ss.write((char*)&vch[0], vch.size());
+        printf("n=%-10d %d seconds\n", n, time(NULL) - nStart);
+    }
+}
+#endif
 
 
 

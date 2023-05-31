@@ -3,58 +3,51 @@
 
 #include <QDialog>
 
-namespace Ui {
-class OptionsDialog;
-}
+QT_BEGIN_NAMESPACE
+class QStackedWidget;
+class QListWidget;
+class QListWidgetItem;
+class QPushButton;
+QT_END_NAMESPACE
 class OptionsModel;
+class MainOptionsPage;
+class DisplayOptionsPage;
 class MonitoredDataMapper;
-class QValidatedLineEdit;
 
 /** Preferences dialog. */
 class OptionsDialog : public QDialog
 {
     Q_OBJECT
-
 public:
-    explicit OptionsDialog(QWidget *parent = 0);
-    ~OptionsDialog();
+    explicit OptionsDialog(QWidget *parent=0);
 
     void setModel(OptionsModel *model);
-    void setMapper();
-
-protected:
-    bool eventFilter(QObject *object, QEvent *event);
-
-private slots:
-    /* enable only apply button */
-    void enableApplyButton();
-    /* disable only apply button */
-    void disableApplyButton();
-    /* enable apply button and OK button */
-    void enableSaveButtons();
-    /* disable apply button and OK button */
-    void disableSaveButtons();
-    /* set apply button and OK button state (enabled / disabled) */
-    void setSaveButtonState(bool fState);
-    void on_okButton_clicked();
-    void on_cancelButton_clicked();
-    void on_applyButton_clicked();
-
-    void showRestartWarning_Proxy();
-    void showRestartWarning_Lang();
-    void updateDisplayUnit();
-    void handleProxyIpValid(QValidatedLineEdit *object, bool fState);
 
 signals:
-    void proxyIpValid(QValidatedLineEdit *object, bool fValid);
+
+public slots:
+    /** Change the current page to \a index. */
+    void changePage(int index);
+
+private slots:
+    void okClicked();
+    void cancelClicked();
+    void applyClicked();
+    void enableApply();
+    void disableApply();
 
 private:
-    Ui::OptionsDialog *ui;
+    QListWidget *contents_widget;
+    QStackedWidget *pages_widget;
     OptionsModel *model;
     MonitoredDataMapper *mapper;
-    bool fRestartWarningDisplayed_Proxy;
-    bool fRestartWarningDisplayed_Lang;
-    bool fProxyIpValid;
+    QPushButton *apply_button;
+
+    // Pages
+    MainOptionsPage *main_page;
+    DisplayOptionsPage *display_page;
+
+    void setupMainPage();
 };
 
 #endif // OPTIONSDIALOG_H

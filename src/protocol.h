@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2013  The curecoin developer
+// Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,19 +15,20 @@
 #include <string>
 #include "uint256.h"
 
-const int DEF_PROT=9911;
-const int DEF_RPCPORT=19911;
-const int DEF_TESTNET_PORT=8600;
-const int DEF_TESTNET_RPCPORT=18600;
+#define PPCOIN_PORT  9901
+#define RPC_PORT     9902
+#define TESTNET_PORT 9903
+#define TESTNET_RPC_PORT 9904
 
 extern bool fTestNet;
+
+void GetMessageStart(unsigned char pchMessageStart[], bool fPersistent = false);
+
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
-    return testnet ? DEF_TESTNET_PORT : DEF_PROT;
+    return testnet ? TESTNET_PORT : PPCOIN_PORT;
 }
 
-
-extern unsigned char pchMessageStart[4];
 
 /** Message header.
  * (4) message start.
@@ -54,16 +55,8 @@ class CMessageHeader
 
     // TODO: make private (improves encapsulation)
     public:
-        enum {
-            MESSAGE_START_SIZE=sizeof(::pchMessageStart),
-            COMMAND_SIZE=12,
-            MESSAGE_SIZE_SIZE=sizeof(int),
-            CHECKSUM_SIZE=sizeof(int),
-
-            MESSAGE_SIZE_OFFSET=MESSAGE_START_SIZE+COMMAND_SIZE,
-            CHECKSUM_OFFSET=MESSAGE_SIZE_OFFSET+MESSAGE_SIZE_SIZE
-        };
-        char pchMessageStart[MESSAGE_START_SIZE];
+        enum { COMMAND_SIZE=12 };
+        unsigned char pchMessageStart[4];
         char pchCommand[COMMAND_SIZE];
         unsigned int nMessageSize;
         unsigned int nChecksum;

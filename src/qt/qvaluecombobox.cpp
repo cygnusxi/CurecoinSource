@@ -6,12 +6,12 @@ QValueComboBox::QValueComboBox(QWidget *parent) :
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(handleSelectionChanged(int)));
 }
 
-QVariant QValueComboBox::value() const
+int QValueComboBox::value() const
 {
-    return itemData(currentIndex(), role);
+    return itemData(currentIndex(), role).toInt();
 }
 
-void QValueComboBox::setValue(const QVariant &value)
+void QValueComboBox::setValue(int value)
 {
     setCurrentIndex(findData(value, role));
 }
