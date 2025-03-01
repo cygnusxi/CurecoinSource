@@ -16,6 +16,8 @@
 #ifndef curecoin_STRLCPY_H
 #define curecoin_STRLCPY_H
 
+#if (__GLIBC__ == 2) && (__GLIBC_MINOR__ < 38)
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -87,4 +89,6 @@ inline size_t strlcat(char *dst, const char *src, size_t siz)
 
     return(dlen + (s - src)); /* count does not include NUL */
 }
+#endif
+
 #endif

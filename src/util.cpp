@@ -1078,7 +1078,11 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
 boost::filesystem::path GetConfigFile()
 {
     boost::filesystem::path pathConfigFile(GetArg("-conf", "curecoin.conf"));
+#if BOOST_VERSION >= 107900
+    if (!pathConfigFile.is_absolute()) pathConfigFile = GetDataDir(false) / pathConfigFile;
+#else
     if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
+#endif
     return pathConfigFile;
 }
 
@@ -1109,7 +1113,11 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet,
 boost::filesystem::path GetPidFile()
 {
     boost::filesystem::path pathPidFile(GetArg("-pid", "curecoind.pid"));
+#if BOOST_VERSION >= 107900
+    if (!pathPidFile.is_absolute()) pathPidFile = GetDataDir() / pathPidFile;
+#else
     if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
+#endif
     return pathPidFile;
 }
 
