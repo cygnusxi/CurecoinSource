@@ -13,13 +13,13 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_GUI -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -DBOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN -D__NO_SYSTEM_INCLUDES -DBOOST_BIND_GLOBAL_PLACEHOLDERS -DQT_DISABLE_DEPRECATED_BEFORE=0 -DUSE_UPNP=0 -DUSE_IPV6=1 -DWIN32 -D_MT -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN
+DEFINES       = -DUNICODE -D_UNICODE -DWIN32 -DMINGW_HAS_SECURE_API=1 -DQT_GUI -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -DBOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN -D__NO_SYSTEM_INCLUDES -DBOOST_BIND_GLOBAL_PLACEHOLDERS -DBOOST_ASIO_ENABLE_OLD_SERVICES -DQT_DISABLE_DEPRECATED_BEFORE=0 -DUSE_UPNP=0 -DUSE_IPV6=1 -DWIN32 -D_MT -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN
 CFLAGS        = -fno-keep-inline-dllexport -march=nocona -msahf -mtune=generic -Wa,-mbig-obj -msse2 -g -Wall -Wextra -Wextra $(DEFINES)
 CXXFLAGS      = -fno-keep-inline-dllexport -march=nocona -msahf -mtune=generic -Wa,-mbig-obj -msse2 -g -std=gnu++11 -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector -fexceptions -mthreads $(DEFINES)
 INCPATH       = -Isrc -Isrc/json -Isrc/qt -IC:/msys64/mingw64/include/QtPrintSupport -IC:/msys64/mingw64/include/QtWidgets -IC:/msys64/mingw64/include/QtGui -IC:/msys64/mingw64/include/QtNetwork -IC:/msys64/mingw64/include/QtCore -Ibuild -Ibuild -I/include -IC:/msys64/mingw64/share/qt5/mkspecs/win32-g++ 
 LINKER      =        g++
 LFLAGS        =        -Wl,--dynamicbase -Wl,--nxcompat -Wl,-subsystem,windows -mthreads
-LIBS        =        -lssl -lcrypto -ldb_cxx -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32 -lboost_system -lboost_filesystem -lboost_program_options -lboost_thread -lboost_chrono C:/msys64/mingw64/lib/libQt5PrintSupport.dll.a C:/msys64/mingw64/lib/libQt5Widgets.dll.a C:/msys64/mingw64/lib/libQt5Gui.dll.a C:/msys64/mingw64/lib/libQt5Network.dll.a C:/msys64/mingw64/lib/libQt5Core.dll.a  -lmingwthrd -lmingw32 C:/msys64/mingw64/lib/libqtmain.a -lshell32 
+LIBS        =        -lssl -lcrypto -ldb_cxx -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32 -Wl,-Bstatic -lboost_filesystem-mt -lboost_program_options-mt -lboost_thread-mt -Wl,-Bdynamic -lboost_chrono-mt C:/msys64/mingw64/lib/libQt5PrintSupport.dll.a C:/msys64/mingw64/lib/libQt5Widgets.dll.a C:/msys64/mingw64/lib/libQt5Gui.dll.a C:/msys64/mingw64/lib/libQt5Network.dll.a C:/msys64/mingw64/lib/libQt5Core.dll.a  -lmingwthrd -lmingw32 C:/msys64/mingw64/lib/libqtmain.a -lshell32 
 QMAKE         = C:/msys64/mingw64/bin/qmake.exe
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d

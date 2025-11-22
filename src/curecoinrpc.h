@@ -34,9 +34,9 @@ class CBlockIndex;
     typedef boost::asio::io_context ioContext;
 
 #else
-    #define GetIOService(s) ((s).get_io_service())
-    #define GetIOServiceFromPtr(s) ((s)->get_io_service())
-    typedef boost::asio::io_service ioContext;
+    #define GetIOService(s) ((s).get_io_context())
+    #define GetIOServiceFromPtr(s) ((s)->get_io_context())
+    typedef boost::asio::io_context ioContext;
 #endif
 
 // HTTP status codes
