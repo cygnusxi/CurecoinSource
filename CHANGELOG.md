@@ -6,4 +6,5 @@ CHANGELOG.md
 
 2.2.0.3 Removed the irc.h and irc.cpp files from the project. (this was a potential security issue)
 
+2.2.0.4 Tweaking DNS function timings tp speed up peer discovery
 

@@ -1205,7 +1205,7 @@ void ThreadDNSAddressSeed2(void* parg)
                     {
                         int nOneDay = 24*3600;
                         CAddress addr = CAddress(CService(ip, GetDefaultPort()));
-                        addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
+                        addr.nTime = GetTime() - nOneDay/2 - GetRand(nOneDay); // use a random age between 12 and 36 hours old
                         vAdd.push_back(addr);
                         found++;
                     }
@@ -1252,7 +1252,7 @@ void ThreadDumpAddress2(void* parg)
     {
         DumpAddresses();
         vnThreadsRunning[THREAD_DUMPADDRESS]--;
-        Sleep(100000);
+        Sleep(60000); // Dump peers.dat every 60 seconds
         vnThreadsRunning[THREAD_DUMPADDRESS]++;
     }
     vnThreadsRunning[THREAD_DUMPADDRESS]--;
