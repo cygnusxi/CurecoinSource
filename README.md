@@ -25,7 +25,9 @@ NOTE: The blockchain, `wallet.dat`, and other settings like the `curecoin.conf` 
 - Mac: `~/Library/Application Support/curecoin`
 
 If the wallet is not syncing immediately, just be patient. Let the wallet run for a day, and will sync up with the network once it finds other nodes to connect to. If the wallet is not connecting to other nodes:
-- You may need to Port Forward port `9911` on your router to the wallet PC.
+- **You will need to manually Port Forward port `9911`** on your router to the wallet PC.
+  - **Note:** UPnP (automatic port forwarding) is temporarily disabled in recent builds due to library compatibility issues. Manual port forwarding is required for incoming connections.
+  - This does not affect outgoing connections or syncing, only accepting incoming peer connections.
 - You can add additional seed nodes in a `curecoin.conf` file, from [Network 'Node List' Buttons](https://chainz.cryptoid.info/cure/#!network), like:
   ```
   addnode=111.111.111.111
