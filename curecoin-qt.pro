@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = curecoin-qt
-VERSION = 2.2.0.2
+VERSION = 2.2.0.3
 INCLUDEPATH += src src/json src/qt
 # Note: BOOST_ASIO_ENABLE_OLD_SERVICES removed - handled in curecoinrpc.h with version detection
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_ASIO_ENABLE_OLD_SERVICES
@@ -137,7 +137,6 @@ HEADERS += src/qt/curecoingui.h \
     src/walletdb.h \
     src/script.h \
     src/init.h \
-    src/irc.h \
     src/mruset.h \
     src/json/json_spirit_writer_template.h \
     src/json/json_spirit_writer.h \
@@ -201,7 +200,6 @@ SOURCES += src/qt/curecoin.cpp src/qt/curecoingui.cpp \
     src/main.cpp \
     src/init.cpp \
     src/net.cpp \
-    src/irc.cpp \
     src/checkpoints.cpp \
     src/addrman.cpp \
     src/db.cpp \
