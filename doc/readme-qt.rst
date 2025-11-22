@@ -16,6 +16,12 @@ git clone https://github.com/cygnusxi/CurecoinSource.git
 
 ##FOR THE GUI CLIENT:
 
+Ubuntu 22.04+ / Debian 12+:
+
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb++-dev dh-make build-essential
+
+Older Ubuntu 18.04 / Debian 10:
+
 sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
 
 From the main directory, run the following:
@@ -28,15 +34,21 @@ Alternatively, don't run that command and just place the binary wherever you wan
 
 ##FOR THE HEADLESS CURECOIND:
 
+Ubuntu 22.04+ / Debian 12+:
+
+sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb++-dev libminiupnpc-dev dh-make build-essential
+
+Older Ubuntu 18.04 / Debian 10:
+
 sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential
+
 cd src/ && mkdir obj/ && make -f makefile.unix
 
-sudo make
-
-install
+sudo make install
 
 Alternatively, don't run that command and just place the binary wherever you want.
-libdb4.8 should also work if libdb5.1 is too high a version for you. Newer versions of Linux will need libdb5.3++-dev
+
+Note: Berkeley DB 5.3+ or 6.x are supported. The codebase now requires C++11 compiler support.
 
 Alternatively, install `Qt Creator`_ and open the `curecoin-qt.pro` file.
 
@@ -134,19 +146,39 @@ flag to qmake to control this:
 +--------------+--------------------------------------------------------------------------+
 
 
-Berkely DB version warning
+Berkeley DB version warning
 ==========================
 
-A warning for people using the *static binary* version of curecoin on a Linux/UNIX-ish system (tl;dr: **Berkely DB databases are not forward compatible**).
+A warning for people using the *static binary* version of curecoin on a Linux/UNIX-ish system (tl;dr: **Berkeley DB databases are not forward compatible**).
 
-The static binary version of curecoin is linked against libdb4.8 (see also `this Debian issue`_).
+Older static binary versions of curecoin were linked against libdb4.8 (see also `this Debian issue`_).
 
-Now the nasty thing is that databases from 5.X are not compatible with 4.X.
+Now the nasty thing is that databases from 5.X/6.X are not compatible with 4.X.
 
-If the globally installed development package of Berkely DB installed on your system is 5.X, any source you
-build yourself will be linked against that. The first time you run with a 5.X version the database will be upgraded,
+If the globally installed development package of Berkeley DB installed on your system is 5.X or 6.X, any source you
+build yourself will be linked against that. The first time you run with a 5.X/6.X version the database will be upgraded,
 and 4.X cannot open the new format. This means that you cannot go back to the old statically linked version without
 significant hassle!
 
+**Recommendation:** Use Berkeley DB 5.3+ or 6.x consistently. Modern builds (2024+) use libdb++ which links to the
+latest available version on your system.
+
 .. _`this Debian issue`: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=621425
+
+Compiler Requirements
+=====================
+
+This codebase now requires C++11 support. Minimum compiler versions:
+
+- GCC 7.0+
+- Clang 5.0+
+- MSVC 2017+
+
+Recommended Library Versions (2024)
+===================================
+
+- Qt: 5.15 LTS or 6.x
+- Boost: 1.70+ (tested up to 1.82+)
+- OpenSSL: 1.1.1+ or 3.0+
+- Berkeley DB: 5.3+ or 6.x
 

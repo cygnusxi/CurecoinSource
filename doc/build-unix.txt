@@ -26,11 +26,12 @@ Dependencies
 
  Library     Purpose           Description
  -------     -------           -----------
- libssl      SSL Support       Secure communications
- libdb4.8    Berkeley DB       Blockchain & wallet storage
- libboost    Boost             C++ Library
+ libssl      SSL Support       Secure communications (OpenSSL 1.1.1+ or 3.0+)
+ libdb       Berkeley DB       Blockchain & wallet storage (BDB 5.3+ or 6.x)
+ libboost    Boost             C++ Library (1.70+ recommended)
  miniupnpc   UPnP Support      Optional firewall-jumping support
  libqrencode QRCode generation Optional QRCode generation
+ C++11       Compiler          GCC 7+ or Clang 5+ with C++11 support
 
 miniupnpc may be used for UPnP port mapping.  It can be downloaded from
 http://miniupnp.tuxfamily.org/files/.  UPnP support is compiled in and
@@ -54,25 +55,41 @@ Licenses of statically linked libraries:
  Boost         MIT-like license
  miniupnpc     New (3-clause) BSD license
 
-Versions used in this release:
- GCC           4.3.3
- OpenSSL       0.9.8g
- Berkeley DB   4.8.30.NC
- Boost         1.37
- miniupnpc     1.6
+Recommended versions (as of 2024):
+ GCC           7.0+ (with C++11 support)
+ OpenSSL       1.1.1+ or 3.0+
+ Berkeley DB   5.3+ or 6.x
+ Boost         1.70+ (tested up to 1.82+)
+ miniupnpc     2.0+
+ Qt            5.15+ or 6.x (for GUI)
+
+Legacy versions (older builds):
+ GCC           4.3.3+
+ OpenSSL       0.9.8g+ (deprecated, security risk)
+ Berkeley DB   4.8.30.NC+
+ Boost         1.37+ (deprecated)
+ miniupnpc     1.6+
 
 Dependency Build Instructions: Ubuntu & Debian
 ----------------------------------------------
+
+For Ubuntu 22.04+ / Debian 12+ (Recommended):
 sudo apt-get install build-essential
 sudo apt-get install libssl-dev
-sudo apt-get install libdb4.8-dev
-sudo apt-get install libdb4.8++-dev
- Boost 1.40+: sudo apt-get install libboost-all-dev
- or Boost 1.37: sudo apt-get install libboost1.37-dev
+sudo apt-get install libdb++-dev
+sudo apt-get install libboost-all-dev
 sudo apt-get install libqrencode-dev
 sudo apt-get install miniupnpc libminiupnpc-dev
 
-If using Boost 1.37, append -mt to the boost libraries in the makefile.
+For older Ubuntu 18.04 / Debian 10:
+sudo apt-get install build-essential
+sudo apt-get install libssl-dev
+sudo apt-get install libdb5.3-dev libdb5.3++-dev
+sudo apt-get install libboost-all-dev
+sudo apt-get install libqrencode-dev
+sudo apt-get install miniupnpc libminiupnpc-dev
+
+Note: Modern Boost versions (1.70+) do not require -mt suffix in makefiles.
 
 
 Dependency Build Instructions: Gentoo
