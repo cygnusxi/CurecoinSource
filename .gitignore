@@ -213,3 +213,63 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+
+#################
+## CureCoin Specific
+#################
+
+# Build artifacts
+Makefile
+Makefile.Debug
+Makefile.Release
+object_script.curecoin-qt.Debug
+object_script.curecoin-qt.Release
+*.o
+*.a
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+.qmake.stash
+
+# Generated files
+src/obj/
+curecoin-qt
+curecoind
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+
+
+#################
+## Developer Documentation
+#################
+# These are internal development/analysis documents.
+# Users only need README.md, QUICKSTART.md, and doc/ folder.
+# Keep these docs in local development but don't push to releases.
+
+# Code analysis and improvement tracking
+ACTION_CHECKLIST.md
+ACTUAL_PROGRESS.md
+ANALYSIS_INDEX.md
+CHANGES_SUMMARY.md
+CODE_IMPROVEMENTS_LIST.md
+CURRENT_STATUS.md
+DOCUMENTATION_UPDATE_SUMMARY.md
+DOCS_STRATEGY.md
+GITIGNORE_UPDATE_SUMMARY.md
+IMPLEMENTATION_PLAN.md
+IMPROVEMENTS_SUMMARY.md
+PRIORITY_MATRIX.md
+README_ANALYSIS.md
+TESTING_GUIDE.md
+UPGRADE_RECOMMENDATIONS.md
+
+# Note: The following docs ARE included for users:
+# - README.md (main user documentation)
+# - QUICKSTART.md (quick start guide)
+# - INSTALL (installation instructions)
+# - COPYING (license)
+# - Leeme (Spanish readme)
+# - doc/ folder (all build documentation)
