@@ -276,3 +276,8 @@ UPGRADE_RECOMMENDATIONS.md
 # - COPYING (license)
 # - Leeme (Spanish readme)
 # - doc/ folder (all build documentation)
+*.Debug
+Makefile.Debug
+object_script.curecoin-qt.Debug
+*.Release
+*.Debug
