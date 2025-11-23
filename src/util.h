@@ -449,11 +449,8 @@ inline uint256 Hash(const T1 pbegin, const T1 pend)
     EVP_MD_CTX_free(ctx);
     memcpy(&hash1, hash_out, sizeof(hash1));
     uint256 hash2;
-    EVP_MD_CTX* ctx2 = EVP_MD_CTX_new();
-    EVP_DigestInit_ex(ctx2, EVP_sha256(), NULL);
-    EVP_DigestUpdate(ctx2, (unsigned char*)&hash1, sizeof(hash1));
-    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, NULL);
-    EVP_MD_CTX_free(ctx2);
+    unsigned int hash_len2;
+    EVP_Digest(EVP_sha256(), (unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2, &hash_len2);
     return hash2;
 }
 
@@ -492,7 +489,8 @@ public:
         unsigned int len;
         EVP_DigestFinal_ex(ctx, (unsigned char*)&hash1, &len);
         uint256 hash2;
-        EVP_Digest(EVP_sha256(), (unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2, NULL);
+        unsigned int len2;
+        EVP_Digest(EVP_sha256(), (unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2, &len2);
         return hash2;
     }
 
@@ -546,7 +544,8 @@ inline uint256 Hash(const T1 p1begin, const T1 p1end,
     EVP_MD_CTX* ctx2 = EVP_MD_CTX_new();
     EVP_DigestInit_ex(ctx2, EVP_sha256(), NULL);
     EVP_DigestUpdate(ctx2, (unsigned char*)&hash1, sizeof(hash1));
-    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, NULL);
+    unsigned int len2;
+    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, &len2);
     EVP_MD_CTX_free(ctx2);
     return hash2;
 }
@@ -574,7 +573,8 @@ inline uint160 Hash160(const std::vector<unsigned char>& vch)
     EVP_MD_CTX* ctx2 = EVP_MD_CTX_new();
     EVP_DigestInit_ex(ctx2, EVP_ripemd160(), NULL);
     EVP_DigestUpdate(ctx2, (unsigned char*)&hash1, sizeof(hash1));
-    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, NULL);
+    unsigned int len2;
+    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, &len2);
     EVP_MD_CTX_free(ctx2);
     return hash2;
 }
