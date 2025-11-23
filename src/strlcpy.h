@@ -20,16 +20,17 @@
 #include <string.h>
 
 /*
- * Only define strlcpy and strlcat if they are not already provided by the system
+ * Use a different approach - only define these if they're not already available
+ * Check using a more reliable method
  */
-#ifndef HAVE_STRLCPY
+#ifndef strlcpy
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters
  * will be copied.  Always NUL terminates (unless siz == 0).
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
-inline size_t strlcpy(char *dst, const char *src, size_t siz)
+static inline size_t strlcpy(char *dst, const char *src, size_t siz)
 {
     char *d = dst;
     const char *s = src;
@@ -57,9 +58,9 @@ inline size_t strlcpy(char *dst, const char *src, size_t siz)
     return(s - src - 1); /* count does not include NUL */
 }
 
-#endif /* HAVE_STRLCPY */
+#endif /* !strlcpy */
 
-#ifndef HAVE_STRLCAT
+#ifndef strlcat
 
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
@@ -68,7 +69,7 @@ inline size_t strlcpy(char *dst, const char *src, size_t siz)
  * Returns strlen(src) + MIN(siz, strlen(initial dst)).
  * If retval >= siz, truncation occurred.
  */
-inline size_t strlcat(char *dst, const char *src, size_t siz)
+static inline size_t strlcat(char *dst, const char *src, size_t siz)
 {
     char *d = dst;
     const char *s = src;
@@ -97,6 +98,6 @@ inline size_t strlcat(char *dst, const char *src, size_t siz)
     return(dlen + (s - src)); /* count does not include NUL */
 }
 
-#endif /* HAVE_STRLCAT */
+#endif /* !strlcat */
 
 #endif

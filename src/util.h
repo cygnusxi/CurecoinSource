@@ -28,6 +28,7 @@ typedef int util_pid_t; /* define for Windows compatibility */
 
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
+#include <openssl/evp.h>
 
 #include "netbase.h" // for AddTimeData
 
@@ -439,40 +440,59 @@ inline uint256 Hash(const T1 pbegin, const T1 pend)
 {
     static unsigned char pblank[1];
     uint256 hash1;
-    SHA256((pbegin == pend ? pblank : (unsigned char*)&pbegin[0]), (pend - pbegin) * sizeof(pbegin[0]), (unsigned char*)&hash1);
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx, pbegin == pend ? pblank : (unsigned char*)&pbegin[0], (pend - pbegin) * sizeof(pbegin[0]));
+    unsigned char hash_out[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+    EVP_DigestFinal_ex(ctx, hash_out, &hash_len);
+    EVP_MD_CTX_free(ctx);
+    memcpy(&hash1, hash_out, sizeof(hash1));
     uint256 hash2;
-    SHA256((unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2);
+    EVP_MD_CTX* ctx2 = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx2, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx2, (unsigned char*)&hash1, sizeof(hash1));
+    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, NULL);
+    EVP_MD_CTX_free(ctx2);
     return hash2;
 }
 
 class CHashWriter
 {
 private:
-    SHA256_CTX ctx;
+    EVP_MD_CTX* ctx;
 
 public:
     int nType;
     int nVersion;
 
     void Init() {
-        SHA256_Init(&ctx);
+        ctx = EVP_MD_CTX_new();
+        EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
     }
 
     CHashWriter(int nTypeIn, int nVersionIn) : nType(nTypeIn), nVersion(nVersionIn) {
         Init();
     }
 
+    ~CHashWriter() {
+        if (ctx) {
+            EVP_MD_CTX_free(ctx);
+        }
+    }
+
     CHashWriter& write(const char *pch, size_t size) {
-        SHA256_Update(&ctx, pch, size);
+        EVP_DigestUpdate(ctx, pch, size);
         return (*this);
     }
 
     // invalidates the object
     uint256 GetHash() {
         uint256 hash1;
-        SHA256_Final((unsigned char*)&hash1, &ctx);
+        unsigned int len;
+        EVP_DigestFinal_ex(ctx, (unsigned char*)&hash1, &len);
         uint256 hash2;
-        SHA256((unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2);
+        EVP_Digest(EVP_sha256(), (unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2, NULL);
         return hash2;
     }
 
@@ -491,13 +511,17 @@ inline uint256 Hash(const T1 p1begin, const T1 p1end,
 {
     static unsigned char pblank[1];
     uint256 hash1;
-    SHA256_CTX ctx;
-    SHA256_Init(&ctx);
-    SHA256_Update(&ctx, (p1begin == p1end ? pblank : (unsigned char*)&p1begin[0]), (p1end - p1begin) * sizeof(p1begin[0]));
-    SHA256_Update(&ctx, (p2begin == p2end ? pblank : (unsigned char*)&p2begin[0]), (p2end - p2begin) * sizeof(p2begin[0]));
-    SHA256_Final((unsigned char*)&hash1, &ctx);
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx, (p1begin == p1end ? pblank : (unsigned char*)&p1begin[0]), (p1end - p1begin) * sizeof(p1begin[0]));
+    EVP_DigestUpdate(ctx, (p2begin == p2end ? pblank : (unsigned char*)&p2begin[0]), (p2end - p2begin) * sizeof(p2begin[0]));
+    unsigned char hash_out[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+    EVP_DigestFinal_ex(ctx, hash_out, &hash_len);
+    EVP_MD_CTX_free(ctx);
+    memcpy(&hash1, hash_out, sizeof(hash1));
     uint256 hash2;
-    SHA256((unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2);
+    EVP_Digest(EVP_sha256(), (unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2, NULL);
     return hash2;
 }
 
@@ -508,14 +532,22 @@ inline uint256 Hash(const T1 p1begin, const T1 p1end,
 {
     static unsigned char pblank[1];
     uint256 hash1;
-    SHA256_CTX ctx;
-    SHA256_Init(&ctx);
-    SHA256_Update(&ctx, (p1begin == p1end ? pblank : (unsigned char*)&p1begin[0]), (p1end - p1begin) * sizeof(p1begin[0]));
-    SHA256_Update(&ctx, (p2begin == p2end ? pblank : (unsigned char*)&p2begin[0]), (p2end - p2begin) * sizeof(p2begin[0]));
-    SHA256_Update(&ctx, (p3begin == p3end ? pblank : (unsigned char*)&p3begin[0]), (p3end - p3begin) * sizeof(p3begin[0]));
-    SHA256_Final((unsigned char*)&hash1, &ctx);
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx, (p1begin == p1end ? pblank : (unsigned char*)&p1begin[0]), (p1end - p1begin) * sizeof(p1begin[0]));
+    EVP_DigestUpdate(ctx, (p2begin == p2end ? pblank : (unsigned char*)&p2begin[0]), (p2end - p2begin) * sizeof(p2begin[0]));
+    EVP_DigestUpdate(ctx, (p3begin == p3end ? pblank : (unsigned char*)&p3begin[0]), (p3end - p3begin) * sizeof(p3begin[0]));
+    unsigned char hash_out[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+    EVP_DigestFinal_ex(ctx, hash_out, &hash_len);
+    EVP_MD_CTX_free(ctx);
+    memcpy(&hash1, hash_out, sizeof(hash1));
     uint256 hash2;
-    SHA256((unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2);
+    EVP_MD_CTX* ctx2 = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx2, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx2, (unsigned char*)&hash1, sizeof(hash1));
+    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, NULL);
+    EVP_MD_CTX_free(ctx2);
     return hash2;
 }
 
@@ -530,9 +562,20 @@ uint256 SerializeHash(const T& obj, int nType=SER_GETHASH, int nVersion=PROTOCOL
 inline uint160 Hash160(const std::vector<unsigned char>& vch)
 {
     uint256 hash1;
-    SHA256(&vch[0], vch.size(), (unsigned char*)&hash1);
+    EVP_MD_CTX* ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx, &vch[0], vch.size());
+    unsigned char hash_out[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+    EVP_DigestFinal_ex(ctx, hash_out, &hash_len);
+    EVP_MD_CTX_free(ctx);
+    memcpy(&hash1, hash_out, sizeof(hash1));
     uint160 hash2;
-    RIPEMD160((unsigned char*)&hash1, sizeof(hash1), (unsigned char*)&hash2);
+    EVP_MD_CTX* ctx2 = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx2, EVP_ripemd160(), NULL);
+    EVP_DigestUpdate(ctx2, (unsigned char*)&hash1, sizeof(hash1));
+    EVP_DigestFinal_ex(ctx2, (unsigned char*)&hash2, NULL);
+    EVP_MD_CTX_free(ctx2);
     return hash2;
 }
 
