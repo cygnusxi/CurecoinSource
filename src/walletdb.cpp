@@ -6,7 +6,6 @@
 #include "walletdb.h"
 #include "wallet.h"
 #include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
 
 #include <list>
 #include <map>
@@ -646,9 +645,11 @@ bool BackupWallet(const CWallet& wallet, const std::string& strDest)
                     pathDest /= wallet.strWalletFile;
 
                 try {
-                    if (boost::filesystem::exists(pathDest))
-                        boost::filesystem::remove(pathDest);
+#if BOOST_VERSION >= 105800
+                    boost::filesystem::copy_file(pathSrc, pathDest, boost::filesystem::copy_options::overwrite_existing);
+#else
                     boost::filesystem::copy_file(pathSrc, pathDest);
+#endif
                     printf("copied wallet.dat to %s\n", pathDest.string().c_str());
                     return true;
                 } catch(const boost::filesystem::filesystem_error &e) {
