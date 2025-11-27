@@ -510,8 +510,9 @@ bool ClientAllowed(const boost::asio::ip::address& address)
 {
     // Make sure that IPv4-compatible and IPv4-mapped IPv6 addresses are treated as IPv4 addresses
     if (address.is_v6()
-    && (address.to_v6().is_v4_mapped()
-    && (boost::asio::ip::make_address_v4(boost::asio::ip::v4_mapped, address.to_v6()).to_uint() & 0xff000000) == 0x7f000000))
+    && address.to_v6().is_v4_mapped()
+    && (boost::asio::ip::make_address_v4(boost::asio::ip::v4_mapped, address.to_v6()).to_uint() & 0xff000000) == 0x7f000000)
+        return true;
 
     if (address == boost::asio::ip::address_v4::loopback()
      || address == boost::asio::ip::address_v6::loopback()
