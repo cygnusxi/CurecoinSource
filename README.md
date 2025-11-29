@@ -25,7 +25,9 @@ NOTE: The blockchain, `wallet.dat`, and other settings like the `curecoin.conf` 
 - Mac: `~/Library/Application Support/curecoin`
 
 If the wallet is not syncing immediately, just be patient. Let the wallet run for a day, and will sync up with the network once it finds other nodes to connect to. If the wallet is not connecting to other nodes:
-- You may need to Port Forward port `9911` on your router to the wallet PC.
+- **You will need to manually Port Forward port `9911`** on your router to the wallet PC.
+  - **Note:** UPnP (automatic port forwarding) is temporarily disabled in recent builds due to library compatibility issues. Manual port forwarding is required for incoming connections.
+  - This does not affect outgoing connections or syncing, only accepting incoming peer connections.
 - You can add additional seed nodes in a `curecoin.conf` file, from [Network 'Node List' Buttons](https://chainz.cryptoid.info/cure/#!network), like:
   ```
   addnode=111.111.111.111
@@ -42,13 +44,27 @@ This involves downloading the source, meeting the dependencies, compiling the co
 - Get the source code: `git clone https://github.com/cygnusxi/CurecoinSource.git`
 
 ### FOR GUI CLIENT (curecoin-qt):
-1. If `qt5-default` gives this command an error, then remove it and optionally add `qtbase5-dev` for newer versions of Linux: `sudo apt-get install qtcreator qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools cmake libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential`
+1. Install dependencies (Ubuntu 22.04+ / Debian 12+):
+   ```bash
+   sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
+     cmake libboost-dev libboost-system-dev libboost-filesystem-dev \
+     libboost-program-options-dev libboost-thread-dev libssl-dev \
+     libminiupnpc-dev libdb++-dev dh-make build-essential
+   ```
+   **Note:** For older Ubuntu/Debian, use `libdb5.3++-dev` instead of `libdb++-dev`
+
 2. From the main directory `cd CurecoinSource`, run the following:
 3. `qmake && make`
 4. Run the GUI wallet with: `./curecoin-qt`
 
 ### FOR HEADLESS (curecoind):
-1. `sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev libdb5.3-dev libdb5.3++-dev libminiupnpc-dev dh-make build-essential`
+1. Install dependencies (Ubuntu 22.04+ / Debian 12+):
+   ```bash
+   sudo apt-get install libboost-all-dev libqrencode-dev libssl-dev \
+     libdb++-dev libminiupnpc-dev dh-make build-essential
+   ```
+   **Note:** For older Ubuntu/Debian, use `libdb5.3-dev libdb5.3++-dev` instead of `libdb++-dev`
+
 2. `cd src`
 3. `make -f makefile.unix`
 4. `sudo make install` &nbsp; &nbsp; {Alternatively, don't run that command, and just place the binary wherever you want}
@@ -57,10 +73,13 @@ This involves downloading the source, meeting the dependencies, compiling the co
    * See the full list of commands with: `./curecoind help`
    * The wallet and blockchain files will be stored in: `~/.curecoin`
 
-### GUI Wallet Linux Example: Install Steps on Mint 21.1 / Ubuntu 22.04:
-```
+### GUI Wallet Linux Example: Install Steps on Mint 21.1+ / Ubuntu 22.04+:
+```bash
 sudo apt install git
-sudo apt-get install qtcreator qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools cmake libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
+  cmake libboost-dev libboost-system-dev libboost-filesystem-dev \
+  libboost-program-options-dev libboost-thread-dev libssl-dev \
+  libminiupnpc-dev libdb++-dev dh-make build-essential
 
 mkdir curecoin
 cd curecoin
@@ -71,10 +90,22 @@ qmake && make
 ./curecoin-qt
 ```
 
+**Recommended Versions:**
+- Qt 5.15+ (Qt 6.x also supported)
+- Boost 1.70+ (tested up to 1.82+)
+- OpenSSL 1.1.1+ or 3.0+
+- Berkeley DB 5.3+ or 6.x
+- C++11 compatible compiler (GCC 7+, Clang 5+)
+
 ### GUI Wallet Linux Example: Install Steps on older Mint 19 / Ubuntu 18.04:
-```
+**Note:** Ubuntu 18.04 is EOL. Consider upgrading to Ubuntu 22.04+ for better security and compatibility.
+
+```bash
 sudo apt install git
-sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools libboost-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libminiupnpc-dev libdb5.3++-dev dh-make build-essential
+sudo apt-get install qt5-default qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
+  libboost-dev libboost-system-dev libboost-filesystem-dev \
+  libboost-program-options-dev libboost-thread-dev libssl-dev \
+  libminiupnpc-dev libdb5.3++-dev dh-make build-essential
 
 mkdir curecoin
 cd curecoin
@@ -84,16 +115,16 @@ cd CurecoinSource
 qmake
 make
 
-   NOTE: If it fails to compile (undefined reference to `SSLeay_version'), then you may need to do these extra steps:
-     sudo apt-get update
-     sudo apt-get upgrade
-     sudo apt-get install libssl1.0-dev
-     [Reboot]  NOTE: ensure the PC is fully updated, and 'libssl1.0-dev' is installed after the items at the beginning.
-     cd curecoin/CurecoinSource
-     qmake
-     make
-
 ./curecoin-qt
+```
+
+**Troubleshooting for older systems:**
+If it fails to compile with OpenSSL errors (`undefined reference to SSLeay_version`):
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install libssl1.0-dev
+# Reboot, then retry compilation
 ```
 
 ### What are the commands that are accepted by the client?

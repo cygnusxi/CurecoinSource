@@ -515,7 +515,7 @@ void ParseParameters(int argc, const char* const argv[])
     for (int i = 1; i < argc; i++)
     {
         char psz[10000];
-        strlcpy(psz, argv[i], sizeof(psz));
+        cure_strlcpy(psz, argv[i], sizeof(psz));
         char* pszValue = (char*)"";
         if (strchr(psz, '='))
         {
@@ -1078,7 +1078,7 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
 boost::filesystem::path GetConfigFile()
 {
     boost::filesystem::path pathConfigFile(GetArg("-conf", "curecoin.conf"));
-    if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
+    if (!pathConfigFile.is_absolute()) pathConfigFile = GetDataDir(false) / pathConfigFile;
     return pathConfigFile;
 }
 
@@ -1109,7 +1109,7 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet,
 boost::filesystem::path GetPidFile()
 {
     boost::filesystem::path pathPidFile(GetArg("-pid", "curecoind.pid"));
-    if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
+    if (!pathPidFile.is_absolute()) pathPidFile = GetDataDir() / pathPidFile;
     return pathPidFile;
 }
 
@@ -1175,7 +1175,7 @@ void ShrinkDebugFile()
     {
         // Restart the file with some of the end
         char pch[200000];
-        fseek(file, -sizeof(pch), SEEK_END);
+        fseek(file, -(long)sizeof(pch), SEEK_END);
         int nBytes = fread(pch, 1, sizeof(pch), file);
         fclose(file);
 

@@ -1,9 +1,10 @@
 TEMPLATE = app
 TARGET = curecoin-qt
-VERSION = 2.0.0.1
+VERSION = 2.2.0.7
 INCLUDEPATH += src src/json src/qt
-DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN BOOST_ASIO_ENABLE_OLD_SERVICES __NO_SYSTEM_INCLUDES
-CONFIG += no_include_pwd
+# Note: BOOST_ASIO_ENABLE_OLD_SERVICES removed - handled in curecoinrpc.h with version detection
+DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_ASIO_ENABLE_OLD_SERVICES
+CONFIG += no_include_pwd c++11
 QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -33,8 +34,8 @@ UI_DIR = build
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
-    # Mac: compile for maximum compatibility (10.5, 32-bit)
-    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.5 -arch i386 -isysroot /Developer/SDKs/MacOSX10.5.sdk
+    # Mac: compile for modern macOS (10.13+, 64-bit only)
+    macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.13
 
     !windows:!macx {
         # Linux: static link
@@ -60,22 +61,11 @@ contains(USE_QRCODE, 1) {
     LIBS += -lqrencode -lpthread
 }
 
-# use: qmake "USE_UPNP=1" ( enabled by default; default)
-#  or: qmake "USE_UPNP=0" (disabled by default)
-#  or: qmake "USE_UPNP=-" (not supported)
-# miniupnpc (http://miniupnp.free.fr/files/) must be installed for support
-contains(USE_UPNP, -) {
-    message(Building without UPNP support)
-} else {
-    message(Building with UPNP support)
-    count(USE_UPNP, 0) {
-        USE_UPNP=1
-    }
-    DEFINES += USE_UPNP=$$USE_UPNP STATICLIB
-    INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
-    LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
-    win32:LIBS += -liphlpapi
-}
+# --- UPNP DISABLED FORCEFULLY ---
+# We are disabling UPNP to avoid miniwget.h errors
+message(Building without UPNP support)
+DEFINES += USE_UPNP=0
+# -------------------------------
 
 # use: qmake "USE_DBUS=1"
 contains(USE_DBUS, 1) {
@@ -147,7 +137,6 @@ HEADERS += src/qt/curecoingui.h \
     src/walletdb.h \
     src/script.h \
     src/init.h \
-    src/irc.h \
     src/mruset.h \
     src/json/json_spirit_writer_template.h \
     src/json/json_spirit_writer.h \
@@ -211,7 +200,6 @@ SOURCES += src/qt/curecoin.cpp src/qt/curecoingui.cpp \
     src/main.cpp \
     src/init.cpp \
     src/net.cpp \
-    src/irc.cpp \
     src/checkpoints.cpp \
     src/addrman.cpp \
     src/db.cpp \
@@ -310,7 +298,9 @@ OTHER_FILES += \
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     macx:BOOST_LIB_SUFFIX = -mt
-    windows:BOOST_LIB_SUFFIX = -mgw44-mt-s-1_50
+    win32:BOOST_LIB_SUFFIX = -mt
+    # Modern Boost versions (1.70+) may not need specific suffixes
+    # windows:BOOST_LIB_SUFFIX = -mgw44-mt-s-1_50
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -373,7 +363,7 @@ LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
 
-LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
+LIBS += -Wl,-Bstatic -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX -Wl,-Bdynamic
 windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
 
 contains(RELEASE, 1) {

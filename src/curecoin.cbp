@@ -76,8 +76,6 @@
 		<Unit filename="db.h" />
 		<Unit filename="init.cpp" />
 		<Unit filename="init.h" />
-		<Unit filename="irc.cpp" />
-		<Unit filename="irc.h" />
 		<Unit filename="json/json_spirit.h" />
 		<Unit filename="json/json_spirit_error_position.h" />
 		<Unit filename="json/json_spirit_reader.cpp" />

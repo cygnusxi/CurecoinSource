@@ -3,7 +3,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "irc.h"
 #include "db.h"
 #include "net.h"
 #include "init.h"
@@ -24,7 +23,7 @@
 #include <string.h>
 #endif
 
-#ifdef USE_UPNP
+#if USE_UPNP
 #include <miniupnpc/miniwget.h>
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
@@ -38,7 +37,7 @@ void ThreadMessageHandler2(void* parg);
 void ThreadSocketHandler2(void* parg);
 void ThreadOpenConnections2(void* parg);
 void ThreadOpenAddedConnections2(void* parg);
-#ifdef USE_UPNP
+#if USE_UPNP
 void ThreadMapPort2(void* parg);
 #endif
 void ThreadDNSAddressSeed2(void* parg);
@@ -353,7 +352,7 @@ bool GetMyExternalIP2(const CService& addrConnect, const char* pszGet, const cha
     return error("GetMyExternalIP() : connection closed");
 }
 
-// We now get our external IP from the IRC server first and only use this as a backup
+// Try to get our external IP from a web service
 bool GetMyExternalIP(CNetAddr& ipRet)
 {
     CService addrConnect;
@@ -1003,7 +1002,7 @@ void ThreadSocketHandler2(void* parg)
 
 
 
-#ifdef USE_UPNP
+#if USE_UPNP
 void ThreadMapPort(void* parg)
 {
     // Make this thread recognisable as the UPnP thread
@@ -1206,7 +1205,7 @@ void ThreadDNSAddressSeed2(void* parg)
                     {
                         int nOneDay = 24*3600;
                         CAddress addr = CAddress(CService(ip, GetDefaultPort()));
-                        addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
+                        addr.nTime = GetTime() - nOneDay/2 - GetRand(nOneDay); // use a random age between 12 and 36 hours old
                         vAdd.push_back(addr);
                         found++;
                     }
@@ -1253,7 +1252,7 @@ void ThreadDumpAddress2(void* parg)
     {
         DumpAddresses();
         vnThreadsRunning[THREAD_DUMPADDRESS]--;
-        Sleep(100000);
+        Sleep(60000); // Dump peers.dat every 60 seconds
         vnThreadsRunning[THREAD_DUMPADDRESS]++;
     }
     vnThreadsRunning[THREAD_DUMPADDRESS]--;
@@ -1378,7 +1377,7 @@ void ThreadOpenConnections2(void* parg)
         if (fShutdown)
             return;
 
-        // Add seed nodes if IRC isn't working
+        // Add seed nodes if DNS seeding hasn't found peers yet
         if (addrman.size()==0 && (GetTime() - nStart > 60) && !fTestNet)
         {
             std::vector<CAddress> vAdd;
@@ -1857,6 +1856,16 @@ void StartNode(void* parg)
     // Start threads
     //
 
+    if (!GetBoolArg("-dnsseed", true))
+        printf("DNS seeding disabled\n");
+    else
+        if (!NewThread(ThreadDNSAddressSeed, NULL))
+            printf("Error: NewThread(ThreadDNSAddressSeed) failed\n");
+
+
+
+
+
 /*
     if (!GetBoolArg("-dnsseed", true))
         printf("DNS seeding disabled\n");
@@ -1865,18 +1874,17 @@ void StartNode(void* parg)
             printf("Error: NewThread(ThreadDNSAddressSeed) failed\n");
 */
 
+// Disable NYI DNS seeding (part of the old start threads)
+
+/*
     if (!GetBoolArg("-dnsseed", false))
         printf("DNS seeding disabled\n");
     if (GetBoolArg("-dnsseed", false))
         printf("DNS seeding NYI\n");
-
+*/
     // Map ports with UPnP
     if (fUseUPnP)
         MapPort();
-
-    // Get addresses from IRC and advertise ours
-    if (!NewThread(ThreadIRCSeed, NULL))
-        printf("Error: NewThread(ThreadIRCSeed) failed\n");
 
     // Send and receive from sockets, accept connections
     if (!NewThread(ThreadSocketHandler, NULL))
@@ -1935,7 +1943,7 @@ bool StopNode()
     if (vnThreadsRunning[THREAD_MINER] > 0) printf("ThreadcurecoinMiner still running\n");
     if (vnThreadsRunning[THREAD_RPCLISTENER] > 0) printf("ThreadRPCListener still running\n");
     if (vnThreadsRunning[THREAD_RPCHANDLER] > 0) printf("ThreadsRPCServer still running\n");
-#ifdef USE_UPNP
+#if USE_UPNP
     if (vnThreadsRunning[THREAD_UPNP] > 0) printf("ThreadMapPort still running\n");
 #endif
     if (vnThreadsRunning[THREAD_DNSSEED] > 0) printf("ThreadDNSAddressSeed still running\n");

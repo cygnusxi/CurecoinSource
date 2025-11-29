@@ -127,7 +127,7 @@ bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nM
         return false;
     char psz[256];
     char *pszHost = psz;
-    strlcpy(psz, pszName, sizeof(psz));
+    cure_strlcpy(psz, pszName, sizeof(psz));
     if (psz[0] == '[' && psz[strlen(psz)-1] == ']')
     {
         pszHost = psz+1;
