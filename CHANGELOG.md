@@ -56,3 +56,7 @@ Implemented -Wl,-Bstatic and -Wl,-Bdynamic wrapping to statically link Boost lib
 2.2.0.4 Tweaking DNS function timings tp speed up peer discovery
 
 2.2.0.5 strlcpy fix, compiling fixes for windows and linux
+
+2.2.0.6 Critical RPC function syntax fix in curecoinrpc.cpp. Fixed broken ClientAllowed function that was causing HTTP 403 Forbidden errors for legitimate RPC connections.
+
+2.2.0.7 Backward compatible Boost fixes and code cleanup. Improved Boost library compatibility and cleaned up deprecated code patterns.
