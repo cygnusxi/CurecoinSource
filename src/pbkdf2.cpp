@@ -1,4 +1,4 @@
-// Copyright (c) 2013 curecoin Developers
+// Copyright (c) 2013-2025 CureCoin Developers
 
 #include <cstring>
 #include "pbkdf2.h"

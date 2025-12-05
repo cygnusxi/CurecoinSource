@@ -16,8 +16,8 @@
     </message>
     <message>
         <location line="+41"/>
-        <source>Copyright © 2013 The curecoin developers</source>
-        <translation>版权所有 © 2013 赏金币开发团队</translation>
+        <source>© 2013-2025 The Curecoin Foundation. CureCoin®</source>
+        <translation>版权所有 © 2013-2025 赏金币基金会。保留所有权利。CureCoin® 为注册商标。</translation>
     </message>
     <message>
         <location line="+13"/>

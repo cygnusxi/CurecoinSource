@@ -91,8 +91,7 @@
         <cursorShape>IBeamCursor</cursorShape>
        </property>
        <property name="text">
-        <string>Copyright © 2013-2020 The Curecoin Foundation
-         https://www.curecoin.net</string>
+        <string>Copyright © 2013-2025 The Curecoin Foundation. All rights reserved. CureCoin® is a registered trademark.</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -106,7 +105,7 @@
        </property>
        <property name="text">
         <string>
-This is experimental software. If you don't treat it as such, you're likely to put an eye out!
+This is experimental software. Make regular backups of your data. Store backups in a secure location. 
 
 Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php.
 

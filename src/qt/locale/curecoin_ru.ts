@@ -16,8 +16,8 @@
     </message>
     <message>
         <location line="+41"/>
-        <source>Copyright © 2009-2012 The curecoin developers</source>
-        <translation>Все права защищены © 2009-2012 Разработчики curecoin</translation>
+        <source>Copyright © 2013-2025 The Curecoin Foundation. All rights reserved.CureCoin® is a registered trademark.</source>
+        <translation>Авторское право © 2013-2025 Фонд Curecoin. Все права защищены. CureCoin® является зарегистрированным товарным знаком.</translation>
     </message>
     <message>
         <location line="+13"/>
