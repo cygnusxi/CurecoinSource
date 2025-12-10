@@ -30,7 +30,7 @@
        <item>
         <widget class="QLabel" name="infoLabel_SM">
          <property name="text">
-          <string>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</string>
+          <string>You can sign messages with your addresses to prove you own them. Only sign messages that you fully understand and agree with.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -230,7 +230,7 @@
        <item>
         <widget class="QLabel" name="infoLabel_VM">
          <property name="text">
-          <string>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</string>
+          <string>Enter the address, message (copy exactly including spaces and line breaks), and signature below to verify the message.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -251,7 +251,7 @@
          <item>
           <widget class="QValidatedLineEdit" name="addressIn_VM">
            <property name="toolTip">
-            <string>The address the message was signed with (e.g. 4Zo1ga6xuKuQ7JV7M9rGDoxdbYwV5zgQJ5)</string>
+            <string>The address the message was signed with (e.g. BZo1ga6xuKuQ7JV7M9rGDoxdbYwV5zgQJ5)</string>
            </property>
            <property name="maxLength">
             <number>34</number>

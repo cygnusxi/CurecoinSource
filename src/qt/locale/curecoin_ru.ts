@@ -225,8 +225,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR COINS&lt;/b&gt;!</source>
-        <translation>Внимание: если вы зашифруете бумажник и потеряете пароль, вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ ВАШИ МОНЕТЫ&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will lose access to your funds.</source>
+        <translation>Внимание: если вы зашифруете бумажник и потеряете пароль, вы потеряете доступ к своим средствам.</translation>
     </message>
     <message>
         <location line="+0"/>
