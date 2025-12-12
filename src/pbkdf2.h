@@ -1,4 +1,4 @@
-// Copyright (c) 2013 curecoin Developers
+// Copyright (c) 2013-2025 CureCoin Developers
 
 #ifndef PBKDF2_H
 #define PBKDF2_H

@@ -16,8 +16,8 @@
     </message>
     <message>
         <location line="+41"/>
-        <source>Copyright © 2013 The curecoin developers</source>
-        <translation>版权所有 © 2013 赏金币开发团队</translation>
+        <source>© 2013-2025 The Curecoin Foundation. CureCoin®</source>
+        <translation>版权所有 © 2013-2025 赏金币基金会。保留所有权利。CureCoin® 为注册商标。</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -227,9 +227,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR COINS&lt;/b&gt;!</source>
-        <translation>警告：如果您加密了您的钱包之后忘记了口令，您将会&lt;b&gt;失去所有的赏金币&lt;/b&gt;！
-？</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will lose access to your funds.</source>
+        <translation>警告：如果您加密了钱包并丢失了口令，您将无法访问您的资金。</translation>
     </message>
     <message>
         <location line="+0"/>

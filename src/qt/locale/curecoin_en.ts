@@ -16,8 +16,8 @@
     </message>
     <message>
         <location line="+41"/>
-        <source>Copyright © 2013 The curecoin developers</source>
-        <translation>Copyright © 2013 The curecoin developers</translation>
+        <source>Copyright © 2013-2025 The Curecoin Foundation. All rights reserved.CureCoin® is a registered trademark.</source>
+        <translation>Copyright © 2013-2025 The Curecoin Foundation. All rights reserved.CureCoin® is a registered trademark.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -225,8 +225,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR COINS&lt;/b&gt;!</source>
-        <translation>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR COINS&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will lose access to your funds.</source>
+        <translation>Warning: If you encrypt your wallet and lose your passphrase, you will lose access to your funds.</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1449,8 +1449,8 @@ Address: %4
     </message>
     <message>
         <location line="-118"/>
-        <source>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</translation>
+        <source>You can sign messages with your addresses to prove you own them. Only sign messages that you fully understand and agree with.</source>
+        <translation>You can sign messages with your addresses to prove you own them. Only sign messages that you fully understand and agree with.</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -1513,8 +1513,8 @@ Address: %4
     </message>
     <message>
         <location line="-64"/>
-        <source>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</source>
-        <translation>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</translation>
+        <source>Enter the address, message (copy exactly including spaces and line breaks), and signature below to verify the message.</source>
+        <translation>Enter the address, message (copy exactly including spaces and line breaks), and signature below to verify the message.</translation>
     </message>
     <message>
         <location line="+21"/>

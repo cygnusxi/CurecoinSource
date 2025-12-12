@@ -16,8 +16,8 @@
     </message>
     <message>
         <location line="+41"/>
-        <source>Copyright © 2009-2012 The curecoin developers</source>
-        <translation>Все права защищены © 2009-2012 Разработчики curecoin</translation>
+        <source>Copyright © 2013-2025 The Curecoin Foundation. All rights reserved.CureCoin® is a registered trademark.</source>
+        <translation>Авторское право © 2013-2025 Фонд Curecoin. Все права защищены. CureCoin® является зарегистрированным товарным знаком.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -225,8 +225,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR COINS&lt;/b&gt;!</source>
-        <translation>Внимание: если вы зашифруете бумажник и потеряете пароль, вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ ВАШИ МОНЕТЫ&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will lose access to your funds.</source>
+        <translation>Внимание: если вы зашифруете бумажник и потеряете пароль, вы потеряете доступ к своим средствам.</translation>
     </message>
     <message>
         <location line="+0"/>
