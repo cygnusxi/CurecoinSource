@@ -39,7 +39,10 @@ contains(RELEASE, 1) {
 
     !windows:!macx {
         # Linux: static link
-        LIBS += -Wl,-Bstatic
+        # MODIFIED: Only attempt strict static linking on non-ARM systems
+        !contains(QT_ARCH, arm):!contains(QT_ARCH, arm64) {
+            LIBS += -Wl,-Bstatic
+        }
     }
 }
 
@@ -102,8 +105,14 @@ contains(curecoin_NEED_QT_PLUGINS, 1) {
     DEFINES += HAVE_BUILD_INFO
 }
 
-QMAKE_CXXFLAGS += -msse2
-QMAKE_CFLAGS += -msse2
+# --- MODIFIED FOR RASPBERRY PI SUPPORT ---
+# Prevent SSE2 flags on ARM architecture (Raspberry Pi)
+!contains(QT_ARCH, arm):!contains(QT_ARCH, arm64) {
+    QMAKE_CXXFLAGS += -msse2
+    QMAKE_CFLAGS += -msse2
+}
+# -----------------------------------------
+
 QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
 
 # Input
@@ -363,7 +372,16 @@ LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
 # -lgdi32 has to happen after -lcrypto (see  #681)
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
 
-LIBS += -Wl,-Bstatic -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX -Wl,-Bdynamic
+# --- MODIFIED FOR RASPBERRY PI SUPPORT ---
+# Use Dynamic linking for Boost on ARM (Pi), Static for others.
+# If we force static on Pi, we usually fail to find the libraries.
+contains(QT_ARCH, arm)|contains(QT_ARCH, arm64) {
+    LIBS += -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
+} else {
+    LIBS += -Wl,-Bstatic -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX -Wl,-Bdynamic
+}
+# -----------------------------------------
+
 windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
 
 contains(RELEASE, 1) {
