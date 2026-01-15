@@ -95,16 +95,14 @@ Choose one of these isolation methods:
 
 #### **System-Level Security**
 
-- Create a **dedicated OS user** specifically for running CureCoin
-- Use **minimal permissions** for the CureCoin process
+- Create a **dedicated OS user** specifically for running CureCoin (This is method of isolation if you run the client on a non dedicated machine / vps/ VM)
 - Keep your system and CureCoin client **updated**
-- Monitor logs for suspicious connection patterns
 
 #### **Additional Security Measures**
 
 ### 📊 Enabling RPC for Network Stats
 
-⚠️ **Warning:** This opens an additional port and requires strict security controls.
+⚠️ **Security Practices:** This opens an additional port and requires standard security controls noted here. 
 
 If you wish to contribute to network statistics (block explorers, status pages), enable JSON-RPC:
 
