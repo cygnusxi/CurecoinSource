@@ -116,7 +116,7 @@ rpcallowip=<Parser_IP_Address>
 rpcallowip=127.0.0.1
 ```
 
-> 🔐 **Security Note:** Strictly limit `rpcallowip` to `127.0.0.1` (localhost) and the specific IP of the stats server. **Never** set this to `0.0.0.0/0` or allow wildcard access. Contact the dev team for the current parser IP address.The only time you should add an IP address to the a curecoin seednode is if you want the CureCoin team to add your seed node to a stats page or if you wish to make your own stats page/ stats app from another server. 
+> 🔐 **Security Note:** Strictly limit `rpcallowip` to `127.0.0.1` (localhost) and the specific IP of the stats server. **Never** set this to `0.0.0.0/0` or allow wildcard access. Contact the dev team for the current parser IP address.You can add your own server IP here if you wish to make your own stats page/ stats app. 
 
 ### 🐳 Docker Deployment
 
