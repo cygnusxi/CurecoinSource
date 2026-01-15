@@ -24,6 +24,11 @@ Running a seed node is a valuable contribution to the CureCoin ecosystem. Seed n
 Seed nodes handle high traffic. Edit your `curecoin.conf` file and add:
 
 ```conf
+rpcuser=<StrongUsername>
+rpcpassword=<StrongAlphanumericPassword>
+# listen for new connections
+listen=1
+# Add this to increase max connections (preferred)
 maxconnections=1000
 ```
 
@@ -97,16 +102,6 @@ Choose one of these isolation methods:
 
 #### **Additional Security Measures**
 
-```conf
-# Add to curecoin.conf for enhanced security
-listen=1
-discover=1
-# Limit connections if needed
-maxconnections=1000
-# Disable wallet functionality (if supported)
-disablewallet=1
-```
-
 ### 📊 Enabling RPC for Network Stats
 
 ⚠️ **Warning:** This opens an additional port and requires strict security controls.
@@ -123,17 +118,11 @@ rpcallowip=<Parser_IP_Address>
 rpcallowip=127.0.0.1
 ```
 
-> 🔐 **Security Note:** Strictly limit `rpcallowip` to `127.0.0.1` (localhost) and the specific IP of the stats server. **Never** set this to `0.0.0.0/0` or allow wildcard access. Contact the dev team for the current parser IP address.
+> 🔐 **Security Note:** Strictly limit `rpcallowip` to `127.0.0.1` (localhost) and the specific IP of the stats server. **Never** set this to `0.0.0.0/0` or allow wildcard access. Contact the dev team for the current parser IP address.The only time you should add an IP address to the a curecoin seednode is if you want the CureCoin team to add your seed node to a stats page or if you wish to make your own stats page/ stats app from another server. 
 
 ### 🐳 Docker Deployment
 
 For users comfortable with containerization, a community-created Docker build is available on the [CureCoin GitHub](https://github.com/cygnusxi/CurecoinSource). Docker provides excellent isolation similar to a VM.
-
-**Benefits:**
-- Easy deployment and updates
-- Built-in isolation from host system
-- Simplified port management
-- Consistent environment across platforms
 
 ---
 
@@ -142,7 +131,7 @@ For users comfortable with containerization, a community-created Docker build is
 Need help? Reach out to the CureCoin community:
 
 - **GitHub:** [CurecoinSource Repository](https://github.com/cygnusxi/CurecoinSource)
-- **Issues:** Submit questions or problems via GitHub Issues
+- **Issues:** Submit questions or problems via GitHub Issues, or join the CureCoin discord server. 
 
 ---
 
