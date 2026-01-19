@@ -1161,6 +1161,7 @@ void MapPort()
 static const char *strDNSSeed[][2] = {
     {"seed.curecoin.net", "seed.curecoin.net"},
     {"seed2.curecoin.net", "seed2.curecoin.net"},
+    {"seednode3.freeddns.org", "seednode3.freeddns.org"},
 };
 
 void ThreadDNSAddressSeed(void* parg)
