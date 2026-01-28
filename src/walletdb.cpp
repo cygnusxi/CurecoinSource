@@ -641,22 +641,40 @@ bool BackupWallet(const CWallet& wallet, const std::string& strDest)
 
                 // Copy wallet.dat
                 boost::filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
-                boost::filesystem::path pathDest(strDest);
-                if (boost::filesystem::is_directory(pathDest))
-                    pathDest /= wallet.strWalletFile;
+                
+                // --- SECURITY FIX START: Sanitize Path ---
+                // 1. Define a forced, safe directory for all backups
+                boost::filesystem::path pathSafeDir = GetDataDir() / "backups";
+                
+                // 2. Create the directory if it doesn't exist
+                boost::filesystem::create_directories(pathSafeDir);
+
+                // 3. Process the user input
+                boost::filesystem::path pathUser(strDest);
+                boost::filesystem::path pathFinal;
+
+                // 4. If user input is a directory, use the default wallet name
+                if (boost::filesystem::is_directory(pathUser)) {
+                    pathFinal = pathSafeDir / wallet.strWalletFile;
+                } else {
+                    // 5. CRITICAL: .filename() strips all directory paths (../../etc/)
+                    // ensuring we only get the file name, not the location.
+                    pathFinal = pathSafeDir / pathUser.filename();
+                }
+                // --- SECURITY FIX END ---
 
                 try {
                     #if BOOST_VERSION >= 107400
                     // Modern Boost syntax
-                    boost::filesystem::copy_file(pathSrc, pathDest, boost::filesystem::copy_options::overwrite_existing);
+                    boost::filesystem::copy_file(pathSrc, pathFinal, boost::filesystem::copy_options::overwrite_existing);
                 #else
                     // Legacy Boost syntax (Singular 'option' and 'if_exists')
-                    boost::filesystem::copy_file(pathSrc, pathDest, boost::filesystem::copy_option::overwrite_if_exists);
+                    boost::filesystem::copy_file(pathSrc, pathFinal, boost::filesystem::copy_option::overwrite_if_exists);
                 #endif
-                    printf("copied wallet.dat to %s\n", pathDest.string().c_str());
+                    printf("copied wallet.dat to %s\n", pathFinal.string().c_str());
                     return true;
                 } catch(const boost::filesystem::filesystem_error &e) {
-                    printf("error copying wallet.dat to %s - %s\n", pathDest.string().c_str(), e.what());
+                    printf("error copying wallet.dat to %s - %s\n", pathFinal.string().c_str(), e.what());
                     return false;
                 }
             }
