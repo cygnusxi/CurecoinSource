@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = curecoin-qt
-VERSION = 2.2.0.9
+VERSION = 2.2.1.1
 INCLUDEPATH += src src/json src/qt
 # Note: BOOST_ASIO_ENABLE_OLD_SERVICES removed - handled in curecoinrpc.h with version detection
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_ASIO_ENABLE_OLD_SERVICES
@@ -392,3 +392,6 @@ contains(RELEASE, 1) {
 }
 
 system($$QMAKE_LRELEASE -silent $$_PRO_FILE_)
+
+# Suppress OpenSSL 3.0 deprecation warnings
+QMAKE_CXXFLAGS += -Wno-deprecated-declarations
