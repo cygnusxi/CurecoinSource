@@ -508,24 +508,27 @@ void ErrorReply(std::ostream& stream, const json_spirit::Object& objError, const
 
 bool ClientAllowed(const boost::asio::ip::address& address)
 {
-    // Make sure that IPv4-compatible and IPv4-mapped IPv6 addresses are treated as IPv4 addresses
-    if (address.is_v6()
-    && address.to_v6().is_v4_mapped()
-    && (boost::asio::ip::make_address_v4(boost::asio::ip::v4_mapped, address.to_v6()).to_uint() & 0xff000000) == 0x7f000000)
-        return true;
+    // Normalize the address to handle IPv4-mapped IPv6 addresses correctly
+    boost::asio::ip::address matchAddress = address;
 
-    if (address == boost::asio::ip::address_v4::loopback()
-     || address == boost::asio::ip::address_v6::loopback()
-     || (address.is_v4()
+    if (matchAddress.is_v6() && matchAddress.to_v6().is_v4_mapped()) {
+        matchAddress = boost::asio::ip::make_address_v4(boost::asio::ip::v4_mapped, matchAddress.to_v6());
+    }
+
+    if (matchAddress == boost::asio::ip::address_v4::loopback()
+     || matchAddress == boost::asio::ip::address_v6::loopback()
+     || (matchAddress.is_v4()
          // Check whether IPv4 addresses match 127.0.0.0/8 (loopback subnet)
-      && (address.to_v4().to_uint() & 0xff000000) == 0x7f000000))
+      && (matchAddress.to_v4().to_uint() & 0xff000000) == 0x7f000000))
         return true;
 
-    const std::string strAddress = address.to_string();
+    // By this point, IPv4-mapped IPs are pure IPv4 strings (e.g., "192.168.1.50")
+    const std::string strAddress = matchAddress.to_string();
     const std::vector<std::string>& vAllow = mapMultiArgs["-rpcallowip"];
     BOOST_FOREACH(std::string strAllow, vAllow)
         if (WildcardMatch(strAddress, strAllow))
             return true;
+            
     return false;
 }
 
