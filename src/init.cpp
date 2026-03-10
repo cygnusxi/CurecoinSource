@@ -225,7 +225,7 @@ std::string HelpMessage()
         "  -gen                   " + _("Generate coins") + "\n" +
         "  -gen=0                 " + _("Don't generate coins") + "\n" +
         "  -datadir=<dir>         " + _("Specify data directory") + "\n" +
-        "  -dbcache=<n>           " + _("Set database cache size in megabytes (default: 25)") + "\n" +
+        "  -dbcache=<n>           " + _("Set database cache size in megabytes (default: 450)") + "\n" +
         "  -dblogsize=<n>         " + _("Set database disk log size in megabytes (default: 100)") + "\n" +
         "  -timeout=<n>           " + _("Specify connection timeout in milliseconds (default: 5000)") + "\n" +
         "  -proxy=<ip:port>       " + _("Connect through socks proxy") + "\n" +
