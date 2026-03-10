@@ -14,7 +14,7 @@
 #undef printf
 #include <boost/asio.hpp>
 #include <boost/asio/ip/v6_only.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/iostreams/concepts.hpp>
@@ -23,7 +23,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <iostream>
 #include <list>
@@ -656,7 +656,7 @@ void ThreadRPCServer(void* parg)
 
 // Forward declaration required for RPCListen
 template <typename Protocol, typename SocketAcceptorService>
-static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
+static void RPCAcceptHandler(std::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
                              boost::asio::ssl::context& context,
                              bool fUseSSL,
                              AcceptedConnection* conn,
@@ -666,7 +666,7 @@ static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_accept
  * Sets up I/O resources to accept and handle a new connection.
  */
 template <typename Protocol, typename SocketAcceptorService>
-static void RPCListen(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
+static void RPCListen(std::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
                    boost::asio::ssl::context& context,
                    const bool fUseSSL)
 {
@@ -676,19 +676,19 @@ static void RPCListen(boost::shared_ptr< boost::asio::basic_socket_acceptor<Prot
     acceptor->async_accept(
             conn->sslStream.lowest_layer(),
             conn->peer,
-            boost::bind(&RPCAcceptHandler<Protocol, SocketAcceptorService>,
+            std::bind(&RPCAcceptHandler<Protocol, SocketAcceptorService>,
                 acceptor,
-                boost::ref(context),
+                std::ref(context),
                 fUseSSL,
                 conn,
-                boost::asio::placeholders::error));
+                std::placeholders::_1));
 }
 
 /**
  * Accept and handle incoming connection.
  */
 template <typename Protocol, typename SocketAcceptorService>
-static void RPCAcceptHandler(boost::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
+static void RPCAcceptHandler(std::shared_ptr< boost::asio::basic_socket_acceptor<Protocol, SocketAcceptorService> > acceptor,
                              boost::asio::ssl::context& context,
                              const bool fUseSSL,
                              AcceptedConnection* conn,
@@ -787,7 +787,7 @@ void ThreadRPCServer2(void* parg)
     boost::asio::ip::address bindAddress = loopback ? boost::asio::ip::address_v6::loopback() : boost::asio::ip::address_v6::any();
     boost::asio::ip::tcp::endpoint endpoint(bindAddress, GetArg("-rpcport", GetDefaultRPCPort()));
     boost::system::error_code v6_only_error;
-    boost::shared_ptr<boost::asio::ip::tcp::acceptor> acceptor(new boost::asio::ip::tcp::acceptor(io_context));
+    std::shared_ptr<boost::asio::ip::tcp::acceptor> acceptor(new boost::asio::ip::tcp::acceptor(io_context));
 
     boost::signals2::signal<void ()> StopRequests;
 

@@ -18,6 +18,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -508,7 +509,8 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
         if ( !strCmd.empty())
         {
             boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
-            boost::thread t(runCommand, strCmd); // thread runs free
+            std::thread t(runCommand, strCmd); // thread runs free
+            t.detach();
         }
 
     }

@@ -32,7 +32,7 @@ namespace boost {
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
-#include <boost/thread.hpp>
+#include <thread>
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 #include <stdarg.h>
@@ -234,9 +234,9 @@ inline int OutputDebugStringF(const char* pszFormat, ...)
             // Since the order of destruction of static/global objects is undefined,
             // allocate mutexDebugLog on the heap the first time this routine
             // is called to avoid crashes during shutdown.
-            static boost::mutex* mutexDebugLog = NULL;
-            if (mutexDebugLog == NULL) mutexDebugLog = new boost::mutex();
-            boost::mutex::scoped_lock scoped_lock(*mutexDebugLog);
+            static std::mutex* mutexDebugLog = NULL;
+            if (mutexDebugLog == NULL) mutexDebugLog = new std::mutex();
+            std::lock_guard<std::mutex> scoped_lock(*mutexDebugLog);
 
             // reopen the log file, if requested
             if (fReopenDebugLog) {
@@ -1357,8 +1357,8 @@ bool NewThread(void(*pfn)(void*), void* parg)
 {
     try
     {
-        boost::thread(pfn, parg); // thread detaches when out of scope
-    } catch(boost::thread_resource_error &e) {
+        std::thread(pfn, parg).detach(); // thread detaches when out of scope
+    } catch(const std::system_error& e) {
         printf("Error creating thread: %s\n", e.what());
         return false;
     }

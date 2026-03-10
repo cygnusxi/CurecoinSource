@@ -22,6 +22,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -1971,7 +1972,8 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
     if (!fIsInitialDownload && !strCmd.empty())
     {
         boost::replace_all(strCmd, "%s", hashBestChain.GetHex());
-        boost::thread t(runCommand, strCmd); // thread runs free
+        std::thread t(runCommand, strCmd); // thread runs free
+        t.detach();
     }
 
     return true;
@@ -4687,7 +4689,7 @@ void Generatecurecoins(bool fGenerate, CWallet* pwallet)
 
     if (fGenerate)
     {
-        int nProcessors = boost::thread::hardware_concurrency();
+        int nProcessors = std::thread::hardware_concurrency();
         printf("%d processors\n", nProcessors);
         if (nProcessors < 1)
             nProcessors = 1;

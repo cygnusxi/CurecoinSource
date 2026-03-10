@@ -6,7 +6,7 @@
 #define curecoin_NET_H
 
 #include <deque>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/foreach.hpp>
 #include <openssl/rand.h>
 
@@ -117,7 +117,7 @@ extern bool fUseUPnP;
 extern uint64 nLocalServices;
 extern uint64 nLocalHostNonce;
 extern CAddress addrSeenByPeer;
-extern boost::array<int, THREAD_MAX> vnThreadsRunning;
+extern std::array<int, THREAD_MAX> vnThreadsRunning;
 extern CAddrMan addrman;
 
 extern std::vector<CNode*> vNodes;

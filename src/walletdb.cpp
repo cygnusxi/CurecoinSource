@@ -544,9 +544,6 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash
         }
         pcursor->close();
     }
-    catch (boost::thread_interrupted) {
-        throw;
-    }
     catch (...) {
         result = DB_CORRUPT;
     }
