@@ -1630,7 +1630,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     // assumeValid: skip script/sig verification for blocks that are ancestors of the assumed-valid block (IBD speedup)
     // PoW, PoS kernel, coinstake, and block structure are NEVER skipped - only standard tx script verification
     bool fScriptChecks = true;
-    if (!hashAssumeValid.IsNull() && mapBlockIndex.count(hashAssumeValid))
+    if (hashAssumeValid != 0 && mapBlockIndex.count(hashAssumeValid))
     {
         const CBlockIndex* pindexAssumeValid = mapBlockIndex[hashAssumeValid];
         for (const CBlockIndex* p = pindexAssumeValid; p; p = p->pprev)

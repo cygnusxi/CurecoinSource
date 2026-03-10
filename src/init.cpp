@@ -696,8 +696,8 @@ bool AppInit2()
         if (!strAssumeValid.empty())
         {
             uint256 hash;
-            if (hash.SetHex(strAssumeValid))
-                hashAssumeValid = hash;
+            hash.SetHex(strAssumeValid);
+            hashAssumeValid = hash;
         }
     }
     else if (!fTestNet)
