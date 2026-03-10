@@ -7,9 +7,11 @@
 #include "curecoinrpc.h"
 #include "net.h"
 #include "init.h"
+#include "main.h"
 #include "util.h"
 #include "ui_interface.h"
 #include "checkpoints.h"
+#include "uint256.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
@@ -287,6 +289,7 @@ std::string HelpMessage()
         "  -salvagewallet         " + _("Attempt to recover private keys from a corrupt wallet.dat") + "\n" +
         "  -checkblocks=<n>       " + _("How many blocks to check at startup (default: 2500, 0 = all)") + "\n" +
         "  -checklevel=<n>        " + _("How thorough the block verification is (0-6, default: 1)") + "\n" +
+        "  -assumevalid=<hex>     " + _("If this block hash is in the chain, skip script verification for blocks before it (default: mainnet checkpoint, empty for testnet)") + "\n" +
         "  -loadblock=<file>      " + _("Imports blocks from external blk000?.dat file") + "\n" +
 
         "\n" + _("Block creation options:") + "\n" +
@@ -685,6 +688,24 @@ bool AppInit2()
         PrintBlockTree();
         return false;
     }
+
+    // Set assumeValid: skip script/sig verification for blocks before this (IBD speedup)
+    if (mapArgs.count("-assumevalid"))
+    {
+        std::string strAssumeValid = GetArg("-assumevalid", "");
+        if (!strAssumeValid.empty())
+        {
+            uint256 hash;
+            if (hash.SetHex(strAssumeValid))
+                hashAssumeValid = hash;
+        }
+    }
+    else if (!fTestNet)
+    {
+        // Default for mainnet: use latest checkpoint (block 1170000)
+        hashAssumeValid = uint256("0xc29686c1166350c35b0d25e40d5ee614dd03056e2b9738e3f5803e79f01ed83a");
+    }
+    // For testnet/regtest: hashAssumeValid stays 0 (no skip)
 
     uiInterface.InitMessage(_("<font style='color: black'>Loading block index...</font>"));
     printf("Loading block index...\n");
