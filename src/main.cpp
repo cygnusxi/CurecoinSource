@@ -1074,7 +1074,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             bnLowerBound = bnMidValue;
     }
     nRewardCoinYear = bnUpperBound.getuint64();
-    if (nBestHeight > (int)HF_BLOCK) std::min(nRewardCoinYear, (int64)(0.04 * MAX_MINT_PROOF_OF_WORK)); // 4% hardfork
+    if (nBestHeight > (int)HF_BLOCK) nRewardCoinYear = std::min(nRewardCoinYear, (int64)(0.04 * MAX_MINT_PROOF_OF_WORK)); // 4% hardfork
     else nRewardCoinYear = std::min(nRewardCoinYear, MAX_MINT_PROOF_OF_STAKE);
 
 
@@ -4418,7 +4418,14 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
         unsigned char pchPadding1[64];
     }
     tmp;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
     std::memset(&tmp, 0, sizeof(tmp));
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     tmp.block.nVersion       = pblock->nVersion;
     tmp.block.hashPrevBlock  = pblock->hashPrevBlock;
