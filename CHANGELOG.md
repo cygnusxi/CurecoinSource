@@ -60,3 +60,9 @@ Implemented -Wl,-Bstatic and -Wl,-Bdynamic wrapping to statically link Boost lib
 2.2.0.6 Critical RPC function syntax fix in curecoinrpc.cpp. Fixed broken ClientAllowed function that was causing HTTP 403 Forbidden errors for legitimate RPC connections.
 
 2.2.0.7 Backward compatible Boost fixes and code cleanup. Improved Boost library compatibility and cleaned up deprecated code patterns.
+
+2.2.1.1 Patched client against dat backup RPC attack (strict backup directory so the backup method cannot be abused)
+
+2.2.1.2 Fixed some logic with remote RPC IPV4 / IPV6 routing. Additional Seed Node added. 
+
+2.2.1.3 Changed logos to PNG for easier msys compiling
