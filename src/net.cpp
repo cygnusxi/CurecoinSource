@@ -1057,12 +1057,19 @@ void ThreadMapPort2(void* parg)
     devlist = upnpDiscover(2000, multicastif, minissdpdpath, 0);
 #endif
 
-    struct UPNPUrls urls;
-    struct IGDdatas data;
-    int r;
+struct UPNPUrls urls;
+struct IGDdatas data;
+int r;
 
-    char externalIPAddress[40] = {0}; 
-    r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr), externalIPAddress, sizeof(externalIPAddress));
+char externalIPAddress[40] = {0}; 
+
+#if MINIUPNPC_API_VERSION >= 18
+// miniupnpc 2.2.8+ (MSYS2) expects 7 arguments (last two for error buffer)
+r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr), externalIPAddress, sizeof(externalIPAddress));
+#else
+// miniupnpc < 2.2.8 (Ubuntu 24.04) expects exactly 5 arguments
+r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr));
+#endif
     if (r == 1)
     {
         if (fDiscover) {
