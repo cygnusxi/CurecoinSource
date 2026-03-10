@@ -5,6 +5,7 @@
 #ifndef curecoin_ALLOCATORS_H
 #define curecoin_ALLOCATORS_H
 
+#include <cassert>
 #include <cstring>
 #include <string>
 #include <mutex>
