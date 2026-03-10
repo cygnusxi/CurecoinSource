@@ -29,17 +29,19 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 #MINIUPNPC_INCLUDE_PATH=c:/deps
 
 # --- VCPKG Integration ---
-
-# 1. Tell the code we are using the static version of the library
-DEFINES += MINIUPNP_STATICLIB
-#win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
-# 2. Keep the existing UPNP defines
+win32 {
+    # 1. Tell the code we are using the static version of the library
+    DEFINES += MINIUPNP_STATICLIB
+    # 2. Refine the LIBS to ensure static linking
+    VCPKG_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
+    LIBS += $$VCPKG_ROOT/lib/libminiupnpc.a -liphlpapi
+}
+!win32 {
+    # Linux/Mac just needs the standard library link
+    LIBS += -lminiupnpc
+}
+# Keep the existing UPNP defines global
 DEFINES += USE_UPNP=1
-
-# 3. Refine the LIBS to ensure static linking
-# It's often safer to use the full path to the .a file to force static linking
-VCPKG_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
-LIBS += $$VCPKG_ROOT/lib/libminiupnpc.a -liphlpapi
 # -------------------------
 
 OBJECTS_DIR = build
@@ -423,16 +425,16 @@ system($$QMAKE_LRELEASE -silent $$_PRO_FILE_)
 QMAKE_CXXFLAGS += -Wno-deprecated-declarations
 
 # --- EXACT MINIUPNPC PATHS ---
-# Pointing directly to the folder from your screenshot
-MINIUPNPC_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
+win32 {
+    # Pointing directly to the folder from your screenshot
+    MINIUPNPC_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
+    # Tell the compiler where to find miniwget.h
+    INCLUDEPATH += $$MINIUPNPC_ROOT/include
+    # Tell the linker where to find libminiupnpc.a
+    LIBS += -L$$MINIUPNPC_ROOT/lib -lminiupnpc -liphlpapi
+    # CRITICAL: Tell the headers we are linking statically (fixes the __imp_ errors)
+    DEFINES += MINIUPNP_STATICLIB
+}
 
-# Tell the compiler where to find miniwget.h
-INCLUDEPATH += $$MINIUPNPC_ROOT/include
-
-# Tell the linker where to find libminiupnpc.a
-LIBS += -L$$MINIUPNPC_ROOT/lib -lminiupnpc -liphlpapi
-
-# CRITICAL: Tell the headers we are linking statically (fixes the __imp_ errors)
-DEFINES += MINIUPNP_STATICLIB
 DEFINES += USE_UPNP=1
 # -----------------------------
