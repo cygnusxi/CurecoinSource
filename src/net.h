@@ -31,6 +31,8 @@ inline unsigned int SendBufferSize() { return 1000*GetArg("-maxsendbuffer", 1*10
 
 void AddOneShot(std::string strDest);
 bool RecvLine(SOCKET hSocket, std::string& strLine);
+uint64 GetTotalBytesRecv();
+uint64 GetTotalBytesSent();
 bool GetMyExternalIP(CNetAddr& ipRet);
 void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);

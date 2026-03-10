@@ -7,6 +7,8 @@ namespace Ui {
     class RPCConsole;
 }
 class ClientModel;
+class PeerTableModel;
+class TrafficGraphWidget;
 
 /** Local curecoin RPC console. */
 class RPCConsole: public QDialog
@@ -49,6 +51,10 @@ public slots:
     void browseHistory(int offset);
     /** Scroll console view to end */
     void scrollToEnd();
+
+private slots:
+    void on_graphRangeCombo_currentIndexChanged(int index);
+
 signals:
     // For RPC command executor
     void stopExecutor();
@@ -57,6 +63,9 @@ signals:
 private:
     Ui::RPCConsole *ui;
     ClientModel *clientModel;
+    TrafficGraphWidget *trafficGraph;
+    PeerTableModel *peerTableModel;
+    QTimer *peerRefreshTimer;
     QStringList history;
     int historyPtr;
 

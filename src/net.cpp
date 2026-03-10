@@ -11,6 +11,7 @@
 #include "ui_interface.h"
 
 #include <algorithm>
+#include <atomic>
 #include <deque>
 #include <list>
 #include <map>
@@ -81,6 +82,13 @@ std::set<CNetAddr> setservAddNodeAddresses;
 CCriticalSection cs_setservAddNodeAddresses;
 
 static CSemaphore *semOutbound = NULL;
+
+// Total bytes received/sent over the network (for traffic graph)
+static std::atomic<uint64> nTotalBytesRecv(0);
+static std::atomic<uint64> nTotalBytesSent(0);
+
+uint64 GetTotalBytesRecv() { return nTotalBytesRecv.load(); }
+uint64 GetTotalBytesSent() { return nTotalBytesSent.load(); }
 
 void AddOneShot(std::string strDest)
 {
@@ -904,6 +912,7 @@ void ThreadSocketHandler2(void* parg)
                             vRecv.resize(nPos + nBytes);
                             memcpy(&vRecv[nPos], pchBuf, nBytes);
                             pnode->nLastRecv = GetTime();
+                            nTotalBytesRecv += nBytes;
                         }
                         else if (nBytes == 0)
                         {
@@ -945,6 +954,7 @@ void ThreadSocketHandler2(void* parg)
                         {
                             vSend.erase(vSend.begin(), vSend.begin() + nBytes);
                             pnode->nLastSend = GetTime();
+                            nTotalBytesSent += nBytes;
                         }
                         else if (nBytes < 0)
                         {

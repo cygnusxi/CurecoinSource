@@ -199,6 +199,8 @@ HEADERS += src/qt/curecoingui.h \
     src/allocators.h \
     src/ui_interface.h \
     src/qt/rpcconsole.h \
+    src/qt/trafficgraphwidget.h \
+    src/qt/peertablemodel.h \
     src/version.h \
     src/netbase.h \
     src/clientversion.h
@@ -260,6 +262,8 @@ SOURCES += src/qt/curecoin.cpp src/qt/curecoingui.cpp \
     src/qt/notificator.cpp \
     src/qt/qtipcserver.cpp \
     src/qt/rpcconsole.cpp \
+    src/qt/trafficgraphwidget.cpp \
+    src/qt/peertablemodel.cpp \
     src/noui.cpp \
     src/kernel.cpp
 
