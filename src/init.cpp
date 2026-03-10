@@ -237,6 +237,8 @@ std::string HelpMessage()
         "  -seednode=<ip>         " + _("Connect to a node to retrieve peer addresses, and disconnect") + "\n" +
         "  -externalip=<ip>       " + _("Specify your own public address") + "\n" +
         "  -onlynet=<net>         " + _("Only connect to nodes in network <net> (IPv4, IPv6 or Tor)") + "\n" +
+        "  -cleanupaddrman        " + _("Remove addresses from unsupported networks on startup (default: 0)") + "\n" +
+        "  -pruneaddrman          " + _("Remove stale/failed addresses when loading peers.dat (default: 0)") + "\n" +
         "  -discover              " + _("Discover own IP address (default: 1 when listening and no -externalip)") + "\n" +
         "  -listen                " + _("Accept connections from outside (default: 1 if no -proxy or -connect)") + "\n" +
         "  -bind=<addr>           " + _("Bind to given address. Use [host]:port notation for IPv6") + "\n" +
@@ -852,6 +854,20 @@ bool AppInit2()
         CAddrDB adb;
         if (!adb.Read(addrman))
             printf("Invalid or missing peers.dat; recreating\n");
+    }
+
+    if (GetBoolArg("-pruneaddrman", false))
+    {
+        int nPruned = addrman.PruneTerrible();
+        if (nPruned > 0)
+            printf("Pruned %d bad addresses on load\n", nPruned);
+    }
+
+    if (GetBoolArg("-cleanupaddrman", false))
+    {
+        int nRemoved = addrman.CleanupUnsupported(IsLimited);
+        if (nRemoved > 0)
+            printf("Removed %d addresses from unsupported networks\n", nRemoved);
     }
 
     printf("Loaded %i addresses from peers.dat  %" PRI64d "ms\n",

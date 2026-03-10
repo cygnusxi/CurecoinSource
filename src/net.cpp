@@ -1155,6 +1155,7 @@ void MapPort()
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
 static const char *strDNSSeed[][2] = {
+    {"138.197.211.36", "138.197.211.36"},  // Always-running seed node
     {"seed.curecoin.net", "seed.curecoin.net"},
     {"seed2.curecoin.net", "seed2.curecoin.net"},
     {"seednode3.freeddns.org", "seednode3.freeddns.org"},
@@ -1228,12 +1229,16 @@ void ThreadDNSAddressSeed2(void* parg)
 
 unsigned int pnSeed[] =
 {
-	0x58099DD9
+    0x8AC5D324   // 138.197.211.36 - always-running seed node
 };
 
 void DumpAddresses()
 {
     int64 nStart = GetTimeMillis();
+
+    int nPruned = addrman.PruneTerrible();
+    if (nPruned > 0)
+        printf("Pruned %d bad addresses from addrman\n", nPruned);
 
     CAddrDB adb;
     adb.Write(addrman);
@@ -1361,8 +1366,16 @@ void ThreadOpenConnections2(void* parg)
     {
         ProcessOneShot();
 
+        // Use shorter sleep when we have few outbound connections for quicker peer finding
+        int nOutboundCount = 0;
+        {
+            LOCK(cs_vNodes);
+            BOOST_FOREACH(CNode* pnode, vNodes)
+                if (!pnode->fInbound)
+                    nOutboundCount++;
+        }
         vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
-        Sleep(500);
+        Sleep(nOutboundCount < 8 ? 100 : 500);
         vnThreadsRunning[THREAD_OPENCONNECTIONS]++;
         if (fShutdown)
             return;
@@ -1375,7 +1388,7 @@ void ThreadOpenConnections2(void* parg)
             return;
 
         // Add seed nodes if DNS seeding hasn't found peers yet
-        if (addrman.size()==0 && (GetTime() - nStart > 60) && !fTestNet)
+        if (addrman.size()==0 && (GetTime() - nStart > 10) && !fTestNet)
         {
             std::vector<CAddress> vAdd;
             for (unsigned int i = 0; i < ARRAYLEN(pnSeed); i++)
@@ -1439,8 +1452,8 @@ void ThreadOpenConnections2(void* parg)
             if (nANow - addr.nLastTry < 600 && nTries < 30)
                 continue;
 
-            // do not allow non-default ports, unless after 50 invalid addresses selected already
-            if (addr.GetPort() != GetDefaultPort() && nTries < 50)
+            // do not allow non-default ports, unless after 30 invalid addresses selected already
+            if (addr.GetPort() != GetDefaultPort() && nTries < 30)
                 continue;
 
             addrConnect = addr;
