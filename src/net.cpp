@@ -1051,23 +1051,19 @@ void ThreadMapPort2(void* parg)
     struct IGDdatas data;
     int r;
 
-    r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr));
+    char externalIPAddress[40] = {0}; 
+    r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr), externalIPAddress, sizeof(externalIPAddress));
     if (r == 1)
     {
         if (fDiscover) {
-            char externalIPAddress[40];
-            r = UPNP_GetExternalIPAddress(urls.controlURL, data.first.servicetype, externalIPAddress);
-            if(r != UPNPCOMMAND_SUCCESS)
-                printf("UPnP: GetExternalIPAddress() returned %d\n", r);
-            else
+            // We use the buffer we already have
+            int r2 = UPNP_GetExternalIPAddress(urls.controlURL, data.first.servicetype, externalIPAddress);
+            if(r2 != UPNPCOMMAND_SUCCESS)
+                printf("UPnP: GetExternalIPAddress() returned %d\n", r2);
+            else if(externalIPAddress[0])
             {
-                if(externalIPAddress[0])
-                {
-                    printf("UPnP: ExternalIPAddress = %s\n", externalIPAddress);
-                    AddLocal(CNetAddr(externalIPAddress), LOCAL_UPNP);
-                }
-                else
-                    printf("UPnP: GetExternalIPAddress failed.\n");
+                printf("UPnP: ExternalIPAddress = %s\n", externalIPAddress);
+                AddLocal(CNetAddr(externalIPAddress), LOCAL_UPNP);
             }
         }
 

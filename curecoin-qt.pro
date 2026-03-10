@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = curecoin-qt
-VERSION = 2.2.1.2
+VERSION = 2.2.1.3
 INCLUDEPATH += src src/json src/qt
 # Note: BOOST_ASIO_ENABLE_OLD_SERVICES removed - handled in curecoinrpc.h with version detection
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_ASIO_ENABLE_OLD_SERVICES
@@ -27,6 +27,20 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 #OPENSSL_LIB_PATH=c:/deps/ssl
 #MINIUPNPC_LIB_PATH=c:/deps/miniupnpc
 #MINIUPNPC_INCLUDE_PATH=c:/deps
+
+# --- VCPKG Integration ---
+
+# 1. Tell the code we are using the static version of the library
+DEFINES += MINIUPNP_STATICLIB
+#win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
+# 2. Keep the existing UPNP defines
+DEFINES += USE_UPNP=1
+
+# 3. Refine the LIBS to ensure static linking
+# It's often safer to use the full path to the .a file to force static linking
+VCPKG_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
+LIBS += $$VCPKG_ROOT/lib/libminiupnpc.a -liphlpapi
+# -------------------------
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -67,7 +81,7 @@ contains(USE_QRCODE, 1) {
 # --- UPNP DISABLED FORCEFULLY ---
 # We are disabling UPNP to avoid miniwget.h errors
 message(Building without UPNP support)
-DEFINES += USE_UPNP=0
+DEFINES += USE_UPNP=1
 # -------------------------------
 
 # use: qmake "USE_DBUS=1"
@@ -265,6 +279,14 @@ FORMS += \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui
 
+##### Fix for non static msys2 mingw64 compile
+### Force windres to look in the correct directory for icons/images
+#windows:QMAKE_RC += --include-dir=src/qt/res
+
+### Fix for MSYS2 path translation issues
+#windows:QMAKE_RC += -O coff
+##### End fix msys2
+
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h
 SOURCES += src/qt/qrcodedialog.cpp
@@ -395,3 +417,18 @@ system($$QMAKE_LRELEASE -silent $$_PRO_FILE_)
 
 # Suppress OpenSSL 3.0 deprecation warnings
 QMAKE_CXXFLAGS += -Wno-deprecated-declarations
+
+# --- EXACT MINIUPNPC PATHS ---
+# Pointing directly to the folder from your screenshot
+MINIUPNPC_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
+
+# Tell the compiler where to find miniwget.h
+INCLUDEPATH += $$MINIUPNPC_ROOT/include
+
+# Tell the linker where to find libminiupnpc.a
+LIBS += -L$$MINIUPNPC_ROOT/lib -lminiupnpc -liphlpapi
+
+# CRITICAL: Tell the headers we are linking statically (fixes the __imp_ errors)
+DEFINES += MINIUPNP_STATICLIB
+DEFINES += USE_UPNP=1
+# -----------------------------
