@@ -183,7 +183,8 @@ public:
     bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64 nSearchInterval, CTransaction& txNew);
     std::string SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false, std::string strTxComment = "");
     std::string SendMoneyToDestination(const CTxDestination &address, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false, std::string strTxComment = "");
-
+    // Custom function to create and send a Research Core registration TX
+    std::string SendRegistrationTx(const std::string& username, std::string& strError);
 
     bool NewKeyPool();
     bool TopUpKeyPool();

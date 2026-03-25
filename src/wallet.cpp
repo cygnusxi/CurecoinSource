@@ -2328,3 +2328,51 @@ void CWallet::UpdatedTransaction(const uint256 &hashTx)
             NotifyTransactionChanged(this, hashTx, CT_UPDATED);
     }
 }
+
+std::string CWallet::SendRegistrationTx(const std::string& username, std::string& strError)
+{
+    // 1. Prepare the payload (e.g., "CUREFA:StarMan")
+    std::string prefix = "CUREFA:";
+    std::string payload = prefix + username;
+    
+    // A standard address hash is EXACTLY 20 bytes.
+    // We must limit our payload to 20 characters. 
+    // Prefix is 7 chars, leaving 13 chars for the username.
+    if (payload.length() > 20) {
+        strError = "Username is too long (max 13 characters).";
+        return "";
+    }
+
+    // 2. Convert payload to a vector and pad it with zeros so it is exactly 20 bytes
+    std::vector<unsigned char> vchData(payload.begin(), payload.end());
+    while (vchData.size() < 20) {
+        vchData.push_back(0); // Pad the remaining space with null bytes
+    }
+
+    // 3. Build the disguised "Fake Address" script
+    // The network will think this is a normal P2PKH payment!
+    CScript scriptPubKey;
+    scriptPubKey << OP_DUP << OP_HASH160 << vchData << OP_EQUALVERIFY << OP_CHECKSIG;
+
+    // 4. Set up the transaction output with the minimum 0.01 CURE to pass dust checks
+    std::vector<std::pair<CScript, int64_t> > vecSend;
+    vecSend.push_back(std::make_pair(scriptPubKey, 10000)); // 10000 base units = 0.01 CURE
+
+    // 5. Create the transaction
+    CWalletTx wtxNew;
+    CReserveKey reservekey(this);
+    int64_t nFeeRequired;
+    
+    bool fCreated = CreateTransaction(vecSend, wtxNew, reservekey, nFeeRequired, strError);
+    if (!fCreated) {
+        return ""; 
+    }
+
+    // 6. Commit and broadcast the transaction to the network
+    if (!CommitTransaction(wtxNew, reservekey)) {
+        strError = "Transaction commit failed. Could not broadcast.";
+        return "";
+    }
+
+    return wtxNew.GetHash().GetHex();
+}

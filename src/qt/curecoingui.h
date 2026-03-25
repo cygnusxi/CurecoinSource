@@ -93,6 +93,7 @@ private:
     QAction *lockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+    QAction *registerResearchAction; // The button in the drop-down menu
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -145,6 +146,8 @@ private slots:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage();
+    /** Switch to research core page */
+    void registerResearchCore(); // Our new pop-up function
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
