@@ -4,14 +4,18 @@
 #include "clientmodel.h"
 #include "curecoinrpc.h"
 #include "guiutil.h"
+#include "trafficgraphwidget.h"
+#include "peertablemodel.h"
 
-#include <QTime>
-#include <QTimer>
-#include <QThread>
-#include <QTextEdit>
+#include <QApplication>
+#include <QDateTime>
 #include <QKeyEvent>
-#include <QUrl>
 #include <QScrollBar>
+#include <QTextEdit>
+#include <QThread>
+#include <QTimer>
+#include <QUrl>
+#include <QVBoxLayout>
 
 #include <openssl/crypto.h>
 
@@ -79,7 +83,7 @@ bool parseCommandLine(std::vector<std::string> &args, const std::string &strComm
         STATE_ESCAPE_DOUBLEQUOTED
     } state = STATE_EATING_SPACES;
     std::string curarg;
-    foreach(char ch, strCommand)
+    for (char ch : strCommand)
     {
         switch(state)
         {
@@ -188,6 +192,10 @@ void RPCExecutor::request(const QString &command)
 RPCConsole::RPCConsole(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::RPCConsole),
+    clientModel(nullptr),
+    trafficGraph(nullptr),
+    peerTableModel(nullptr),
+    peerRefreshTimer(nullptr),
     historyPtr(0)
 {
     ui->setupUi(this);
@@ -201,7 +209,27 @@ RPCConsole::RPCConsole(QWidget *parent) :
     ui->lineEdit->installEventFilter(this);
     ui->messagesWidget->installEventFilter(this);
 
-    connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clear()));
+    connect(ui->clearButton, &QPushButton::clicked, this, &RPCConsole::clear);
+
+    // Replace traffic graph placeholder with TrafficGraphWidget
+    trafficGraph = new TrafficGraphWidget(this);
+    QLayoutItem *placeholderItem = ui->verticalLayout_traffic->replaceWidget(ui->trafficGraphPlaceholder, trafficGraph);
+    if (placeholderItem) {
+        delete placeholderItem->widget();
+        delete placeholderItem;
+    }
+    connect(ui->graphRangeCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &RPCConsole::on_graphRangeCombo_currentIndexChanged);
+    ui->graphRangeCombo->setCurrentIndex(0);
+
+    // Setup peer table
+    peerTableModel = new PeerTableModel(this);
+    ui->peerTable->setModel(peerTableModel);
+    ui->peerTable->horizontalHeader()->setStretchLastSection(true);
+    connect(ui->refreshPeersButton, &QPushButton::clicked, peerTableModel, &PeerTableModel::refresh);
+    peerRefreshTimer = new QTimer(this);
+    connect(peerRefreshTimer, &QTimer::timeout, peerTableModel, &PeerTableModel::refresh);
+    peerRefreshTimer->start(5000); // Refresh every 5 seconds
 
     // set OpenSSL version label
     ui->openSSLVersion->setText(SSLeay_version(SSLEAY_VERSION));
@@ -256,11 +284,10 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent *event)
 void RPCConsole::setClientModel(ClientModel *model)
 {
     this->clientModel = model;
-    if(model)
-    {
-        // Subscribe to information, replies, messages, errors
-        connect(model, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
-        connect(model, SIGNAL(numBlocksChanged(int,int)), this, SLOT(setNumBlocks(int,int)));
+    if (model) {
+        // Subscribe to information, replies, messages, errors (Qt5/6 function pointer style)
+        connect(model, &ClientModel::numConnectionsChanged, this, &RPCConsole::setNumConnections);
+        connect(model, &ClientModel::numBlocksChanged, this, &RPCConsole::setNumBlocks);
 
         // Provide initial values
         ui->clientVersion->setText(model->formatFullVersion());
@@ -272,6 +299,14 @@ void RPCConsole::setClientModel(ClientModel *model)
         ui->isTestNet->setChecked(model->isTestNet());
 
         setNumBlocks(model->getNumBlocks(), model->getNumBlocksOfPeers());
+
+        // Pass model to traffic graph and peer table
+        if (trafficGraph)
+            trafficGraph->setClientModel(model);
+        if (peerTableModel) {
+            peerTableModel->setClientModel(model);
+            peerTableModel->refresh();
+        }
     }
 }
 
@@ -319,8 +354,7 @@ void RPCConsole::clear()
 
 void RPCConsole::message(int category, const QString &message, bool html)
 {
-    QTime time = QTime::currentTime();
-    QString timeString = time.toString();
+    QString timeString = QDateTime::currentDateTime().toString("hh:mm:ss");
     QString out;
     out += "<table><tr><td class=\"time\" width=\"65\">" + timeString + "</td>";
     out += "<td class=\"icon\" width=\"32\"><img src=\"" + categoryClass(category) + "\"></td>";
@@ -393,18 +427,15 @@ void RPCConsole::startExecutor()
     executor->moveToThread(thread);
 
     // Notify executor when thread started (in executor thread)
-    connect(thread, SIGNAL(started()), executor, SLOT(start()));
+    connect(thread, &QThread::started, executor, &RPCExecutor::start);
     // Replies from executor object must go to this object
-    connect(executor, SIGNAL(reply(int,QString)), this, SLOT(message(int,QString)));
+    connect(executor, &RPCExecutor::reply, this, [this](int cat, const QString &msg) { message(cat, msg); });
     // Requests from this object must go to executor
-    connect(this, SIGNAL(cmdRequest(QString)), executor, SLOT(request(QString)));
+    connect(this, &RPCConsole::cmdRequest, executor, &RPCExecutor::request);
     // On stopExecutor signal
-    // - queue executor for deletion (in execution thread)
-    // - quit the Qt event loop in the execution thread
-    connect(this, SIGNAL(stopExecutor()), executor, SLOT(deleteLater()));
-    connect(this, SIGNAL(stopExecutor()), thread, SLOT(quit()));
-    // Queue the thread for deletion (in this thread) when it is finished
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(this, &RPCConsole::stopExecutor, executor, &QObject::deleteLater);
+    connect(this, &RPCConsole::stopExecutor, thread, &QThread::quit);
+    connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
     // Default implementation of QThread::run() simply spins up an event loop in the thread,
     // which is what we want.
@@ -434,4 +465,12 @@ void RPCConsole::on_showCLOptionsButton_clicked()
 {
     GUIUtil::HelpMessageBox help;
     help.exec();
+}
+
+void RPCConsole::on_graphRangeCombo_currentIndexChanged(int index)
+{
+    if (trafficGraph) {
+        static const int mins[] = {5, 10, 30, 60};
+        trafficGraph->setGraphRangeMins(mins[index]);
+    }
 }

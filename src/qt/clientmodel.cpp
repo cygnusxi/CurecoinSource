@@ -6,8 +6,10 @@
 
 #include "alert.h"
 #include "main.h"
+#include "net.h"
 #include "ui_interface.h"
 
+#include <boost/bind.hpp>
 #include <QDateTime>
 #include <QTimer>
 
@@ -22,7 +24,7 @@ ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
     pollTimer = new QTimer(this);
     pollTimer->setInterval(MODEL_UPDATE_DELAY);
     pollTimer->start();
-    connect(pollTimer, SIGNAL(timeout()), this, SLOT(updateTimer()));
+    connect(pollTimer, &QTimer::timeout, this, &ClientModel::updateTimer);
 
     subscribeToCoreSignals();
 }
@@ -50,7 +52,11 @@ int ClientModel::getNumBlocksAtStartup()
 
 QDateTime ClientModel::getLastBlockDate() const
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    return QDateTime::fromSecsSinceEpoch(pindexBest->GetBlockTime());
+#else
     return QDateTime::fromTime_t(pindexBest->GetBlockTime());
+#endif
 }
 
 void ClientModel::updateTimer()
@@ -139,6 +145,46 @@ QString ClientModel::getStatusBarWarnings() const
     return QString::fromStdString(GetWarnings("statusbar"));
 }
 
+quint64 ClientModel::getTotalBytesRecv() const
+{
+    return static_cast<quint64>(GetTotalBytesRecv());
+}
+
+quint64 ClientModel::getTotalBytesSent() const
+{
+    return static_cast<quint64>(GetTotalBytesSent());
+}
+
+QList<ClientModel::PeerInfo> ClientModel::getPeerInfo() const
+{
+    QList<PeerInfo> result;
+    std::vector<CNodeStats> vstats;
+    {
+        LOCK(cs_vNodes);
+        vstats.reserve(vNodes.size());
+        BOOST_FOREACH(CNode* pnode, vNodes) {
+            CNodeStats stats;
+            pnode->copyStats(stats);
+            vstats.push_back(stats);
+        }
+    }
+    int64 nNow = GetTime();
+    for (const CNodeStats& stats : vstats) {
+        PeerInfo info;
+        info.address = QString::fromStdString(stats.addrName);
+        // Ping = time since last receive (approximate latency)
+        int64 nPing = (stats.nLastRecv > 0) ? (nNow - stats.nLastRecv) : -1;
+        info.ping = (nPing >= 0) ? QString::number(nPing) : tr("N/A");
+        info.protocolVersion = stats.nVersion;
+        info.subversion = QString::fromStdString(stats.strSubVer).trimmed();
+        if (info.subversion.isEmpty())
+            info.subversion = tr("N/A");
+        info.inbound = stats.fInbound;
+        result.append(info);
+    }
+    return result;
+}
+
 OptionsModel *ClientModel::getOptionsModel()
 {
     return optionsModel;
@@ -161,7 +207,11 @@ QString ClientModel::clientName() const
 
 QString ClientModel::formatClientStartupTime() const
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+    return QDateTime::fromSecsSinceEpoch(nClientStartupTime).toString();
+#else
     return QDateTime::fromTime_t(nClientStartupTime).toString();
+#endif
 }
 
 // Handlers for core signals

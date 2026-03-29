@@ -6,10 +6,27 @@
 #define curecoin_KEYSTORE_H
 
 #include "crypter.h"
+#include "key.h"
 #include "sync.h"
 #include <boost/signals2/signal.hpp>
+#include <boost/variant.hpp>
+#include <set>
 
 class CScript;
+
+class CNoDestination {
+public:
+    friend bool operator==(const CNoDestination &a, const CNoDestination &b) { return true; }
+    friend bool operator<(const CNoDestination &a, const CNoDestination &b) { return true; }
+};
+
+/** A txout script template with a specific destination. It is either:
+ *  * CNoDestination: no destination set
+ *  * CKeyID: TX_PUBKEYHASH destination
+ *  * CScriptID: TX_SCRIPTHASH destination
+ *  A CTxDestination is the internal data type encoded in a CcurecoinAddress
+ */
+typedef boost::variant<CNoDestination, CKeyID, CScriptID> CTxDestination;
 
 /** A virtual base class for key stores */
 class CKeyStore
@@ -34,6 +51,10 @@ public:
     virtual bool HaveCScript(const CScriptID &hash) const =0;
     virtual bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const =0;
 
+    // Support for watch-only addresses
+    virtual bool AddWatchOnly(const CTxDestination &dest) =0;
+    virtual bool HaveWatchOnly(const CTxDestination &dest) const =0;
+
     virtual bool GetSecret(const CKeyID &address, CSecret& vchSecret, bool &fCompressed) const
     {
         CKey key;
@@ -46,6 +67,7 @@ public:
 
 typedef std::map<CKeyID, std::pair<CSecret, bool> > KeyMap;
 typedef std::map<CScriptID, CScript > ScriptMap;
+typedef std::set<CTxDestination> WatchOnlySet;
 
 /** Basic key store, that keeps keys in an address->secret map */
 class CBasicKeyStore : public CKeyStore
@@ -53,6 +75,7 @@ class CBasicKeyStore : public CKeyStore
 protected:
     KeyMap mapKeys;
     ScriptMap mapScripts;
+    WatchOnlySet setWatchOnly;
 
 public:
     bool AddKey(const CKey& key);
@@ -95,6 +118,9 @@ public:
     virtual bool AddCScript(const CScript& redeemScript);
     virtual bool HaveCScript(const CScriptID &hash) const;
     virtual bool GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const;
+
+    virtual bool AddWatchOnly(const CTxDestination &dest);
+    virtual bool HaveWatchOnly(const CTxDestination &dest) const;
 };
 
 typedef std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char> > > CryptedKeyMap;

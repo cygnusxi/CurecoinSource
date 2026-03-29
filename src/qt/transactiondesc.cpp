@@ -77,10 +77,10 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 // Credit
                 BOOST_FOREACH(const CTxOut& txout, wtx.vout)
                 {
-                    if (wallet->IsMine(txout))
+                    if (wallet->IsMine(txout) != MINE_NO)
                     {
                         CTxDestination address;
-                        if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address))
+                        if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address) != MINE_NO)
                         {
                             if (wallet->mapAddressBook.count(address))
                             {
@@ -143,11 +143,11 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
         {
             bool fAllFromMe = true;
             BOOST_FOREACH(const CTxIn& txin, wtx.vin)
-                fAllFromMe = fAllFromMe && wallet->IsMine(txin);
+                fAllFromMe = fAllFromMe && wallet->IsMine(txin) != MINE_NO;
 
             bool fAllToMe = true;
             BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-                fAllToMe = fAllToMe && wallet->IsMine(txout);
+                fAllToMe = fAllToMe && wallet->IsMine(txout) != MINE_NO;
 
             if (fAllFromMe)
             {
@@ -156,7 +156,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 //
                 BOOST_FOREACH(const CTxOut& txout, wtx.vout)
                 {
-                    if (wallet->IsMine(txout))
+                    if (wallet->IsMine(txout) != MINE_NO)
                         continue;
 
                     if (!wtx.mapValue.count("to") || wtx.mapValue["to"].empty())
@@ -195,10 +195,10 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 // Mixed debit transaction
                 //
                 BOOST_FOREACH(const CTxIn& txin, wtx.vin)
-                    if (wallet->IsMine(txin))
+                    if (wallet->IsMine(txin) != MINE_NO)
                         strHTML += "<b>" + tr("Debit") + ":</b> " + curecoinUnits::formatWithUnit(curecoinUnits::BTC, -wallet->GetDebit(txin)) + "<br>";
                 BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-                    if (wallet->IsMine(txout))
+                    if (wallet->IsMine(txout) != MINE_NO)
                         strHTML += "<b>" + tr("Credit") + ":</b> " + curecoinUnits::formatWithUnit(curecoinUnits::BTC, wallet->GetCredit(txout)) + "<br>";
             }
         }
@@ -235,10 +235,10 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
         {
             strHTML += "<hr><br>" + tr("Debug information") + "<br><br>";
             BOOST_FOREACH(const CTxIn& txin, wtx.vin)
-                if(wallet->IsMine(txin))
+                if(wallet->IsMine(txin) != MINE_NO)
                     strHTML += "<b>" + tr("Debit") + ":</b> " + curecoinUnits::formatWithUnit(curecoinUnits::BTC, -wallet->GetDebit(txin)) + "<br>";
             BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-                if(wallet->IsMine(txout))
+                if(wallet->IsMine(txout) != MINE_NO)
                     strHTML += "<b>" + tr("Credit") + ":</b> " + curecoinUnits::formatWithUnit(curecoinUnits::BTC, wallet->GetCredit(txout)) + "<br>";
 
             strHTML += "<br><b>" + tr("Transaction") + ":</b><br>";
@@ -270,7 +270,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                                 strHTML += QString::fromStdString(CcurecoinAddress(address).ToString());
                             }
                             strHTML = strHTML + " " + tr("Amount") + "=" + curecoinUnits::formatWithUnit(curecoinUnits::BTC, vout.nValue);
-                            strHTML = strHTML + " IsMine=" + (wallet->IsMine(vout) ? tr("true") : tr("false")) + "</li>";
+                            strHTML = strHTML + " IsMine=" + (wallet->IsMine(vout) != MINE_NO ? tr("true") : tr("false")) + "</li>";
                         }
                     }
                 }

@@ -33,7 +33,8 @@ CMessageHeader::CMessageHeader()
 CMessageHeader::CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn)
 {
     std::memcpy(pchMessageStart, ::pchMessageStart, sizeof(pchMessageStart));
-    std::strncpy(pchCommand, pszCommand, COMMAND_SIZE);
+    std::strncpy(pchCommand, pszCommand, COMMAND_SIZE - 1);
+    pchCommand[COMMAND_SIZE - 1] = '\0';
     nMessageSize = nMessageSizeIn;
     nChecksum = 0;
 }

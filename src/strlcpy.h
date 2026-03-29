@@ -87,6 +87,6 @@ inline size_t cure_strlcpy(char *dst, const char *src, size_t siz)
     }
     *d = '\0';
 
-    return(dlen + (s - src)); /* count does not include NUL */
+    return(dlen + (s - src)); // count does not include NUL */
 //}
 #endif

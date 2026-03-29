@@ -446,7 +446,7 @@ json_spirit::Value getreceivedbyaddress(const json_spirit::Array& params, bool f
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid curecoin address");
     scriptPubKey.SetDestination(address.Get());
-    if (!IsMine(*pwalletMain,scriptPubKey))
+    if (IsMine(*pwalletMain,scriptPubKey) == MINE_NO)
         return (double)0.0;
 
     // Minimum confirmations
@@ -511,7 +511,7 @@ json_spirit::Value getreceivedbyaccount(const json_spirit::Array& params, bool f
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
             CTxDestination address;
-            if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
+            if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) != MINE_NO && setAddress.count(address))
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
                     nAmount += txout.nValue;
         }
@@ -894,7 +894,7 @@ json_spirit::Value ListReceived(const json_spirit::Array& params, bool fByAccoun
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
             CTxDestination address;
-            if (!ExtractDestination(txout.scriptPubKey, address) || !IsMine(*pwalletMain, address))
+            if (!ExtractDestination(txout.scriptPubKey, address) || IsMine(*pwalletMain, address) == MINE_NO)
                 continue;
 
             tallyitem& item = mapTally[address];
@@ -1156,7 +1156,7 @@ json_spirit::Value listaccounts(const json_spirit::Array& params, bool fHelp)
 
     std::map<std::string, int64> mapAccountBalances;
     BOOST_FOREACH(const PAIRTYPE(CTxDestination, std::string)& entry, pwalletMain->mapAddressBook) {
-        if (IsMine(*pwalletMain, entry.first)) // This address belongs to me
+        if (IsMine(*pwalletMain, entry.first) != MINE_NO) // This address belongs to me
             mapAccountBalances[entry.second] = 0;
     }
 
@@ -1547,35 +1547,44 @@ json_spirit::Value encryptwallet(const json_spirit::Array& params, bool fHelp)
 
 class DescribeAddressVisitor : public boost::static_visitor<json_spirit::Object>
 {
+private:
+    isminetype mine;
+
 public:
+    DescribeAddressVisitor(isminetype mineIn) : mine(mineIn) {}
+
     json_spirit::Object operator()(const CNoDestination &dest) const { return json_spirit::Object(); }
 
     json_spirit::Object operator()(const CKeyID &keyID) const {
         json_spirit::Object obj;
-        CPubKey vchPubKey;
-        pwalletMain->GetPubKey(keyID, vchPubKey);
         obj.push_back(json_spirit::Pair("isscript", false));
-        obj.push_back(json_spirit::Pair("pubkey", HexStr(vchPubKey.Raw())));
-        obj.push_back(json_spirit::Pair("iscompressed", vchPubKey.IsCompressed()));
+        if (mine == MINE_SPENDABLE) {
+            CPubKey vchPubKey;
+            pwalletMain->GetPubKey(keyID, vchPubKey);
+            obj.push_back(json_spirit::Pair("pubkey", HexStr(vchPubKey.Raw())));
+            obj.push_back(json_spirit::Pair("iscompressed", vchPubKey.IsCompressed()));
+        }
         return obj;
     }
 
     json_spirit::Object operator()(const CScriptID &scriptID) const {
         json_spirit::Object obj;
         obj.push_back(json_spirit::Pair("isscript", true));
-        CScript subscript;
-        pwalletMain->GetCScript(scriptID, subscript);
-        std::vector<CTxDestination> addresses;
-        txnouttype whichType;
-        int nRequired;
-        ExtractDestinations(subscript, whichType, addresses, nRequired);
-        obj.push_back(json_spirit::Pair("script", GetTxnOutputType(whichType)));
-        json_spirit::Array a;
-        BOOST_FOREACH(const CTxDestination& addr, addresses)
-            a.push_back(CcurecoinAddress(addr).ToString());
-        obj.push_back(json_spirit::Pair("addresses", a));
-        if (whichType == TX_MULTISIG)
-            obj.push_back(json_spirit::Pair("sigsrequired", nRequired));
+        if (mine == MINE_SPENDABLE) {
+            CScript subscript;
+            pwalletMain->GetCScript(scriptID, subscript);
+            std::vector<CTxDestination> addresses;
+            txnouttype whichType;
+            int nRequired;
+            ExtractDestinations(subscript, whichType, addresses, nRequired);
+            obj.push_back(json_spirit::Pair("script", GetTxnOutputType(whichType)));
+            json_spirit::Array a;
+            BOOST_FOREACH(const CTxDestination& addr, addresses)
+                a.push_back(CcurecoinAddress(addr).ToString());
+            obj.push_back(json_spirit::Pair("addresses", a));
+            if (whichType == TX_MULTISIG)
+                obj.push_back(json_spirit::Pair("sigsrequired", nRequired));
+        }
         return obj;
     }
 };
@@ -1597,10 +1606,11 @@ json_spirit::Value validateaddress(const json_spirit::Array& params, bool fHelp)
         CTxDestination dest = address.Get();
         std::string currentAddress = address.ToString();
         ret.push_back(json_spirit::Pair("address", currentAddress));
-        bool fMine = IsMine(*pwalletMain, dest);
-        ret.push_back(json_spirit::Pair("ismine", fMine));
-        if (fMine) {
-            json_spirit::Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
+        isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : MINE_NO;
+        ret.push_back(json_spirit::Pair("ismine", mine != MINE_NO));
+        if (mine != MINE_NO) {
+            ret.push_back(json_spirit::Pair("watchonly", mine == MINE_WATCH_ONLY));
+            json_spirit::Object detail = boost::apply_visitor(DescribeAddressVisitor(mine), dest);
             ret.insert(ret.end(), detail.begin(), detail.end());
         }
         if (pwalletMain->mapAddressBook.count(dest))
@@ -1633,11 +1643,12 @@ json_spirit::Value validatepubkey(const json_spirit::Array& params, bool fHelp)
         CTxDestination dest = address.Get();
         std::string currentAddress = address.ToString();
         ret.push_back(json_spirit::Pair("address", currentAddress));
-        bool fMine = IsMine(*pwalletMain, dest);
-        ret.push_back(json_spirit::Pair("ismine", fMine));
+        isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : MINE_NO;
+        ret.push_back(json_spirit::Pair("ismine", mine != MINE_NO));
         ret.push_back(json_spirit::Pair("iscompressed", isCompressed));
-        if (fMine) {
-            json_spirit::Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
+        if (mine != MINE_NO) {
+            ret.push_back(json_spirit::Pair("watchonly", mine == MINE_WATCH_ONLY));
+            json_spirit::Object detail = boost::apply_visitor(DescribeAddressVisitor(mine), dest);
             ret.insert(ret.end(), detail.begin(), detail.end());
         }
         if (pwalletMain->mapAddressBook.count(dest))

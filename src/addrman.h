@@ -243,6 +243,12 @@ protected:
     // Mark an entry as currently-connected-to.
     void Connected_(const CService &addr, int64 nTime);
 
+    // Remove a tried entry by nId.
+    void DeleteTried_(int nId);
+
+    // Remove a new entry by nId from all buckets.
+    void DeleteNew_(int nId);
+
 public:
 
     IMPLEMENT_SERIALIZE
@@ -497,6 +503,71 @@ public:
             Connected_(addr, nTime);
             Check();
         }
+    }
+
+    // Remove addresses from unsupported networks (e.g. filtered by -onlynet).
+    // fIsUnsupported(addr) should return true for addresses to remove.
+    int CleanupUnsupported(bool (*fIsUnsupported)(const CNetAddr&))
+    {
+        if (!fIsUnsupported)
+            return 0;
+        int nRemoved = 0;
+        {
+            LOCK(cs);
+            Check();
+            std::vector<int> vToRemove;
+            for (std::map<int, CAddrInfo>::iterator it = mapInfo.begin(); it != mapInfo.end(); it++)
+            {
+                if (fIsUnsupported(it->second))
+                    vToRemove.push_back(it->first);
+            }
+            for (std::vector<int>::iterator it = vToRemove.begin(); it != vToRemove.end(); it++)
+            {
+                int nId = *it;
+                if (!mapInfo.count(nId))
+                    continue;
+                CAddrInfo &info = mapInfo[nId];
+                if (info.fInTried)
+                    DeleteTried_(nId);
+                else
+                    DeleteNew_(nId);
+                nRemoved++;
+            }
+            Check();
+        }
+        return nRemoved;
+    }
+
+    // Remove addresses that are stale, unreachable, or have failed repeatedly.
+    // Call before saving to peers.dat to keep the on-disk database lean.
+    int PruneTerrible()
+    {
+        int nRemoved = 0;
+        {
+            LOCK(cs);
+            Check();
+            int64 nNow = GetAdjustedTime();
+            std::vector<int> vToRemove;
+            for (std::map<int, CAddrInfo>::iterator it = mapInfo.begin(); it != mapInfo.end(); it++)
+            {
+                if (it->second.IsTerrible(nNow))
+                    vToRemove.push_back(it->first);
+            }
+            for (std::vector<int>::iterator it = vToRemove.begin(); it != vToRemove.end(); it++)
+            {
+                int nId = *it;
+                if (!mapInfo.count(nId))
+                    continue;
+                CAddrInfo &info = mapInfo[nId];
+                if (info.fInTried)
+                    DeleteTried_(nId);
+                else
+                    DeleteNew_(nId);
+                nRemoved++;
+            }
+            Check();
+        }
+        return nRemoved;
     }
 };
 

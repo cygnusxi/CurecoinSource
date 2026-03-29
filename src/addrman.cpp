@@ -389,18 +389,23 @@ void CAddrMan::Attempt_(const CService &addr, int64 nTime)
     info.nAttempts++;
 }
 
+// Maximum iterations in Select_ to avoid long loops when all addresses have low chance
+#define ADDRMAN_SELECT_MAX_ITERATIONS 1000
+
 CAddress CAddrMan::Select_(int nUnkBias)
 {
     if (size() == 0)
         return CAddress();
 
+    int64 nNow = GetAdjustedTime();
     double nCorTried = sqrt(nTried) * (100.0 - nUnkBias);
     double nCorNew = sqrt(nNew) * nUnkBias;
     if ((nCorTried + nCorNew)*GetRandInt(1<<30)/(1<<30) < nCorTried)
     {
         // use a tried node
         double fChanceFactor = 1.0;
-        while(1)
+        CAddress addrFallback;
+        for (int nIter = 0; nIter < ADDRMAN_SELECT_MAX_ITERATIONS; nIter++)
         {
             int nKBucket = GetRandInt(vvTried.size());
             std::vector<int> &vTried = vvTried[nKBucket];
@@ -408,14 +413,18 @@ CAddress CAddrMan::Select_(int nUnkBias)
             int nPos = GetRandInt(vTried.size());
             assert(mapInfo.count(vTried[nPos]) == 1);
             CAddrInfo &info = mapInfo[vTried[nPos]];
-            if (GetRandInt(1<<30) < fChanceFactor*info.GetChance()*(1<<30))
+            if (!addrFallback.IsValid())
+                addrFallback = info;
+            if (GetRandInt(1<<30) < fChanceFactor*info.GetChance(nNow)*(1<<30))
                 return info;
             fChanceFactor *= 1.2;
         }
+        return addrFallback;
     } else {
         // use a new node
         double fChanceFactor = 1.0;
-        while(1)
+        CAddress addrFallback;
+        for (int nIter = 0; nIter < ADDRMAN_SELECT_MAX_ITERATIONS; nIter++)
         {
             int nUBucket = GetRandInt(vvNew.size());
             std::set<int> &vNew = vvNew[nUBucket];
@@ -426,10 +435,13 @@ CAddress CAddrMan::Select_(int nUnkBias)
                 it++;
             assert(mapInfo.count(*it) == 1);
             CAddrInfo &info = mapInfo[*it];
-            if (GetRandInt(1<<30) < fChanceFactor*info.GetChance()*(1<<30))
+            if (!addrFallback.IsValid())
+                addrFallback = info;
+            if (GetRandInt(1<<30) < fChanceFactor*info.GetChance(nNow)*(1<<30))
                 return info;
             fChanceFactor *= 1.2;
         }
+        return addrFallback;
     }
 }
 
@@ -527,4 +539,45 @@ void CAddrMan::Connected_(const CService &addr, int64 nTime)
     int64 nUpdateInterval = 20 * 60;
     if (nTime - info.nTime > nUpdateInterval)
         info.nTime = nTime;
+}
+
+void CAddrMan::DeleteTried_(int nId)
+{
+    assert(mapInfo.count(nId));
+    CAddrInfo &info = mapInfo[nId];
+    assert(info.fInTried);
+
+    int nKBucket = info.GetTriedBucket(nKey);
+    std::vector<int> &vTried = vvTried[nKBucket];
+    std::vector<int>::iterator it = std::find(vTried.begin(), vTried.end(), nId);
+    if (it != vTried.end())
+    {
+        vTried.erase(it);
+        nTried--;
+    }
+
+    SwapRandom(info.nRandomPos, vRandom.size() - 1);
+    vRandom.pop_back();
+    mapAddr.erase(info);
+    mapInfo.erase(nId);
+}
+
+void CAddrMan::DeleteNew_(int nId)
+{
+    assert(mapInfo.count(nId));
+    CAddrInfo &info = mapInfo[nId];
+    assert(!info.fInTried);
+
+    for (std::vector<std::set<int> >::iterator it = vvNew.begin(); it != vvNew.end(); it++)
+    {
+        if ((*it).erase(nId))
+            info.nRefCount--;
+    }
+    assert(info.nRefCount == 0);
+
+    SwapRandom(info.nRandomPos, vRandom.size() - 1);
+    vRandom.pop_back();
+    mapAddr.erase(info);
+    mapInfo.erase(nId);
+    nNew--;
 }
