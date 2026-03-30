@@ -2354,9 +2354,9 @@ std::string CWallet::SendRegistrationTx(const std::string& username, std::string
     CScript scriptPubKey;
     scriptPubKey << OP_DUP << OP_HASH160 << vchData << OP_EQUALVERIFY << OP_CHECKSIG;
 
-    // 4. Set up the transaction output with the minimum 0.01 CURE to pass dust checks
+    // 4. Set up the transaction output with the minimum 0.0001 CURE to pass dust checks
     std::vector<std::pair<CScript, int64_t> > vecSend;
-    vecSend.push_back(std::make_pair(scriptPubKey, 10000)); // 10000 base units = 0.01 CURE
+    vecSend.push_back(std::make_pair(scriptPubKey, 100)); // 100 base units = 0.0001 CURE
 
     // 5. Create the transaction
     CWalletTx wtxNew;
