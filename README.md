@@ -78,7 +78,7 @@ git clone [https://github.com/cygnusxi/CurecoinSource.git](https://github.com/cy
 sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
   cmake libboost-dev libboost-system-dev libboost-filesystem-dev \
   libboost-program-options-dev libboost-thread-dev libssl-dev \
-  libminiupnpc-dev libdb++-dev dh-make build-essential
+  libminiupnpc-dev libdb++-dev dh-make build-essential zlib1g-dev
 ```
 *(Note: For older systems like Ubuntu 18.04, replace `libdb++-dev` with `libdb5.3++-dev`)*
 
