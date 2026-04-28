@@ -2347,3 +2347,75 @@ void CWallet::UpdatedTransaction(const uint256 &hashTx)
             NotifyTransactionChanged(this, hashTx, CT_UPDATED);
     }
 }
+
+std::string CWallet::SendRegistrationTx(const std::string& username, std::string& strError)
+{
+    std::vector<std::pair<CScript, int64_t> > vecSend;
+    
+    // We now allow up to 64 characters (which equals exactly 4 outputs)
+    if (username.length() > 64) {
+        strError = "Username is too long (max 64 characters).";
+        return "";
+    }
+
+    // --- SCENARIO A: SINGLE OUTPUT (<= 16 chars) ---
+    if (username.length() <= 16) {
+        std::string payload = "CFA:" + username;
+        std::vector<unsigned char> vchData(payload.begin(), payload.end());
+        
+        while (vchData.size() < 20) vchData.push_back(0); // Pad with null bytes
+
+        CScript scriptPubKey;
+        scriptPubKey << OP_DUP << OP_HASH160 << vchData << OP_EQUALVERIFY << OP_CHECKSIG;
+        
+        // Note: I am setting this to 10000 (0.01 CURE) to ensure it survives the strict 
+        // network dust filters. If you use 100, miners might reject it!
+        vecSend.push_back(std::make_pair(scriptPubKey, 10000)); 
+    } 
+    // --- SCENARIO B: DYNAMIC MULTI-OUTPUT (17 to 64 chars) ---
+    else {
+        // Calculate how many 16-character chunks we need
+        int chunks = (username.length() + 15) / 16; 
+        
+        for (int i = 0; i < chunks; ++i) {
+            // Grab the next 16 characters (or whatever is left)
+            std::string part = username.substr(i * 16, 16);
+            
+            // Build the prefix dynamically (e.g., CF1:, CF2:, CF3:, CF4:)
+            // We use safe char math here so older C++ compilers don't complain
+            std::string prefix = "CF";
+            prefix += (char)('1' + i); 
+            prefix += ":";
+            
+            std::string payload = prefix + part;
+
+            // Build the Fake Address script for this specific chunk
+            std::vector<unsigned char> vchData(payload.begin(), payload.end());
+            while (vchData.size() < 20) vchData.push_back(0);
+            
+            CScript scriptPubKey;
+            scriptPubKey << OP_DUP << OP_HASH160 << vchData << OP_EQUALVERIFY << OP_CHECKSIG;
+            
+            // Add this chunk to the transaction outputs
+            vecSend.push_back(std::make_pair(scriptPubKey, 10000));
+        }
+    }
+
+    // Create the transaction
+    CWalletTx wtxNew;
+    CReserveKey reservekey(this);
+    int64_t nFeeRequired;
+    
+    bool fCreated = CreateTransaction(vecSend, wtxNew, reservekey, nFeeRequired, strError);
+    if (!fCreated) {
+        return ""; 
+    }
+
+    // Commit and broadcast the transaction
+    if (!CommitTransaction(wtxNew, reservekey)) {
+        strError = "Transaction commit failed. Could not broadcast.";
+        return "";
+    }
+
+    return wtxNew.GetHash().GetHex();
+}

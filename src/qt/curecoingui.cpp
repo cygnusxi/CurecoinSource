@@ -56,6 +56,7 @@
 #include <QUrl>
 #include <QStyle>
 #include <QtWidgets>
+#include <QInputDialog>
 
 #include <iostream>
 
@@ -242,6 +243,11 @@ void curecoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
+    // research core action
+    registerResearchAction = new QAction(tr("&Register for Research..."), this);
+    registerResearchAction->setStatusTip(tr("Register your username on the blockchain"));
+    connect(registerResearchAction, SIGNAL(triggered()), this, SLOT(registerResearchCore()));
+
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -335,6 +341,10 @@ void curecoinGUI::createMenuBar()
     help->addSeparator();
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+
+    // research core createMenuBar()
+    QMenu *researchMenu = appMenuBar->addMenu(tr("&Research"));
+    researchMenu->addAction(registerResearchAction);
 }
 
 void curecoinGUI::createToolBars()
@@ -964,4 +974,34 @@ void curecoinGUI::showNormalIfMinimized(bool fToggleHidden)
 void curecoinGUI::toggleHidden()
 {
     showNormalIfMinimized(true);
+}
+
+void curecoinGUI::registerResearchCore()
+{
+    // 1. Show the built-in Qt text input pop-up
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("Research Core Registration"),
+                                         tr("Enter your desired Username:"), QLineEdit::Normal,
+                                         "", &ok);
+                                         
+    // 2. If the user clicked "OK" and didn't leave it blank...
+    if (ok && !text.isEmpty()) {
+        
+        // Convert the Qt string to a standard C++ string
+        std::string username = text.toStdString();
+        std::string strError;
+        
+        // 3. Call the backend engine function we wrote earlier!
+        // (pwalletMain is the global pointer to the active wallet)
+        std::string txid = pwalletMain->SendRegistrationTx(username, strError);
+        
+        // 4. Show the result to the user
+        if (txid != "") {
+            QMessageBox::information(this, tr("Success"), 
+                tr("Registration broadcast successfully!\nTXID: ") + QString::fromStdString(txid));
+        } else {
+            QMessageBox::critical(this, tr("Error"), 
+                tr("Registration failed:\n") + QString::fromStdString(strError));
+        }
+    }
 }
