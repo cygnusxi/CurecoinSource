@@ -6,7 +6,7 @@
 #define curecoin_NET_H
 
 #include <deque>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/foreach.hpp>
 #include <openssl/rand.h>
 
@@ -31,6 +31,8 @@ inline unsigned int SendBufferSize() { return 1000*GetArg("-maxsendbuffer", 1*10
 
 void AddOneShot(std::string strDest);
 bool RecvLine(SOCKET hSocket, std::string& strLine);
+uint64 GetTotalBytesRecv();
+uint64 GetTotalBytesSent();
 bool GetMyExternalIP(CNetAddr& ipRet);
 void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);
@@ -117,7 +119,7 @@ extern bool fUseUPnP;
 extern uint64 nLocalServices;
 extern uint64 nLocalHostNonce;
 extern CAddress addrSeenByPeer;
-extern boost::array<int, THREAD_MAX> vnThreadsRunning;
+extern std::array<int, THREAD_MAX> vnThreadsRunning;
 extern CAddrMan addrman;
 
 extern std::vector<CNode*> vNodes;

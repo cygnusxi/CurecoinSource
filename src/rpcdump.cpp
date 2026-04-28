@@ -71,6 +71,51 @@ json_spirit::Value importprivkey(const json_spirit::Array& params, bool fHelp)
     return json_spirit::Value::null;
 }
 
+json_spirit::Value importaddress(const json_spirit::Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 3)
+        throw std::runtime_error(
+            "importaddress <curecoinaddress> [label] [rescan=true]\n"
+            "Adds an address that can be watched as if it were in your wallet but cannot be used to spend.\n"
+            "Transactions to or from watch-only addresses will appear in listtransactions and listunspent\n"
+            "and will be counted in getbalance, but are not spendable without the private key.\n"
+            "Watch-only addresses may be made spendable by importing the corresponding private key using importprivkey.");
+
+    CcurecoinAddress address(params[0].get_str());
+    if (!address.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid curecoin address");
+    CTxDestination dest = address.Get();
+
+    std::string strLabel = "";
+    if (params.size() > 1)
+        strLabel = params[1].get_str();
+
+    bool fRescan = true;
+    if (params.size() > 2)
+        fRescan = params[2].get_bool();
+
+    {
+        LOCK2(cs_main, pwalletMain->cs_wallet);
+
+        if (pwalletMain->HaveWatchOnly(dest))
+            return json_spirit::Value::null;
+
+        pwalletMain->MarkDirty();
+        pwalletMain->SetAddressBookName(dest, strLabel);
+
+        if (!pwalletMain->AddWatchOnly(dest))
+            throw JSONRPCError(RPC_WALLET_ERROR, "Error adding address to wallet");
+
+        if (fRescan)
+        {
+            pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
+            pwalletMain->ReacceptWalletTransactions();
+        }
+    }
+
+    return json_spirit::Value::null;
+}
+
 json_spirit::Value dumpprivkey(const json_spirit::Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)

@@ -43,13 +43,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
         //
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
-            if(wallet->IsMine(txout))
+            if(wallet->IsMine(txout) != MINE_NO)
             {
                 TransactionRecord sub(hash, nTime);
                 CTxDestination address;
                 sub.idx = parts.size(); // sequence number
                 sub.credit = txout.nValue;
-                if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address))
+                if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address) != MINE_NO)
                 {
                     // Received by curecoin Address
                     sub.type = TransactionRecord::RecvWithAddress;
@@ -75,11 +75,11 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
     {
         bool fAllFromMe = true;
         BOOST_FOREACH(const CTxIn& txin, wtx.vin)
-            fAllFromMe = fAllFromMe && wallet->IsMine(txin);
+            fAllFromMe = fAllFromMe && wallet->IsMine(txin) != MINE_NO;
 
         bool fAllToMe = true;
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-            fAllToMe = fAllToMe && wallet->IsMine(txout);
+            fAllToMe = fAllToMe && wallet->IsMine(txout) != MINE_NO;
 
         if (fAllFromMe && fAllToMe)
         {
@@ -102,7 +102,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                 TransactionRecord sub(hash, nTime);
                 sub.idx = parts.size();
 
-                if(wallet->IsMine(txout))
+                if(wallet->IsMine(txout) != MINE_NO)
                 {
                     // Ignore parts sent to self, as this is usually the change
                     // from a transaction sent back to our own address.

@@ -30,6 +30,7 @@ rpcpassword=<StrongAlphanumericPassword>
 listen=1
 # Add this to increase max connections (preferred)
 maxconnections=1000
+rpcport=chooseaportnumber
 ```
 
 > **Note:** Expect your node to maintain around 500 active connections.

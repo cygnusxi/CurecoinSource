@@ -18,7 +18,7 @@
 #include <stdexcept>
 #include <boost/config.hpp> 
 #include <boost/cstdint.hpp> 
-#include <boost/shared_ptr.hpp> 
+#include <memory> 
 #include <boost/variant.hpp> 
 
 namespace json_spirit

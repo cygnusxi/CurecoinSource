@@ -2,6 +2,7 @@
 #define CLIENTMODEL_H
 
 #include <QObject>
+#include <QList>
 
 class OptionsModel;
 class AddressTableModel;
@@ -37,6 +38,20 @@ public:
     int getNumBlocksOfPeers() const;
     //! Return warnings to be displayed in status bar
     QString getStatusBarWarnings() const;
+
+    //! Return total bytes received over the network (for traffic graph)
+    quint64 getTotalBytesRecv() const;
+    //! Return total bytes sent over the network (for traffic graph)
+    quint64 getTotalBytesSent() const;
+    //! Return peer connection info for the peers table
+    struct PeerInfo {
+        QString address;
+        QString ping;
+        int protocolVersion;
+        QString subversion;
+        bool inbound;
+    };
+    QList<PeerInfo> getPeerInfo() const;
 
     QString formatFullVersion() const;
     QString formatBuildDate() const;

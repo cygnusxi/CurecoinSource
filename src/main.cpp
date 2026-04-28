@@ -22,6 +22,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -42,6 +43,7 @@ unsigned int nTransactionsUpdated = 0;
 std::map<uint256, CBlockIndex*> mapBlockIndex;
 std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 uint256 hashGenesisBlock = hashGenesisBlockOfficial;
+uint256 hashAssumeValid = 0;  // Set in init; default mainnet checkpoint, empty for testnet
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 static CBigNum bnProofOfStakeLimit(~uint256(0) >> 24);
 static CBigNum bnProofOfStakeHardLimit(~uint256(0) >> 30);
@@ -1073,7 +1075,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
             bnLowerBound = bnMidValue;
     }
     nRewardCoinYear = bnUpperBound.getuint64();
-    if (nBestHeight > (int)HF_BLOCK) std::min(nRewardCoinYear, (int64)(0.04 * MAX_MINT_PROOF_OF_WORK)); // 4% hardfork
+    if (nBestHeight > (int)HF_BLOCK) nRewardCoinYear = std::min(nRewardCoinYear, (int64)(0.04 * MAX_MINT_PROOF_OF_WORK)); // 4% hardfork
     else nRewardCoinYear = std::min(nRewardCoinYear, MAX_MINT_PROOF_OF_STAKE);
 
 
@@ -1418,7 +1420,8 @@ unsigned int CTransaction::GetP2SHSigOpCount(const MapPrevTx& inputs) const
 
 bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs,
                                  std::map<uint256, CTxIndex>& mapTestPool, const CDiskTxPos& posThisTx,
-                                 const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, bool fStrictPayToScriptHash)
+                                 const CBlockIndex* pindexBlock, bool fBlock, bool fMiner, bool fStrictPayToScriptHash,
+                                 bool fScriptChecks)
 {
     // Take over previous transactions' spent pointers
     // fBlock is true when this is called from AcceptBlock when a new best-block is added to the blockchain
@@ -1470,10 +1473,10 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs,
             if (!txindex.vSpent[prevout.n].IsNull())
                 return fMiner ? false : error("ConnectInputs() : %s prev tx already used at %s", GetHash().ToString().substr(0,10).c_str(), txindex.vSpent[prevout.n].ToString().c_str());
 
-            // Skip ECDSA signature verification when connecting blocks (fBlock=true)
-            // before the last blockchain checkpoint. This is safe because block merkle hashes are
-            // still computed and checked, and any change will be caught at the next checkpoint.
-            if (!(fBlock && (nBestHeight < Checkpoints::GetTotalBlocksEstimate())))
+            // Skip ECDSA signature verification when fScriptChecks is false (assumeValid IBD optimization).
+            // CRITICAL: NEVER skip for coinstake - PoS kernel/signature must always be verified.
+            // PoW, merkle root, and block structure are always checked in CheckBlock/ProcessBlock.
+            if (fScriptChecks || IsCoinStake())
             {
                 // Verify signature
                 if (!VerifySignature(txPrev, *this, i, fStrictPayToScriptHash, 0))
@@ -1624,6 +1627,20 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     bool fEnforceBIP30 = true; // Always active in curecoin
     bool fStrictPayToScriptHash = true; // Always active in curecoin
 
+    // assumeValid: skip script/sig verification for blocks that are ancestors of the assumed-valid block (IBD speedup)
+    // PoW, PoS kernel, coinstake, and block structure are NEVER skipped - only standard tx script verification
+    bool fScriptChecks = true;
+    if (hashAssumeValid != 0 && mapBlockIndex.count(hashAssumeValid))
+    {
+        const CBlockIndex* pindexAssumeValid = mapBlockIndex[hashAssumeValid];
+        for (const CBlockIndex* p = pindexAssumeValid; p; p = p->pprev)
+            if (p == pindex)
+            {
+                fScriptChecks = false;
+                break;
+            }
+    }
+
     //// issue here: it doesn't know the version
     unsigned int nTxPos;
     if (fJustCheck)
@@ -1685,7 +1702,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
             if (!tx.IsCoinStake())
                 nFees += nTxValueIn - nTxValueOut;
 
-            if (!tx.ConnectInputs(txdb, mapInputs, mapQueuedChanges, posThisTx, pindex, true, false, fStrictPayToScriptHash))
+            if (!tx.ConnectInputs(txdb, mapInputs, mapQueuedChanges, posThisTx, pindex, true, false, fStrictPayToScriptHash, fScriptChecks))
                 return false;
         }
 
@@ -1971,7 +1988,8 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
     if (!fIsInitialDownload && !strCmd.empty())
     {
         boost::replace_all(strCmd, "%s", hashBestChain.GetHex());
-        boost::thread t(runCommand, strCmd); // thread runs free
+        std::thread t(runCommand, strCmd); // thread runs free
+        t.detach();
     }
 
     return true;
@@ -3096,7 +3114,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             }
 
             // Get recent addresses
-            if (pfrom->fOneShot || pfrom->nVersion >= CADDR_TIME_VERSION || addrman.size() < 1000)
+            if (pfrom->fOneShot || pfrom->nVersion >= CADDR_TIME_VERSION || addrman.size() < 2000)
             {
                 pfrom->PushMessage("getaddr");
                 pfrom->fGetAddr = true;
@@ -3168,7 +3186,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         vRecv >> vAddr;
 
         // Don't want addr from older versions unless seeding
-        if (pfrom->nVersion < CADDR_TIME_VERSION && addrman.size() > 1000)
+        if (pfrom->nVersion < CADDR_TIME_VERSION && addrman.size() > 2000)
             return true;
         if (vAddr.size() > 1000)
         {
@@ -4416,7 +4434,14 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
         unsigned char pchPadding1[64];
     }
     tmp;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
     std::memset(&tmp, 0, sizeof(tmp));
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     tmp.block.nVersion       = pblock->nVersion;
     tmp.block.hashPrevBlock  = pblock->hashPrevBlock;
@@ -4687,7 +4712,7 @@ void Generatecurecoins(bool fGenerate, CWallet* pwallet)
 
     if (fGenerate)
     {
-        int nProcessors = boost::thread::hardware_concurrency();
+        int nProcessors = std::thread::hardware_concurrency();
         printf("%d processors\n", nProcessors);
         if (nProcessors < 1)
             nProcessors = 1;

@@ -206,6 +206,7 @@ json_spirit::Value listunspent(const json_spirit::Array& params, bool fHelp)
         entry.push_back(json_spirit::Pair("scriptPubKey", HexStr(pk.begin(), pk.end())));
         entry.push_back(json_spirit::Pair("amount",ValueFromAmount(nValue)));
         entry.push_back(json_spirit::Pair("confirmations",out.nDepth));
+        entry.push_back(json_spirit::Pair("spendable", out.fSpendable));
         results.push_back(entry);
     }
 

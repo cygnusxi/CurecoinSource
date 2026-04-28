@@ -83,10 +83,15 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     if (GetBoolArg("-privdb", true))
         nEnvFlags |= DB_PRIVATE;
 
-    int nDbCache = GetArg("-dbcache", 25);
+    // Database cache size in MB; default 450MB for modern performance
+    int64 nDbCache = GetArg("-dbcache", 450);
+    if (nDbCache < 1)
+        nDbCache = 1;
+    // Safe conversion MB->bytes: BDB set_cachesize(gbytes, bytes, ncache)
+    // bytes = (nDbCache % 1024) * 1048576 stays within u_int32_t
     dbenv.set_lg_dir(pathLogDir.string().c_str());
-    dbenv.set_cachesize(nDbCache / 1024, (nDbCache % 1024)*1048576, 1);
-    dbenv.set_lg_bsize(1048576);
+    dbenv.set_cachesize((u_int32_t)(nDbCache / 1024), (u_int32_t)((nDbCache % 1024) * 1048576), 1);
+    dbenv.set_lg_bsize(33554432);  // 32MB log buffer for improved IBD write performance
     dbenv.set_lg_max(10485760);
     dbenv.set_lk_max_locks(10000);
     dbenv.set_lk_max_objects(10000);

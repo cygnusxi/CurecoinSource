@@ -7,9 +7,11 @@
 #include "curecoinrpc.h"
 #include "net.h"
 #include "init.h"
+#include "main.h"
 #include "util.h"
 #include "ui_interface.h"
 #include "checkpoints.h"
+#include "uint256.h"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
@@ -223,7 +225,7 @@ std::string HelpMessage()
         "  -gen                   " + _("Generate coins") + "\n" +
         "  -gen=0                 " + _("Don't generate coins") + "\n" +
         "  -datadir=<dir>         " + _("Specify data directory") + "\n" +
-        "  -dbcache=<n>           " + _("Set database cache size in megabytes (default: 25)") + "\n" +
+        "  -dbcache=<n>           " + _("Set database cache size in megabytes (default: 450)") + "\n" +
         "  -dblogsize=<n>         " + _("Set database disk log size in megabytes (default: 100)") + "\n" +
         "  -timeout=<n>           " + _("Specify connection timeout in milliseconds (default: 5000)") + "\n" +
         "  -proxy=<ip:port>       " + _("Connect through socks proxy") + "\n" +
@@ -237,6 +239,8 @@ std::string HelpMessage()
         "  -seednode=<ip>         " + _("Connect to a node to retrieve peer addresses, and disconnect") + "\n" +
         "  -externalip=<ip>       " + _("Specify your own public address") + "\n" +
         "  -onlynet=<net>         " + _("Only connect to nodes in network <net> (IPv4, IPv6 or Tor)") + "\n" +
+        "  -cleanupaddrman        " + _("Remove addresses from unsupported networks on startup (default: 0)") + "\n" +
+        "  -pruneaddrman          " + _("Remove stale/failed addresses when loading peers.dat (default: 0)") + "\n" +
         "  -discover              " + _("Discover own IP address (default: 1 when listening and no -externalip)") + "\n" +
         "  -listen                " + _("Accept connections from outside (default: 1 if no -proxy or -connect)") + "\n" +
         "  -bind=<addr>           " + _("Bind to given address. Use [host]:port notation for IPv6") + "\n" +
@@ -285,6 +289,7 @@ std::string HelpMessage()
         "  -salvagewallet         " + _("Attempt to recover private keys from a corrupt wallet.dat") + "\n" +
         "  -checkblocks=<n>       " + _("How many blocks to check at startup (default: 2500, 0 = all)") + "\n" +
         "  -checklevel=<n>        " + _("How thorough the block verification is (0-6, default: 1)") + "\n" +
+        "  -assumevalid=<hex>     " + _("If this block hash is in the chain, skip script verification for blocks before it (default: mainnet checkpoint, empty for testnet)") + "\n" +
         "  -loadblock=<file>      " + _("Imports blocks from external blk000?.dat file") + "\n" +
 
         "\n" + _("Block creation options:") + "\n" +
@@ -326,7 +331,14 @@ bool AppInit2()
 #define PROCESS_DEP_ENABLE 0x00000001
 #endif
     typedef BOOL (WINAPI *PSETPROCDEPPOL)(DWORD);
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     PSETPROCDEPPOL setProcDEPPol = (PSETPROCDEPPOL)GetProcAddress(GetModuleHandleA("Kernel32.dll"), "SetProcessDEPPolicy");
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
     if (setProcDEPPol != NULL) setProcDEPPol(PROCESS_DEP_ENABLE);
 #endif
 #ifndef WIN32
@@ -677,6 +689,24 @@ bool AppInit2()
         return false;
     }
 
+    // Set assumeValid: skip script/sig verification for blocks before this (IBD speedup)
+    if (mapArgs.count("-assumevalid"))
+    {
+        std::string strAssumeValid = GetArg("-assumevalid", "");
+        if (!strAssumeValid.empty())
+        {
+            uint256 hash;
+            hash.SetHex(strAssumeValid);
+            hashAssumeValid = hash;
+        }
+    }
+    else if (!fTestNet)
+    {
+        // Default for mainnet: use latest checkpoint (block 1170000)
+        hashAssumeValid = uint256("0xc29686c1166350c35b0d25e40d5ee614dd03056e2b9738e3f5803e79f01ed83a");
+    }
+    // For testnet/regtest: hashAssumeValid stays 0 (no skip)
+
     uiInterface.InitMessage(_("<font style='color: black'>Loading block index...</font>"));
     printf("Loading block index...\n");
     nStart = GetTimeMillis();
@@ -852,6 +882,20 @@ bool AppInit2()
         CAddrDB adb;
         if (!adb.Read(addrman))
             printf("Invalid or missing peers.dat; recreating\n");
+    }
+
+    if (GetBoolArg("-pruneaddrman", false))
+    {
+        int nPruned = addrman.PruneTerrible();
+        if (nPruned > 0)
+            printf("Pruned %d bad addresses on load\n", nPruned);
+    }
+
+    if (GetBoolArg("-cleanupaddrman", false))
+    {
+        int nRemoved = addrman.CleanupUnsupported(IsLimited);
+        if (nRemoved > 0)
+            printf("Removed %d addresses from unsupported networks\n", nRemoved);
     }
 
     printf("Loaded %i addresses from peers.dat  %" PRI64d "ms\n",

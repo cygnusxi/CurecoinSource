@@ -264,6 +264,15 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
                     fAnyUnordered = true;
             }
         }
+        else if (strType == "watch")
+        {
+            std::string strAddress;
+            ssKey >> strAddress;
+            char fYes;
+            ssValue >> fYes;
+            if (fYes == '1')
+                pwallet->LoadWatchOnly(CcurecoinAddress(strAddress).Get());
+        }
         else if (strType == "key" || strType == "wkey")
         {
             std::vector<unsigned char> vchPubKey;
@@ -534,9 +543,6 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash
             }
         }
         pcursor->close();
-    }
-    catch (boost::thread_interrupted) {
-        throw;
     }
     catch (...) {
         result = DB_CORRUPT;

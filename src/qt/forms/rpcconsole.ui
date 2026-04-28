@@ -373,6 +373,77 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_traffic">
+      <attribute name="title">
+       <string>&amp;Network Traffic</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_traffic">
+       <item>
+        <widget class="QWidget" name="trafficGraphPlaceholder" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="graphRangeCombo">
+         <property name="toolTip">
+          <string>Select the time range for the traffic graph</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>5 min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>10 min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>30 min</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1 hour</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_peers">
+      <attribute name="title">
+       <string>&amp;Peers</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_peers">
+       <item>
+        <widget class="QTableView" name="peerTable">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="refreshPeersButton">
+         <property name="text">
+          <string>&amp;Refresh</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab_console">
       <attribute name="title">
        <string>&amp;Console</string>
