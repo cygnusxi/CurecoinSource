@@ -2350,7 +2350,8 @@ void CWallet::UpdatedTransaction(const uint256 &hashTx)
 
 std::string CWallet::SendRegistrationTx(const std::string& username, std::string& strError)
 {
-    std::vector<std::pair<CScript, int64_t> > vecSend;
+    std::vector<std::pair<CScript, int64> > vecSend;
+    const int64 nRegistrationOutput = 10000;
     
     // We now allow up to 64 characters (which equals exactly 4 outputs)
     if (username.length() > 64) {
@@ -2370,7 +2371,7 @@ std::string CWallet::SendRegistrationTx(const std::string& username, std::string
         
         // Note: I am setting this to 10000 (0.01 CURE) to ensure it survives the strict 
         // network dust filters. If you use 100, miners might reject it!
-        vecSend.push_back(std::make_pair(scriptPubKey, 10000)); 
+        vecSend.push_back(std::make_pair(scriptPubKey, nRegistrationOutput)); 
     } 
     // --- SCENARIO B: DYNAMIC MULTI-OUTPUT (17 to 64 chars) ---
     else {
@@ -2397,14 +2398,14 @@ std::string CWallet::SendRegistrationTx(const std::string& username, std::string
             scriptPubKey << OP_DUP << OP_HASH160 << vchData << OP_EQUALVERIFY << OP_CHECKSIG;
             
             // Add this chunk to the transaction outputs
-            vecSend.push_back(std::make_pair(scriptPubKey, 10000));
+            vecSend.push_back(std::make_pair(scriptPubKey, nRegistrationOutput));
         }
     }
 
     // Create the transaction
     CWalletTx wtxNew;
     CReserveKey reservekey(this);
-    int64_t nFeeRequired;
+    int64 nFeeRequired;
     
     bool fCreated = CreateTransaction(vecSend, wtxNew, reservekey, nFeeRequired, strError);
     if (!fCreated) {
