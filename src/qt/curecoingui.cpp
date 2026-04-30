@@ -982,18 +982,37 @@ void curecoinGUI::registerResearchCore()
     // 1. Show the built-in Qt text input pop-up
     bool ok;
     QString text = QInputDialog::getText(this, tr("Research Core Registration"),
-                                         tr("Enter your desired Username:"), QLineEdit::Normal,
+                                         tr("Enter your desired Username (max 64 chars):"), QLineEdit::Normal,
                                          "", &ok);
                                          
     // 2. If the user clicked "OK" and didn't leave it blank...
     if (ok && !text.isEmpty()) {
         
+        // --- NEW: THE WALLET UNLOCK CHECK ---
+        // Make sure the walletModel is actually loaded
+        if (!walletModel) {
+            QMessageBox::critical(this, tr("Error"), tr("Wallet model is not initialized."));
+            return;
+        }
+
+        // This line checks if the wallet is locked. 
+        // If it IS locked, it automatically spawns the Password Pop-up!
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock());
+        
+        // If they click 'Cancel' on the password pop-up, or get it wrong, we abort.
+        if (!ctx.isValid()) {
+            QMessageBox::warning(this, tr("Registration Canceled"), 
+                                 tr("Wallet unlock failed or was canceled."));
+            return; 
+        }
+        // ------------------------------------
+
         // Convert the Qt string to a standard C++ string
         std::string username = text.toStdString();
         std::string strError;
         
-        // 3. Call the backend engine function we wrote earlier!
-        // (pwalletMain is the global pointer to the active wallet)
+        // 3. Call the backend engine function!
+        // (Because we passed the UnlockContext above, pwalletMain is safely unlocked here)
         std::string txid = pwalletMain->SendRegistrationTx(username, strError);
         
         // 4. Show the result to the user
@@ -1004,5 +1023,7 @@ void curecoinGUI::registerResearchCore()
             QMessageBox::critical(this, tr("Error"), 
                 tr("Registration failed:\n") + QString::fromStdString(strError));
         }
+        
+        // The moment this function ends, 'ctx' is destroyed, and the wallet instantly re-locks!
     }
 }
