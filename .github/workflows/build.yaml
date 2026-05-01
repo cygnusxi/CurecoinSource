@@ -3,6 +3,9 @@ name: CureCoin Linux Build
 on:
   push:
     branches: [ "master", "dev", "research" ]
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
   pull_request:
     branches: [ "master" ]
 
