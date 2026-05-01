@@ -1,4 +1,4 @@
-![Build Status](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yml/badge.svg)
+[![CureCoin Linux Build](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yaml/badge.svg)](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yaml)
 
 # CureCoin Wallet
 
