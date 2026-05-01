@@ -1,3 +1,5 @@
+![Build Status](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yml/badge.svg)
+
 # CureCoin Wallet
 
 ## Overview
