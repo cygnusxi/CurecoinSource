@@ -2,9 +2,9 @@ name: CureCoin Linux Build
 
 on:
   push:
-    branches: [ "main", "dev", "research" ]
+    branches: [ "master", "dev", "research" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   build-linux:
