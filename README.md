@@ -1,4 +1,4 @@
-[![CureCoin Linux Build](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yaml/badge.svg)](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yaml) [![CodeQL Advanced](https://github.com/cygnusxi/CurecoinSource/actions/workflows/codeql.yml/badge.svg)](https://github.com/cygnusxi/CurecoinSource/actions/workflows/codeql.yml) ![Release](https://img.shields.io/github/v/release/cygnusxi/CurecoinSource)
+[![CureCoin Linux Build](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yaml/badge.svg)](https://github.com/cygnusxi/CurecoinSource/actions/workflows/build.yaml) [![CodeQL Advanced](https://github.com/cygnusxi/CurecoinSource/actions/workflows/codeql.yml/badge.svg)](https://github.com/cygnusxi/CurecoinSource/actions/workflows/codeql.yml) ![Latest Version](https://img.shields.io/github/v/tag/cygnusxi/CurecoinSource?label=version&sort=semver) 
 
 # CureCoin Wallet
 
