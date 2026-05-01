@@ -1,0 +1,66 @@
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '38 2 * * 4'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+            build-mode: none
+          - language: c-cpp
+            build-mode: manual  # Changed from autobuild to manual
+          - language: python
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-extended,security-and-quality
+
+      # This step only runs for C++ to provide the necessary environment
+      - name: Install Dependencies and Build Wallet
+        if: matrix.build-mode == 'manual'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
+            cmake libboost-dev libboost-system-dev libboost-filesystem-dev \
+            libboost-program-options-dev libboost-thread-dev libssl-dev \
+            libminiupnpc-dev libdb++-dev dh-make build-essential zlib1g-dev
+          
+          # Build the headless daemon (helps CodeQL see core logic)
+          cd src
+          make -f makefile.unix
+          cd ..
+          
+          # Build the GUI (helps CodeQL see UI/Frontend logic)
+          qmake
+          make
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{matrix.language}}"
