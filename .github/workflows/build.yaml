@@ -1,0 +1,44 @@
+name: CureCoin Linux Build
+
+on:
+  push:
+    branches: [ "main", "dev", "research" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
+            cmake libboost-dev libboost-system-dev libboost-filesystem-dev \
+            libboost-program-options-dev libboost-thread-dev libssl-dev \
+            libminiupnpc-dev libdb++-dev dh-make build-essential zlib1g-dev
+
+      - name: Build Headless Wallet (curecoind)
+        run: |
+          cd src
+          make -f makefile.unix
+          # Optional: strip the binary to reduce size
+          strip curecoind
+
+      - name: Build GUI Wallet (curecoin-qt)
+        run: |
+          qmake
+          make
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: curecoin-binaries
+          path: |
+            src/curecoind
+            curecoin-qt
