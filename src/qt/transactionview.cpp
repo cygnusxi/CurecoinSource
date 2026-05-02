@@ -28,6 +28,7 @@
 #include <QClipboard>
 #include <QLabel>
 #include <QDateTimeEdit>
+#include <QFontMetrics>
 
 TransactionView::TransactionView(QWidget *parent) :
     QWidget(parent), model(0), transactionProxyModel(0),
@@ -177,13 +178,14 @@ void TransactionView::setModel(WalletModel *model)
         transactionView->horizontalHeader()->resizeSection(
                 TransactionTableModel::Status, 23);
         transactionView->horizontalHeader()->resizeSection(
-                TransactionTableModel::Date, 120);
+                TransactionTableModel::Date, qMax(130, transactionView->fontMetrics().width("88/88/8888 88:88") + 24));
         transactionView->horizontalHeader()->resizeSection(
-                TransactionTableModel::Type, 120);
+                TransactionTableModel::Type, qMax(120, transactionView->fontMetrics().width(tr("Received with")) + 28));
         transactionView->horizontalHeader()->setResizeMode(
                 TransactionTableModel::ToAddress, QHeaderView::Stretch);
+        QFontMetrics amountMetrics(GUIUtil::tabularAmountFont());
         transactionView->horizontalHeader()->resizeSection(
-                TransactionTableModel::Amount, 100);
+                TransactionTableModel::Amount, qMax(190, amountMetrics.width("-99999999.99999999 CURE") + 34));
     }
 }
 

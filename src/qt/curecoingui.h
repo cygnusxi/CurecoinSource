@@ -24,6 +24,7 @@ class QModelIndex;
 class QProgressBar;
 class QStackedWidget;
 class QUrl;
+class QActionGroup;
 QT_END_NAMESPACE
 
 /**
@@ -94,6 +95,9 @@ private:
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
     QAction *registerResearchAction; // The button in the drop-down menu
+    QActionGroup *themeActionGroup;
+    QAction *classicThemeAction;
+    QAction *darkThemeAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -110,6 +114,7 @@ private:
     void createToolBars();
     /** Create system tray (notification) icon */
     void createTrayIcon();
+    void updateProgressBarStyle();
 
 public slots:
     /** Set number of connections shown in the UI */
@@ -183,6 +188,9 @@ private slots:
     void toggleHidden();
 
     void updateStakingIcon();
+    void setClassicTheme();
+    void setDarkTheme();
+    void updateThemeActions(const QString &themeId);
 };
 
 #endif

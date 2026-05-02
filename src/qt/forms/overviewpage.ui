@@ -17,7 +17,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QFrame" name="frame">
+      <widget class="QFrame" name="overviewWalletFrame">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>
@@ -249,7 +249,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <widget class="QFrame" name="frame_2">
+      <widget class="QFrame" name="overviewRecentFrame">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>

@@ -170,6 +170,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return QVariant(bitdb.GetDetach());
         case Language:
             return settings.value("language", "");
+        case GuiTheme:
+            return GUIUtil::guiThemeSetting();
         default:
             return QVariant();
         }
@@ -258,6 +260,12 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case Language:
             settings.setValue("language", value);
             break;
+        case GuiTheme: {
+            QString themeId = value.toString();
+            GUIUtil::setGuiThemeSetting(themeId);
+            emit guiThemeChanged(GUIUtil::guiThemeSetting());
+            }
+            break;
         default:
             break;
         }
@@ -290,4 +298,9 @@ int OptionsModel::getDisplayUnit()
 bool OptionsModel::getDisplayAddresses()
 {
     return bDisplayAddresses;
+}
+
+QString OptionsModel::getGuiTheme()
+{
+    return GUIUtil::guiThemeSetting();
 }

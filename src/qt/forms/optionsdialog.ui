@@ -334,6 +334,30 @@
         </layout>
        </item>
        <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3_Display">
+        <item>
+         <widget class="QLabel" name="themeLabel">
+          <property name="text">
+           <string>&amp;Theme:</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+          <property name="buddy">
+           <cstring>theme</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QValueComboBox" name="theme">
+          <property name="toolTip">
+           <string>Choose the visual theme for the Curecoin interface.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
         <widget class="QCheckBox" name="displayAddresses">
          <property name="toolTip">
           <string>Whether to show curecoin addresses in the transaction list or not.</string>

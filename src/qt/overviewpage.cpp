@@ -31,11 +31,11 @@ public:
 
         QIcon icon = qvariant_cast<QIcon>(index.data(Qt::DecorationRole));
         QRect mainRect = option.rect;
-        QRect decorationRect(mainRect.topLeft(), QSize(DECORATION_SIZE, DECORATION_SIZE));
-        int xspace = DECORATION_SIZE + 8;
-        int ypad = 6;
+        QRect decorationRect(mainRect.left() + 4, mainRect.top() + (mainRect.height() - DECORATION_SIZE) / 2, DECORATION_SIZE, DECORATION_SIZE);
+        int xspace = DECORATION_SIZE + 18;
+        int ypad = 9;
         int halfheight = (mainRect.height() - 2*ypad)/2;
-        QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
+        QRect topLineRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace - 6, halfheight);
         QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
         icon.paint(painter, decorationRect);
 
@@ -71,17 +71,27 @@ public:
         {
             amountText = QString("[") + amountText + QString("]");
         }
+        QFont regularFont = painter->font();
+        QFont amountFont = GUIUtil::tabularAmountFont();
+        QFontMetrics amountMetrics(amountFont);
+        int amountWidth = qMin(topLineRect.width(), amountMetrics.width(amountText) + 10);
+        QRect amountRect(topLineRect.right() - amountWidth + 1, topLineRect.top(), amountWidth, topLineRect.height());
+        QRect dateRect(topLineRect.left(), topLineRect.top(), qMax(0, topLineRect.width() - amountWidth - 10), topLineRect.height());
+
+        painter->setFont(amountFont);
         painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
+        painter->setFont(regularFont);
 
         painter->setPen(option.palette.color(QPalette::Text));
-        painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
+        painter->drawText(dateRect, Qt::AlignLeft|Qt::AlignVCenter,
+                          painter->fontMetrics().elidedText(GUIUtil::dateTimeStr(date), Qt::ElideRight, dateRect.width()));
 
         painter->restore();
     }
 
     inline QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
-        return QSize(DECORATION_SIZE, DECORATION_SIZE);
+        return QSize(DECORATION_SIZE, DECORATION_SIZE + 18);
     }
 
     int unit;
@@ -101,10 +111,18 @@ OverviewPage::OverviewPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QFont amountFont = GUIUtil::tabularAmountFont();
+    amountFont.setBold(true);
+    ui->labelBalance->setFont(amountFont);
+    ui->labelStake->setFont(amountFont);
+    ui->labelUnconfirmed->setFont(amountFont);
+    ui->labelImmature->setFont(amountFont);
+    ui->labelNumTransactions->setFont(amountFont);
+
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
-    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 2));
+    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 20));
     ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
