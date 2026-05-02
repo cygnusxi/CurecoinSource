@@ -52,6 +52,9 @@
     <qresource prefix="/movies">
         <file alias="update_spinner">res/movies/update_spinner.mng</file>
     </qresource>
+    <qresource prefix="/themes">
+        <file alias="dark.qss">res/themes/dark.qss</file>
+    </qresource>
     <qresource prefix="/translations">
         <file alias="en">locale/curecoin_en.qm</file>
         <file alias="ru">locale/curecoin_ru.qm</file>

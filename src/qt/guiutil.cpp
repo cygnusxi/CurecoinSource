@@ -16,8 +16,13 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
+#include <QFile>
+#include <QPalette>
+#include <QSettings>
+#include <QStyle>
 #include <QDesktopServices>
 #include <QThread>
+#include <QWidget>
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QUrlQuery>
 #endif
@@ -60,6 +65,107 @@ QFont curecoinAddressFont()
     QFont font("Monospace");
     font.setStyleHint(QFont::TypeWriter);
     return font;
+}
+
+QFont tabularAmountFont()
+{
+    QFont font("Monospace");
+    int pointSize = QApplication::font().pointSize();
+    if(pointSize > 0)
+        font.setPointSize(pointSize);
+    font.setStyleHint(QFont::TypeWriter);
+    font.setFixedPitch(true);
+    return font;
+}
+
+QString defaultGuiTheme()
+{
+    return QString("classic");
+}
+
+QString darkGuiTheme()
+{
+    return QString("dark");
+}
+
+static QString normalizeGuiTheme(const QString &themeId)
+{
+    if(themeId == darkGuiTheme())
+        return darkGuiTheme();
+    return defaultGuiTheme();
+}
+
+QString guiThemeSetting()
+{
+    QSettings settings;
+    return normalizeGuiTheme(settings.value("guiTheme", defaultGuiTheme()).toString());
+}
+
+void setGuiThemeSetting(const QString &themeId)
+{
+    QSettings settings;
+    settings.setValue("guiTheme", normalizeGuiTheme(themeId));
+}
+
+void applyGuiTheme(const QString &themeId)
+{
+    QString normalizedTheme = normalizeGuiTheme(themeId);
+
+    if(normalizedTheme == defaultGuiTheme())
+    {
+        qApp->setPalette(qApp->style()->standardPalette());
+        qApp->setStyleSheet(QString());
+        return;
+    }
+
+    QPalette palette;
+    palette.setColor(QPalette::Window, QColor(26, 29, 33));
+    palette.setColor(QPalette::WindowText, QColor(232, 234, 237));
+    palette.setColor(QPalette::Base, QColor(17, 20, 24));
+    palette.setColor(QPalette::AlternateBase, QColor(31, 36, 43));
+    palette.setColor(QPalette::ToolTipBase, QColor(34, 38, 45));
+    palette.setColor(QPalette::ToolTipText, QColor(232, 234, 237));
+    palette.setColor(QPalette::Text, QColor(232, 234, 237));
+    palette.setColor(QPalette::Button, QColor(42, 48, 56));
+    palette.setColor(QPalette::ButtonText, QColor(232, 234, 237));
+    palette.setColor(QPalette::BrightText, QColor(255, 255, 255));
+    palette.setColor(QPalette::Highlight, QColor(46, 182, 232));
+    palette.setColor(QPalette::HighlightedText, QColor(7, 16, 20));
+    palette.setColor(QPalette::Disabled, QPalette::Text, QColor(122, 130, 142));
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(122, 130, 142));
+    qApp->setPalette(palette);
+
+    QFile themeFile(":/themes/dark.qss");
+    if(themeFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        qApp->setStyleSheet(QString::fromUtf8(themeFile.readAll()));
+}
+
+void setTitleBarDark(QWidget *widget, bool enabled)
+{
+#ifdef WIN32
+    if(!widget)
+        return;
+
+    typedef HRESULT (WINAPI *DwmSetWindowAttributeFunc)(HWND, DWORD, LPCVOID, DWORD);
+    HMODULE dwmapi = LoadLibraryW(L"dwmapi.dll");
+    if(!dwmapi)
+        return;
+
+    DwmSetWindowAttributeFunc dwmSetWindowAttribute =
+        reinterpret_cast<DwmSetWindowAttributeFunc>(GetProcAddress(dwmapi, "DwmSetWindowAttribute"));
+    if(dwmSetWindowAttribute)
+    {
+        BOOL dark = enabled ? TRUE : FALSE;
+        // Windows 10 1809+ uses 20; some earlier builds used 19.
+        dwmSetWindowAttribute(reinterpret_cast<HWND>(widget->winId()), 20, &dark, sizeof(dark));
+        dwmSetWindowAttribute(reinterpret_cast<HWND>(widget->winId()), 19, &dark, sizeof(dark));
+    }
+
+    FreeLibrary(dwmapi);
+#else
+    Q_UNUSED(widget);
+    Q_UNUSED(enabled);
+#endif
 }
 
 void setupAddressWidget(QLineEdit *widget, QWidget *parent)

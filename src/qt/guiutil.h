@@ -26,6 +26,16 @@ namespace GUIUtil
     // Render curecoin addresses in monospace font
     QFont curecoinAddressFont();
 
+    // Render amounts with stable digit widths.
+    QFont tabularAmountFont();
+
+    QString defaultGuiTheme();
+    QString darkGuiTheme();
+    QString guiThemeSetting();
+    void setGuiThemeSetting(const QString &themeId);
+    void applyGuiTheme(const QString &themeId);
+    void setTitleBarDark(QWidget *widget, bool enabled);
+
     // Set up widgets for address and amounts
     void setupAddressWidget(QLineEdit *widget, QWidget *parent);
     void setupAmountWidget(QLineEdit *widget, QWidget *parent);

@@ -5,6 +5,7 @@
 #include "monitoreddatamapper.h"
 #include "netbase.h"
 #include "optionsmodel.h"
+#include "guiutil.h"
 
 #include <QDir>
 #include <QIntValidator>
@@ -81,6 +82,8 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     }
 
     ui->unit->setModel(new curecoinUnits(this));
+    ui->theme->addItem(tr("Classic"), GUIUtil::defaultGuiTheme());
+    ui->theme->addItem(tr("Curecoin Dark"), GUIUtil::darkGuiTheme());
 
     /* Widget-to-option mapper */
     mapper = new MonitoredDataMapper(this);
@@ -147,6 +150,7 @@ void OptionsDialog::setMapper()
     /* Display */
     mapper->addMapping(ui->lang, OptionsModel::Language);
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
+    mapper->addMapping(ui->theme, OptionsModel::GuiTheme);
     mapper->addMapping(ui->displayAddresses, OptionsModel::DisplayAddresses);
 }
 

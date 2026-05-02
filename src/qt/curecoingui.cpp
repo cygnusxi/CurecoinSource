@@ -48,8 +48,10 @@
 #include <QProgressBar>
 #include <QStackedWidget>
 #include <QDateTime>
+#include <QDesktopWidget>
 #include <QMovie>
 #include <QFileDialog>
+#include <QFontMetrics>
 #include <QDesktopServices>
 #include <QTimer>
 #include <QDragEnterEvent>
@@ -74,11 +76,24 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     unlockWalletAction(0),
     lockWalletAction(0),
     aboutQtAction(0),
+    progressBarLabel(0),
+    progressBar(0),
+    themeActionGroup(0),
+    classicThemeAction(0),
+    darkThemeAction(0),
     trayIcon(0),
     notificator(0),
     rpcConsole(0)
 {
-    resize(850, 550);
+    QFontMetrics metrics(font());
+    QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
+    int initialWidth = qMax(1100, metrics.width("M") * 105);
+    int initialHeight = qMax(680, metrics.height() * 36);
+    initialWidth = qMin(initialWidth, availableGeometry.width() * 9 / 10);
+    initialHeight = qMin(initialHeight, availableGeometry.height() * 9 / 10);
+    setMinimumSize(qMin(980, availableGeometry.width() * 8 / 10),
+                   qMin(620, availableGeometry.height() * 8 / 10));
+    resize(initialWidth, initialHeight);
     setWindowTitle(tr("Curecoin") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/curecoin"));
@@ -170,11 +185,7 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     // Override style sheet for progress bar for styles that have a segmented progress bar,
     // as they make the text unreadable (workaround for issue #1071)
     // See https://qt-project.org/doc/qt-4.8/gallery.html
-    QString curStyle = qApp->style()->metaObject()->className();
-    if(curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle")
-    {
-        progressBar->setStyleSheet("QProgressBar { background-color: #e8e8e8; border: 1px solid grey; border-radius: 7px; padding: 1px; text-align: center; } QProgressBar::chunk { background: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #FF8000, stop: 1 orange); border-radius: 7px; margin: 0px; }");
-    }
+    updateProgressBarStyle();
 
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
@@ -272,6 +283,15 @@ void curecoinGUI::createActions()
     optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
     optionsAction->setToolTip(tr("Modify configuration options for Curecoin"));
     optionsAction->setMenuRole(QAction::PreferencesRole);
+    themeActionGroup = new QActionGroup(this);
+    themeActionGroup->setExclusive(true);
+    classicThemeAction = new QAction(tr("&Classic"), this);
+    classicThemeAction->setCheckable(true);
+    darkThemeAction = new QAction(tr("Curecoin &Dark"), this);
+    darkThemeAction->setCheckable(true);
+    themeActionGroup->addAction(classicThemeAction);
+    themeActionGroup->addAction(darkThemeAction);
+    updateThemeActions(GUIUtil::guiThemeSetting());
     toggleHideAction = new QAction(QIcon(":/icons/curecoin"), tr("&Show / Hide"), this);
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
     encryptWalletAction->setToolTip(tr("Encrypt or decrypt wallet"));
@@ -296,6 +316,8 @@ void curecoinGUI::createActions()
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
+    connect(classicThemeAction, SIGNAL(triggered()), this, SLOT(setClassicTheme()));
+    connect(darkThemeAction, SIGNAL(triggered()), this, SLOT(setDarkTheme()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(encryptWalletAction, SIGNAL(triggered(bool)), this, SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), this, SLOT(backupWallet()));
@@ -334,6 +356,10 @@ void curecoinGUI::createMenuBar()
     settings->addAction(unlockWalletAction);
     settings->addAction(lockWalletAction);
     settings->addSeparator();
+    QMenu *themeMenu = settings->addMenu(tr("&Theme"));
+    themeMenu->addAction(classicThemeAction);
+    themeMenu->addAction(darkThemeAction);
+    settings->addSeparator();
     settings->addAction(optionsAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
@@ -360,6 +386,58 @@ void curecoinGUI::createToolBars()
     QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar2->addAction(exportAction);
+}
+
+void curecoinGUI::updateProgressBarStyle()
+{
+    if(!progressBar)
+        return;
+
+    progressBar->setStyleSheet(QString());
+    QString curStyle = qApp->style()->metaObject()->className();
+    if(GUIUtil::guiThemeSetting() == GUIUtil::defaultGuiTheme() &&
+       (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle"))
+    {
+        progressBar->setStyleSheet("QProgressBar { background-color: #e8e8e8; border: 1px solid grey; border-radius: 7px; padding: 1px; text-align: center; } QProgressBar::chunk { background: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #FF8000, stop: 1 orange); border-radius: 7px; margin: 0px; }");
+    }
+}
+
+void curecoinGUI::setClassicTheme()
+{
+    if(clientModel && clientModel->getOptionsModel())
+    {
+        clientModel->getOptionsModel()->setData(clientModel->getOptionsModel()->index(OptionsModel::GuiTheme, 0), GUIUtil::defaultGuiTheme());
+        return;
+    }
+
+    GUIUtil::setGuiThemeSetting(GUIUtil::defaultGuiTheme());
+    updateThemeActions(GUIUtil::defaultGuiTheme());
+}
+
+void curecoinGUI::setDarkTheme()
+{
+    if(clientModel && clientModel->getOptionsModel())
+    {
+        clientModel->getOptionsModel()->setData(clientModel->getOptionsModel()->index(OptionsModel::GuiTheme, 0), GUIUtil::darkGuiTheme());
+        return;
+    }
+
+    GUIUtil::setGuiThemeSetting(GUIUtil::darkGuiTheme());
+    updateThemeActions(GUIUtil::darkGuiTheme());
+}
+
+void curecoinGUI::updateThemeActions(const QString &themeId)
+{
+    QString normalizedTheme = themeId == GUIUtil::darkGuiTheme() ? GUIUtil::darkGuiTheme() : GUIUtil::defaultGuiTheme();
+
+    if(classicThemeAction)
+        classicThemeAction->setChecked(normalizedTheme == GUIUtil::defaultGuiTheme());
+    if(darkThemeAction)
+        darkThemeAction->setChecked(normalizedTheme == GUIUtil::darkGuiTheme());
+
+    GUIUtil::applyGuiTheme(normalizedTheme);
+    GUIUtil::setTitleBarDark(this, normalizedTheme == GUIUtil::darkGuiTheme());
+    updateProgressBarStyle();
 }
 
 void curecoinGUI::setClientModel(ClientModel *clientModel)
@@ -400,6 +478,11 @@ void curecoinGUI::setClientModel(ClientModel *clientModel)
         rpcConsole->setClientModel(clientModel);
         addressBookPage->setOptionsModel(clientModel->getOptionsModel());
         receiveCoinsPage->setOptionsModel(clientModel->getOptionsModel());
+        if(clientModel->getOptionsModel())
+        {
+            connect(clientModel->getOptionsModel(), SIGNAL(guiThemeChanged(QString)), this, SLOT(updateThemeActions(QString)));
+            updateThemeActions(clientModel->getOptionsModel()->getGuiTheme());
+        }
     }
 }
 

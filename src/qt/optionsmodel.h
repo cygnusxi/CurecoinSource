@@ -30,6 +30,7 @@ public:
         DisplayAddresses,  // bool
         DetachDatabases,   // bool
         Language,          // QString
+        GuiTheme,          // QString
         OptionIDRowCount,
     };
 
@@ -49,6 +50,7 @@ public:
     int getDisplayUnit();
     bool getDisplayAddresses();
     QString getLanguage() { return language; }
+    QString getGuiTheme();
 
 private:
     int nDisplayUnit;
@@ -59,6 +61,7 @@ private:
 
 signals:
     void displayUnitChanged(int unit);
+    void guiThemeChanged(const QString &themeId);
 };
 
 #endif // OPTIONSMODEL_H

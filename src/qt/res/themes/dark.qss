@@ -1,0 +1,255 @@
+/* Curecoin Dark
+   Accent: CureCoin Blue #2eb6e8 */
+
+QWidget {
+    background-color: #1a1d21;
+    color: #e8eaed;
+    selection-background-color: #2eb6e8;
+    selection-color: #071014;
+}
+
+QMainWindow,
+QDialog,
+QMenuBar,
+QMenu,
+QStatusBar,
+QToolBar {
+    background-color: #1a1d21;
+    color: #e8eaed;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 6px 10px;
+}
+
+QMenuBar::item:selected,
+QMenu::item:selected {
+    background-color: #2a3038;
+    color: #ffffff;
+}
+
+QMenu {
+    border: 1px solid #3a3f48;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 24px 6px 24px;
+}
+
+QToolBar {
+    border: 0;
+    spacing: 6px;
+    padding: 6px;
+}
+
+QStatusBar {
+    border-top: 1px solid #303640;
+}
+
+QFrame#overviewWalletFrame,
+QFrame#overviewRecentFrame,
+QFrame[frameShape="6"] {
+    background-color: #22262d;
+    border: 1px solid #3a3f48;
+    border-radius: 8px;
+}
+
+QLabel {
+    background: transparent;
+}
+
+QLabel#labelWalletStatus,
+QLabel#labelTransactionsStatus,
+QLabel#statusLabel {
+    color: #ff6b6b;
+}
+
+QLabel#labelBalance,
+QLabel#labelStake,
+QLabel#labelUnconfirmed,
+QLabel#labelImmature,
+QLabel#labelNumTransactions {
+    color: #f5fbff;
+    font-family: "Cascadia Mono", "Consolas", "Monospace";
+}
+
+QPushButton,
+QToolButton {
+    background-color: #2a3038;
+    border: 1px solid #3f4652;
+    border-radius: 6px;
+    color: #e8eaed;
+    padding: 7px 12px;
+}
+
+QPushButton:hover,
+QToolButton:hover {
+    background-color: #313844;
+    border-color: #2eb6e8;
+}
+
+QPushButton:pressed,
+QToolButton:pressed {
+    background-color: #21313a;
+}
+
+QPushButton:disabled,
+QToolButton:disabled {
+    background-color: #20242a;
+    color: #7a828e;
+    border-color: #303640;
+}
+
+QLineEdit,
+QComboBox,
+QAbstractSpinBox,
+QDateTimeEdit {
+    background-color: #111418;
+    border: 1px solid #3a3f48;
+    border-radius: 6px;
+    color: #e8eaed;
+    padding: 6px 8px;
+    selection-background-color: #2eb6e8;
+    selection-color: #071014;
+}
+
+QLineEdit:focus,
+QComboBox:focus,
+QAbstractSpinBox:focus,
+QDateTimeEdit:focus {
+    border-color: #2eb6e8;
+}
+
+QComboBox::drop-down,
+QDateTimeEdit::drop-down {
+    border: 0;
+    width: 24px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #20242a;
+    border: 1px solid #3a3f48;
+    selection-background-color: #2eb6e8;
+    selection-color: #071014;
+}
+
+QCheckBox,
+QRadioButton {
+    spacing: 8px;
+}
+
+QTabWidget::pane {
+    border: 1px solid #3a3f48;
+    border-radius: 8px;
+    top: -1px;
+}
+
+QTabBar::tab {
+    background-color: #20242a;
+    border: 1px solid #303640;
+    border-bottom-color: #3a3f48;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 7px 12px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background-color: #2a3038;
+    border-color: #2eb6e8;
+    color: #ffffff;
+}
+
+QTableView,
+QTreeView,
+QListView {
+    background-color: #171a1f;
+    alternate-background-color: #1f242b;
+    border: 1px solid #303640;
+    border-radius: 8px;
+    color: #e8eaed;
+    gridline-color: #303640;
+}
+
+QListView {
+    padding: 6px;
+}
+
+QListView::item {
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+QListView::item:hover {
+    background-color: #242a32;
+}
+
+QTableView::item {
+    padding: 7px 8px;
+}
+
+QTableView::item:selected,
+QListView::item:selected {
+    background-color: #2eb6e8;
+    color: #071014;
+}
+
+QHeaderView::section {
+    background-color: #22262d;
+    border: 0;
+    border-right: 1px solid #303640;
+    border-bottom: 1px solid #303640;
+    color: #e8eaed;
+    padding: 7px 8px;
+}
+
+QScrollBar:vertical,
+QScrollBar:horizontal {
+    background: #15181d;
+    border: 0;
+    margin: 0;
+}
+
+QScrollBar:vertical {
+    width: 12px;
+}
+
+QScrollBar:horizontal {
+    height: 12px;
+}
+
+QScrollBar::handle {
+    background: #3a3f48;
+    border-radius: 6px;
+    min-height: 28px;
+    min-width: 28px;
+}
+
+QScrollBar::handle:hover {
+    background: #4a5360;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line,
+QScrollBar::add-page,
+QScrollBar::sub-page {
+    background: transparent;
+    border: 0;
+}
+
+QProgressBar {
+    background-color: #111418;
+    border: 1px solid #3a3f48;
+    border-radius: 7px;
+    color: #e8eaed;
+    padding: 1px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #2eb6e8;
+    border-radius: 6px;
+}
