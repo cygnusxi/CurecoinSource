@@ -10,3 +10,4 @@ Version: VERSION_HERE
 Depends: FINAL_DEPENDS
 Description: CureCoin Wallet and Headless Daemon
  A distributed research network and cryptographic reward protocol.
+ 
