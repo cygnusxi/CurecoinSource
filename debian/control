@@ -7,6 +7,6 @@ Build-Depends: debhelper-compat (= 13), qtbase5-dev, qt5-qmake, libboost-all-dev
 Package: curecoin
 Architecture: amd64
 Version: VERSION_HERE
-Depends: ${shlibs:Depends}, ${misc:Depends}, libdb5.3++
+Depends: FINAL_DEPENDS
 Description: CureCoin Wallet and Headless Daemon
  A distributed research network and cryptographic reward protocol.

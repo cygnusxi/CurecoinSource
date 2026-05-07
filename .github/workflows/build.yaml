@@ -67,27 +67,33 @@ jobs:
 
       - name: Package Debian (.deb)
         run: |
-          # 1. Create structure
+          # 1. Setup structure
           mkdir -p pkg/DEBIAN pkg/usr/bin
           cp curecoin-qt pkg/usr/bin/
           cp src/curecoind pkg/usr/bin/
 
-          # 2. Extract ONLY the Package stanza (from "Package:" to the end)
-          # This removes the "Source" block that was confusing dpkg-deb
+          # 2. Extract the Package block only
           sed -n '/^Package:/,$p' debian/control > pkg/DEBIAN/control
 
-          # 3. Handle Versioning (ensures Version is correct in the final control file)
+          # 3. Handle Versioning
           sed -i "s/VERSION_HERE/${{ env.APP_VERSION }}/g" pkg/DEBIAN/control
 
-          # 4. Auto-detect dependencies
-          # We run shlibdeps, grab the output, and swap the placeholder in the file
-          SHLIBS=$(dpkg-shlibdeps -O pkg/usr/bin/curecoin-qt | sed 's/shlibs:Depends=//')
-          sed -i "s/\${shlibs:Depends}/$SHLIBS/g" pkg/DEBIAN/control
+          # 4. Generate & Clean Dependencies
+          # We grab the auto-detected libs and add the modern BDB package
+          SHLIBS=$(dpkg-shlibdeps -O pkg/usr/bin/curecoin-qt 2>/dev/null | sed 's/shlibs:Depends=//')
           
-          # Clean up the misc depends placeholder (usually empty)
-          sed -i "s/\${misc:Depends}//g" pkg/DEBIAN/control
+          # Ubuntu (24.04+) uses libdb5.3++t64 or libdb5.3t64
+          # Use libdb5.3++t64 as it specifically covers the C++ interface
+          if [ -z "$SHLIBS" ]; then
+            COMBINED_DEPS="libdb5.3++t64"
+          else
+            COMBINED_DEPS="$SHLIBS, libdb5.3++t64"
+          fi
 
-          # 5. Build the final package
+          # Inject the cleaned-up string into the control file
+          sed -i "s/FINAL_DEPENDS/$COMBINED_DEPS/g" pkg/DEBIAN/control
+
+          # 5. Build
           dpkg-deb --build pkg curecoin-${{ env.APP_VERSION }}-amd64.deb
 
       - name: Upload Build Artifacts
