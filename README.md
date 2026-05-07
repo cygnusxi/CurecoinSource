@@ -70,7 +70,7 @@ These instructions are for compiling the wallet yourself.
 Install Git and clone the repository:
 ```bash
 sudo apt install git
-git clone [https://github.com/cygnusxi/CurecoinSource.git](https://github.com/cygnusxi/CurecoinSource.git)
+git clone https://github.com/cygnusxi/CurecoinSource.git
 ```
 
 ### 2. Install Dependencies
