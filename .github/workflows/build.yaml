@@ -1,4 +1,4 @@
-name: CureCoin Linux Build
+name: CureCoin Linux Build & Package
 
 on:
   push:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessary to find git tags for versioning
 
       - name: Install Dependencies
         run: |
@@ -24,13 +26,21 @@ jobs:
             qtbase5-dev qt5-qmake qtbase5-dev-tools qttools5-dev-tools \
             cmake libboost-dev libboost-system-dev libboost-filesystem-dev \
             libboost-program-options-dev libboost-thread-dev libssl-dev \
-            libminiupnpc-dev libdb++-dev dh-make build-essential zlib1g-dev
+            libminiupnpc-dev libdb++-dev dh-make build-essential zlib1g-dev \
+            libfuse2 # Needed for linuxdeploy AppImage
+
+      - name: Prepare Version String
+        run: |
+          # Grabs latest tag, falls back to 2.2.1.3 if no tags found
+          RAW_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v2.2.1.3")
+          VERSION=${RAW_VERSION#v}
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          sed -i "s/VERSION_HERE/$VERSION/g" debian/control
 
       - name: Build Headless Wallet (curecoind)
         run: |
           cd src
           make -f makefile.unix
-          # Optional: strip the binary to reduce size
           strip curecoind
 
       - name: Build GUI Wallet (curecoin-qt)
@@ -38,10 +48,35 @@ jobs:
           qmake
           make
 
+      - name: Package AppImage
+        run: |
+          wget -c https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -c https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+          
+          # Setup minimal desktop file for the AppImage
+          echo -e "[Desktop Entry]\nType=Application\nName=CureCoin\nExec=curecoin-qt\nIcon=curecoin\nCategories=Finance;" > curecoin.desktop
+          touch curecoin.png # Placeholder icon
+          
+          export QMAKE=/usr/lib/qt5/bin/qmake
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir -e curecoin-qt -d curecoin.desktop -i curecoin.png --plugin qt --output appimage
+
+      - name: Package Debian (.deb)
+        run: |
+          mkdir -p pkg/DEBIAN pkg/usr/bin
+          cp curecoin-qt pkg/usr/bin/
+          cp src/curecoind pkg/usr/bin/
+          # Use dpkg-shlibdeps to automatically calculate library dependencies
+          dpkg-shlibdeps -O pkg/usr/bin/curecoin-qt > debian/substvars || true
+          cp debian/control pkg/DEBIAN/control
+          dpkg-deb --build pkg curecoin-${{ env.APP_VERSION }}-amd64.deb
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: curecoin-binaries
+          name: CureCoin-Installers
           path: |
+            CureCoin-*.AppImage
+            curecoin-*.deb
             src/curecoind
             curecoin-qt
