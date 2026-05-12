@@ -121,6 +121,7 @@ private:
     void createTrayIcon();
     void updateProgressBarStyle();
     QLabel *createStatusPill(const QString &objectName);
+    void openUnlockWalletDialog(bool showStakingOnly);
 
 public slots:
     /** Set number of connections shown in the UI */
@@ -186,6 +187,7 @@ private slots:
     void changePassphrase();
     /** Ask for passphrase to unlock wallet temporarily */
     void unlockWallet();
+    void unlockWalletForOperation();
     void lockWallet();
 
     /** Show window if hidden, unminimize when minimized, rise when obscured or show if hidden and fToggleHidden is true */

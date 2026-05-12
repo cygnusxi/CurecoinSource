@@ -23,7 +23,7 @@ public:
         Decrypt     /**< Ask passphrase and decrypt wallet */
     };
 
-    explicit AskPassphraseDialog(Mode mode, QWidget *parent = 0);
+    explicit AskPassphraseDialog(Mode mode, QWidget *parent = 0, bool showStakingOnly = false);
     ~AskPassphraseDialog();
 
     void accept();
@@ -35,6 +35,7 @@ private:
     Mode mode;
     WalletModel *model;
     bool fCapsLock;
+    bool fShowStakingOnly;
 
 private slots:
     void textChanged();

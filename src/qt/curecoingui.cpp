@@ -552,7 +552,7 @@ void curecoinGUI::setWalletModel(WalletModel *walletModel)
                 this, SLOT(incomingTransaction(QModelIndex,int,int)));
 
         // Ask for passphrase if needed
-        connect(walletModel, &WalletModel::requireUnlock, this, &curecoinGUI::unlockWallet);
+        connect(walletModel, &WalletModel::requireUnlock, this, &curecoinGUI::unlockWalletForOperation);
     }
 }
 
@@ -1098,12 +1098,22 @@ void curecoinGUI::lockWallet()
 
 void curecoinGUI::unlockWallet()
 {
+    openUnlockWalletDialog(true);
+}
+
+void curecoinGUI::unlockWalletForOperation()
+{
+    openUnlockWalletDialog(false);
+}
+
+void curecoinGUI::openUnlockWalletDialog(bool showStakingOnly)
+{
     if(!walletModel)
         return;
     // Unlock wallet when requested by wallet model
     if(walletModel->getEncryptionStatus() == WalletModel::Locked)
     {
-        AskPassphraseDialog dlg(AskPassphraseDialog::Unlock, this);
+        AskPassphraseDialog dlg(AskPassphraseDialog::Unlock, this, showStakingOnly);
         dlg.setModel(walletModel);
         dlg.exec();
     }
