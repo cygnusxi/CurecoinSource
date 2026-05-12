@@ -381,6 +381,78 @@ QDialog#OptionsDialog QPushButton#applyButton:hover {
     background-color: #1f6f91;
 }
 
+QDialog#SignVerifyMessageDialog,
+QDialog#AboutDialog {
+    background-color: #1a1d21;
+}
+
+QTabWidget#signatureTabWidget::pane {
+    background-color: #111c26;
+    border: 1px solid #2d4656;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QLabel#signatureInfoCard,
+QLabel#aboutBodyCard {
+    background-color: #111c26;
+    border: 1px solid #2d4656;
+    border-radius: 8px;
+    color: #b5c4cf;
+    padding: 12px;
+}
+
+QPlainTextEdit#signatureMessageBox {
+    background-color: #071014;
+    border: 1px solid #2d4656;
+    border-radius: 8px;
+    color: #d8f3ff;
+    padding: 8px;
+}
+
+QLabel#signatureStatusLabel {
+    border-radius: 8px;
+    padding: 5px 10px;
+}
+
+QPushButton#signaturePrimaryButton {
+    background-color: #14506a;
+    border-color: #2eb6e8;
+    color: #ffffff;
+    font-weight: bold;
+    min-height: 30px;
+}
+
+QPushButton#signaturePrimaryButton:hover {
+    background-color: #1f6f91;
+}
+
+QLabel#aboutBrandImage {
+    background-color: #071014;
+    border: 1px solid #2d4656;
+    border-radius: 10px;
+    padding: 8px;
+}
+
+QLabel#aboutTitleLabel {
+    color: #7fd8ff;
+    font-weight: bold;
+}
+
+QLabel#aboutVersionBadge {
+    background-color: #122833;
+    border: 1px solid #2eb6e8;
+    border-radius: 10px;
+    color: #9ee8ff;
+    font-family: "Cascadia Mono", "Consolas", "Monospace";
+    font-weight: bold;
+    padding: 4px 10px;
+}
+
+QLabel#aboutCopyrightLabel {
+    color: #b5c4cf;
+}
+
 QComboBox#transactionFilterCombo,
 QLineEdit#transactionFilterSearch,
 QLineEdit#transactionFilterAmount {

@@ -1045,13 +1045,21 @@ void curecoinGUI::setEncryptionStatus(int status)
     case WalletModel::Unlocked:
         labelEncryptionIcon->show();
         labelEncryptionIcon->setPixmap(QIcon(":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-        labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
-        labelEncryptionStatus->setText(tr("Unlocked"));
+        if(walletModel && walletModel->isWalletUnlockedForStakingOnly())
+        {
+            labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked for staking only</b>"));
+            labelEncryptionStatus->setText(tr("Staking Only"));
+        }
+        else
+        {
+            labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
+            labelEncryptionStatus->setText(tr("Unlocked"));
+        }
         labelEncryptionStatus->setObjectName("statusPillWarning");
         labelEncryptionStatus->setToolTip(labelEncryptionIcon->toolTip());
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
-        unlockWalletAction->setVisible(false);
+        unlockWalletAction->setVisible(walletModel && walletModel->isWalletUnlockedForStakingOnly());
         lockWalletAction->setVisible(true);
         encryptWalletAction->setEnabled(false); // TODO: decrypt currently not supported
         break;
@@ -1125,12 +1133,16 @@ void curecoinGUI::openUnlockWalletDialog(bool showStakingOnly)
 {
     if(!walletModel)
         return;
-    // Unlock wallet when requested by wallet model
+    if(walletModel->isWalletUnlockedForStakingOnly())
+    {
+        walletModel->setWalletLocked(true);
+    }
     if(walletModel->getEncryptionStatus() == WalletModel::Locked)
     {
         AskPassphraseDialog dlg(AskPassphraseDialog::Unlock, this, showStakingOnly);
         dlg.setModel(walletModel);
         dlg.exec();
+        setEncryptionStatus(walletModel->getEncryptionStatus());
     }
 }
 

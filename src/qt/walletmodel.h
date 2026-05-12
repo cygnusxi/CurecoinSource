@@ -61,6 +61,7 @@ public:
     qint64 getImmatureBalance() const;
     int getNumTransactions() const;
     EncryptionStatus getEncryptionStatus() const;
+    bool isWalletUnlockedForStakingOnly() const;
 
     // Check address for validity
     bool validateAddress(const QString &address);

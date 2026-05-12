@@ -264,6 +264,11 @@ WalletModel::EncryptionStatus WalletModel::getEncryptionStatus() const
     }
 }
 
+bool WalletModel::isWalletUnlockedForStakingOnly() const
+{
+    return wallet->IsCrypted() && !wallet->IsLocked() && fWalletUnlockMintOnly;
+}
+
 bool WalletModel::setWalletEncrypted(bool encrypted, const SecureString &passphrase)
 {
     if(encrypted)
