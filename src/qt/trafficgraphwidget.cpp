@@ -108,6 +108,20 @@ void TrafficGraphWidget::paintEvent(QPaintEvent *)
     painter.drawRoundedRect(plotRect.adjusted(0, 0, -1, -1), 6, 6);
     painter.restore();
 
+    QFont labelFont = font();
+    labelFont.setBold(true);
+    painter.setFont(labelFont);
+    QRect legendRect(plotRect.right() - 190, plotRect.top() + 10, 178, 24);
+    painter.setPen(QPen(QColor(52, 156, 205, 95), 1));
+    painter.setBrush(QColor(3, 12, 20, 185));
+    painter.drawRoundedRect(legendRect, 10, 10);
+    painter.setPen(QColor(0, 255, 170));
+    painter.drawText(legendRect.adjusted(12, 0, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, tr("IN"));
+    painter.setPen(QColor(255, 95, 45));
+    painter.drawText(legendRect.adjusted(72, 0, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, tr("OUT"));
+    painter.setPen(QColor(205, 232, 244, 210));
+    painter.drawText(legendRect.adjusted(132, 0, -8, 0), Qt::AlignRight | Qt::AlignVCenter, QString("%1m").arg(m_mins));
+
     if (m_fMax <= 0.0f)
         return;
 
@@ -162,6 +176,11 @@ void TrafficGraphWidget::paintEvent(QPaintEvent *)
         painter.fillPath(areaPath, QColor(255, 95, 50, 22));
         drawGlowLine(painter, linePath, QColor(255, 95, 45));
     }
+
+    painter.setFont(labelFont);
+    painter.setPen(QColor(205, 232, 244, 210));
+    painter.drawText(plotRect.adjusted(12, 10, -12, -10), Qt::AlignLeft | Qt::AlignTop,
+                     tr("PEAK %1 kB/s").arg(QString::number(m_fMax, 'f', m_fMax >= 10.0f ? 0 : 1)));
 }
 
 void TrafficGraphWidget::updateRates()

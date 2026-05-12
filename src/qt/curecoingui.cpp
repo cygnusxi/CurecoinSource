@@ -127,7 +127,22 @@ curecoinGUI::curecoinGUI(QWidget *parent):
 
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
+    vbox->setContentsMargins(10, 10, 10, 10);
+    vbox->setSpacing(10);
+    QFrame *transactionsHeroFrame = new QFrame(this);
+    transactionsHeroFrame->setObjectName("transactionsHeroFrame");
+    QVBoxLayout *transactionsHeroLayout = new QVBoxLayout(transactionsHeroFrame);
+    transactionsHeroLayout->setContentsMargins(16, 12, 16, 12);
+    transactionsHeroLayout->setSpacing(4);
+    QLabel *transactionsHeroTitle = new QLabel(tr("TRANSACTION INTELLIGENCE"), transactionsHeroFrame);
+    transactionsHeroTitle->setObjectName("pageHeroEyebrow");
+    QLabel *transactionsHeroSubtitle = new QLabel(tr("Audit wallet activity with live filters, sortable telemetry, and export-ready history."), transactionsHeroFrame);
+    transactionsHeroSubtitle->setObjectName("pageHeroSubtitle");
+    transactionsHeroSubtitle->setWordWrap(true);
+    transactionsHeroLayout->addWidget(transactionsHeroTitle);
+    transactionsHeroLayout->addWidget(transactionsHeroSubtitle);
     transactionView = new TransactionView(this);
+    vbox->addWidget(transactionsHeroFrame);
     vbox->addWidget(transactionView);
     transactionsPage->setLayout(vbox);
 

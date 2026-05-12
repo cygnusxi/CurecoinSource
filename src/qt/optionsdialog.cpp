@@ -9,10 +9,12 @@
 
 #include <QDir>
 #include <QIntValidator>
+#include <QLabel>
 #include <QLocale>
 #include <QMessageBox>
 #include <QRegExp>
 #include <QRegExpValidator>
+#include <QVBoxLayout>
 
 OptionsDialog::OptionsDialog(QWidget *parent) :
     QDialog(parent),
@@ -24,6 +26,17 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     fProxyIpValid(true)
 {
     ui->setupUi(this);
+    setMinimumSize(620, 460);
+    ui->tabWidget->setObjectName("settingsTabWidget");
+    ui->statusLabel->setObjectName("settingsStatusLabel");
+
+    QLabel *settingsEyebrow = new QLabel(tr("CURECOIN CONTROL SURFACE"), this);
+    settingsEyebrow->setObjectName("settingsHeroEyebrow");
+    QLabel *settingsSubtitle = new QLabel(tr("Tune wallet behavior, network access, display units, and visual themes."), this);
+    settingsSubtitle->setObjectName("settingsHeroSubtitle");
+    settingsSubtitle->setWordWrap(true);
+    ui->verticalLayout->insertWidget(0, settingsEyebrow);
+    ui->verticalLayout->insertWidget(1, settingsSubtitle);
 
     /* Network elements init */
 #ifndef USE_UPNP

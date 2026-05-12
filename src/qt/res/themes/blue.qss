@@ -187,6 +187,23 @@ QLabel#overviewEmptyState {
     padding: 28px;
 }
 
+QFrame#transactionsHeroFrame {
+    background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
+                                stop: 0 #061828, stop: 1 #0d3554);
+    border: 1px solid #2d6f99;
+    border-radius: 10px;
+}
+
+QLabel#pageHeroEyebrow {
+    color: #85dcff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+QLabel#pageHeroSubtitle {
+    color: #c2deee;
+}
+
 QLabel#labelWalletStatus,
 QLabel#labelTransactionsStatus,
 QLabel#statusLabel {
@@ -322,6 +339,62 @@ QComboBox QAbstractItemView {
     selection-color: #06121d;
 }
 
+QFrame#transactionFilterFrame {
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+QDialog#OptionsDialog {
+    background-color: #0d2538;
+}
+
+QLabel#settingsHeroEyebrow {
+    color: #85dcff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+QLabel#settingsHeroSubtitle {
+    color: #c2deee;
+}
+
+QTabWidget#settingsTabWidget::pane {
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+QTabWidget#settingsTabWidget QTabBar::tab {
+    min-width: 82px;
+}
+
+QLabel#settingsStatusLabel {
+    color: #ffaaaa;
+}
+
+QDialog#OptionsDialog QPushButton#okButton,
+QDialog#OptionsDialog QPushButton#applyButton {
+    background-color: #0f69a0;
+    border-color: #28b7ff;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+QDialog#OptionsDialog QPushButton#okButton:hover,
+QDialog#OptionsDialog QPushButton#applyButton:hover {
+    background-color: #1283c9;
+}
+
+QComboBox#transactionFilterCombo,
+QLineEdit#transactionFilterSearch,
+QLineEdit#transactionFilterAmount {
+    background-color: #071725;
+    border-color: #2d6f99;
+}
+
 QCheckBox,
 QRadioButton {
     spacing: 8px;
@@ -399,6 +472,15 @@ QTableView#peerTelemetryTable {
 
 QTableView#peerTelemetryTable::item {
     padding: 8px;
+}
+
+QTableView#transactionHistoryTable {
+    background-color: #061827;
+    border-color: #2d6f99;
+}
+
+QTableView#transactionHistoryTable::item {
+    padding: 9px 8px;
 }
 
 QScrollBar:vertical,
