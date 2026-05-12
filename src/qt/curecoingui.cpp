@@ -93,11 +93,11 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     QFontMetrics metrics(font());
     QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
     int initialWidth = qMax(1100, metrics.width("M") * 105);
-    int initialHeight = qMax(680, metrics.height() * 36);
+    int initialHeight = qMax(740, metrics.height() * 40);
     initialWidth = qMin(initialWidth, availableGeometry.width() * 9 / 10);
     initialHeight = qMin(initialHeight, availableGeometry.height() * 9 / 10);
     setMinimumSize(qMin(980, availableGeometry.width() * 8 / 10),
-                   qMin(620, availableGeometry.height() * 8 / 10));
+                   qMin(700, availableGeometry.height() * 8 / 10));
     resize(initialWidth, initialHeight);
     setWindowTitle(tr("Curecoin") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
@@ -178,10 +178,10 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
     labelStakingIcon = new QLabel();
-    labelEncryptionStatus = createStatusPill("statusPillNeutral");
-    labelConnectionsStatus = createStatusPill("statusPillWarning");
-    labelBlocksStatus = createStatusPill("statusPillWarning");
-    labelStakingStatus = createStatusPill("statusPillNeutral");
+    labelEncryptionStatus = createStatusPill(frameBlocks, "statusPillNeutral");
+    labelConnectionsStatus = createStatusPill(frameBlocks, "statusPillWarning");
+    labelBlocksStatus = createStatusPill(frameBlocks, "statusPillWarning");
+    labelStakingStatus = createStatusPill(frameBlocks, "statusPillNeutral");
     frameBlocksLayout->addWidget(labelEncryptionIcon);
     frameBlocksLayout->addWidget(labelEncryptionStatus);
     frameBlocksLayout->addWidget(labelStakingIcon);
@@ -415,9 +415,9 @@ void curecoinGUI::createToolBars()
     toolbar2->addAction(exportAction);
 }
 
-QLabel *curecoinGUI::createStatusPill(const QString &objectName)
+QLabel *curecoinGUI::createStatusPill(QWidget *parent, const QString &objectName)
 {
-    QLabel *label = new QLabel(this);
+    QLabel *label = new QLabel(parent);
     label->setObjectName(objectName);
     label->setTextFormat(Qt::PlainText);
     label->setAlignment(Qt::AlignCenter);

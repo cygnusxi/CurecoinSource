@@ -120,7 +120,7 @@ private:
     /** Create system tray (notification) icon */
     void createTrayIcon();
     void updateProgressBarStyle();
-    QLabel *createStatusPill(const QString &objectName);
+    QLabel *createStatusPill(QWidget *parent, const QString &objectName);
     void openUnlockWalletDialog(bool showStakingOnly);
 
 public slots:

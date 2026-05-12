@@ -277,7 +277,7 @@ public:
 
     inline QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
-        return QSize(DECORATION_SIZE, DECORATION_SIZE + 34);
+        return QSize(DECORATION_SIZE, DECORATION_SIZE + 42);
     }
 
     int unit;
@@ -324,7 +324,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
-    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 38));
+    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 46));
     ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
     labelRecentEmptyState = new QLabel(tr("No recent transactions yet.\nNew wallet activity will appear here as a live timeline."));
     labelRecentEmptyState->setObjectName("overviewEmptyState");
