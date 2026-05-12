@@ -98,6 +98,7 @@ private:
     QActionGroup *themeActionGroup;
     QAction *classicThemeAction;
     QAction *darkThemeAction;
+    QAction *blueThemeAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -190,6 +191,7 @@ private slots:
     void updateStakingIcon();
     void setClassicTheme();
     void setDarkTheme();
+    void setBlueTheme();
     void updateThemeActions(const QString &themeId);
 };
 

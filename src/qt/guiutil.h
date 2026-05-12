@@ -31,6 +31,7 @@ namespace GUIUtil
 
     QString defaultGuiTheme();
     QString darkGuiTheme();
+    QString blueGuiTheme();
     QString guiThemeSetting();
     void setGuiThemeSetting(const QString &themeId);
     void applyGuiTheme(const QString &themeId);

@@ -35,11 +35,14 @@ public slots:
     void clear();
 
 private:
-    void paintPath(QPainterPath &path, QQueue<float> &samples);
+    void buildGraphPath(QPainterPath &path, const QQueue<float> &samples, bool closeToBaseline) const;
+    void drawGlowLine(QPainter &painter, const QPainterPath &path, const QColor &color) const;
 
     static const int DESIRED_SAMPLES = 800;
-    static const int XMARGIN = 10;
-    static const int YMARGIN = 10;
+    static const int LEFT_MARGIN = 58;
+    static const int RIGHT_MARGIN = 12;
+    static const int TOP_MARGIN = 14;
+    static const int BOTTOM_MARGIN = 28;
 
     QTimer *m_timer;
     float m_fMax;

@@ -84,6 +84,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     ui->unit->setModel(new curecoinUnits(this));
     ui->theme->addItem(tr("Classic"), GUIUtil::defaultGuiTheme());
     ui->theme->addItem(tr("Curecoin Dark"), GUIUtil::darkGuiTheme());
+    ui->theme->addItem(tr("Curecoin Blue"), GUIUtil::blueGuiTheme());
 
     /* Widget-to-option mapper */
     mapper = new MonitoredDataMapper(this);

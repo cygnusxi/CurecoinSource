@@ -81,6 +81,7 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     themeActionGroup(0),
     classicThemeAction(0),
     darkThemeAction(0),
+    blueThemeAction(0),
     trayIcon(0),
     notificator(0),
     rpcConsole(0)
@@ -289,8 +290,11 @@ void curecoinGUI::createActions()
     classicThemeAction->setCheckable(true);
     darkThemeAction = new QAction(tr("Curecoin &Dark"), this);
     darkThemeAction->setCheckable(true);
+    blueThemeAction = new QAction(tr("Curecoin &Blue"), this);
+    blueThemeAction->setCheckable(true);
     themeActionGroup->addAction(classicThemeAction);
     themeActionGroup->addAction(darkThemeAction);
+    themeActionGroup->addAction(blueThemeAction);
     updateThemeActions(GUIUtil::guiThemeSetting());
     toggleHideAction = new QAction(QIcon(":/icons/curecoin"), tr("&Show / Hide"), this);
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
@@ -318,6 +322,7 @@ void curecoinGUI::createActions()
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(classicThemeAction, SIGNAL(triggered()), this, SLOT(setClassicTheme()));
     connect(darkThemeAction, SIGNAL(triggered()), this, SLOT(setDarkTheme()));
+    connect(blueThemeAction, SIGNAL(triggered()), this, SLOT(setBlueTheme()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(encryptWalletAction, SIGNAL(triggered(bool)), this, SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), this, SLOT(backupWallet()));
@@ -359,6 +364,7 @@ void curecoinGUI::createMenuBar()
     QMenu *themeMenu = settings->addMenu(tr("&Theme"));
     themeMenu->addAction(classicThemeAction);
     themeMenu->addAction(darkThemeAction);
+    themeMenu->addAction(blueThemeAction);
     settings->addSeparator();
     settings->addAction(optionsAction);
 
@@ -426,17 +432,35 @@ void curecoinGUI::setDarkTheme()
     updateThemeActions(GUIUtil::darkGuiTheme());
 }
 
+void curecoinGUI::setBlueTheme()
+{
+    if(clientModel && clientModel->getOptionsModel())
+    {
+        clientModel->getOptionsModel()->setData(clientModel->getOptionsModel()->index(OptionsModel::GuiTheme, 0), GUIUtil::blueGuiTheme());
+        return;
+    }
+
+    GUIUtil::setGuiThemeSetting(GUIUtil::blueGuiTheme());
+    updateThemeActions(GUIUtil::blueGuiTheme());
+}
+
 void curecoinGUI::updateThemeActions(const QString &themeId)
 {
-    QString normalizedTheme = themeId == GUIUtil::darkGuiTheme() ? GUIUtil::darkGuiTheme() : GUIUtil::defaultGuiTheme();
+    QString normalizedTheme = GUIUtil::defaultGuiTheme();
+    if(themeId == GUIUtil::darkGuiTheme())
+        normalizedTheme = GUIUtil::darkGuiTheme();
+    else if(themeId == GUIUtil::blueGuiTheme())
+        normalizedTheme = GUIUtil::blueGuiTheme();
 
     if(classicThemeAction)
         classicThemeAction->setChecked(normalizedTheme == GUIUtil::defaultGuiTheme());
     if(darkThemeAction)
         darkThemeAction->setChecked(normalizedTheme == GUIUtil::darkGuiTheme());
+    if(blueThemeAction)
+        blueThemeAction->setChecked(normalizedTheme == GUIUtil::blueGuiTheme());
 
     GUIUtil::applyGuiTheme(normalizedTheme);
-    GUIUtil::setTitleBarDark(this, normalizedTheme == GUIUtil::darkGuiTheme());
+    GUIUtil::setTitleBarDark(this, normalizedTheme != GUIUtil::defaultGuiTheme());
     updateProgressBarStyle();
 }
 
