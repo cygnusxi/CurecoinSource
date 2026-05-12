@@ -119,9 +119,12 @@ protected:
         painter.setFont(titleFont);
         painter.drawText(textRect, Qt::AlignLeft | Qt::AlignTop, tr("NETWORK SYNC"));
 
+        // blocks == nBestHeight (local best chain). Peer-reported height can lag behind a rising
+        // tip; use the larger value so "Block X of Y" and progress never show a stale target.
+        const int targetHeight = qMax(blocks, peerBlocks);
         int progress = 0;
-        if(peerBlocks > 0)
-            progress = qMin(100, qMax(0, blocks * 100 / peerBlocks));
+        if(targetHeight > 0)
+            progress = qMin(100, qMax(0, blocks * 100 / targetHeight));
         QString status = syncing ? tr("Synchronizing") : tr("Synchronized");
         if(connections == 0)
             status = tr("Offline");
@@ -129,14 +132,14 @@ protected:
         QFont detailFont = font();
         painter.setFont(detailFont);
         painter.setPen(QColor(218, 238, 247));
-        bool showProgress = syncing && connections > 0 && peerBlocks > 0 && progress < 100;
+        bool showProgress = syncing && connections > 0 && targetHeight > 0 && progress < 100;
         QRect detailRect = textRect.adjusted(0, 32, 0, showProgress ? -24 : 0);
         painter.drawText(detailRect, Qt::AlignLeft | Qt::AlignTop,
                          tr("%1 peers  |  %2% complete\nBlock %3 of %4\n%5")
                          .arg(connections)
                          .arg(progress)
                          .arg(blocks)
-                         .arg(peerBlocks > 0 ? QString::number(peerBlocks) : tr("unknown"))
+                         .arg(targetHeight > 0 ? QString::number(targetHeight) : tr("unknown"))
                          .arg(status));
 
         if(!showProgress)
