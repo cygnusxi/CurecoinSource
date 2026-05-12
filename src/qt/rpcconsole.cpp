@@ -229,7 +229,13 @@ RPCConsole::RPCConsole(QWidget *parent) :
     // Setup peer table
     peerTableModel = new PeerTableModel(this);
     ui->peerTable->setModel(peerTableModel);
+    ui->peerTable->setObjectName("peerTelemetryTable");
     ui->peerTable->horizontalHeader()->setStretchLastSection(true);
+    ui->peerTable->verticalHeader()->setDefaultSectionSize(30);
+    ui->peerTable->horizontalHeader()->resizeSection(0, 220);
+    ui->peerTable->horizontalHeader()->resizeSection(1, 90);
+    ui->peerTable->horizontalHeader()->resizeSection(2, 90);
+    ui->peerTable->horizontalHeader()->resizeSection(4, 110);
     connect(ui->refreshPeersButton, &QPushButton::clicked, peerTableModel, &PeerTableModel::refresh);
     peerRefreshTimer = new QTimer(this);
     connect(peerRefreshTimer, &QTimer::timeout, peerTableModel, &PeerTableModel::refresh);

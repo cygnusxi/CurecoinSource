@@ -223,6 +223,66 @@ QDateTimeEdit:focus {
     border-color: #49c4ff;
 }
 
+QScrollArea {
+    background-color: #091927;
+    border: 1px solid #1e5578;
+    border-radius: 8px;
+}
+
+QScrollArea > QWidget > QWidget {
+    background-color: transparent;
+}
+
+QDialog#SendCoinsDialog,
+QWidget#AddressBookPage {
+    background-color: #0d2538;
+}
+
+QWidget#AddressBookPage QLabel#labelExplanation {
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
+    border-radius: 8px;
+    color: #c2deee;
+    padding: 12px;
+}
+
+QWidget#AddressBookPage QPushButton {
+    min-height: 28px;
+}
+
+QDialog#SendCoinsDialog QLabel#labelBalance {
+    color: #ffffff;
+    font-family: "Cascadia Mono", "Consolas", "Monospace";
+    font-weight: bold;
+}
+
+QDialog#SendCoinsDialog QPushButton#sendButton {
+    background-color: #0f69a0;
+    border-color: #28b7ff;
+    color: #ffffff;
+    font-weight: bold;
+    min-height: 30px;
+}
+
+QDialog#SendCoinsDialog QPushButton#sendButton:hover {
+    background-color: #1283c9;
+}
+
+QFrame#SendCoinsEntry {
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
+    border-radius: 8px;
+}
+
+QFrame#SendCoinsEntry QLabel {
+    color: #c2deee;
+}
+
+QFrame#SendCoinsEntry QToolButton {
+    min-width: 28px;
+    padding: 5px;
+}
+
 QComboBox::drop-down,
 QDateTimeEdit::drop-down {
     border: 0;
@@ -304,6 +364,15 @@ QHeaderView::section {
     border-bottom: 1px solid #1e5578;
     color: #edf7ff;
     padding: 7px 8px;
+}
+
+QTableView#peerTelemetryTable {
+    background-color: #061827;
+    border-color: #28b7ff;
+}
+
+QTableView#peerTelemetryTable::item {
+    padding: 8px;
 }
 
 QScrollBar:vertical,
