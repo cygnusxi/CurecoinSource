@@ -128,7 +128,8 @@ protected:
         QFont detailFont = font();
         painter.setFont(detailFont);
         painter.setPen(QColor(218, 238, 247));
-        QRect detailRect = textRect.adjusted(0, 32, 0, 0);
+        bool showProgress = syncing && connections > 0 && peerBlocks > 0 && progress < 100;
+        QRect detailRect = textRect.adjusted(0, 32, 0, showProgress ? -24 : 0);
         painter.drawText(detailRect, Qt::AlignLeft | Qt::AlignTop,
                          tr("%1 peers  |  %2% complete\nBlock %3 of %4\n%5")
                          .arg(connections)
@@ -136,6 +137,9 @@ protected:
                          .arg(blocks)
                          .arg(peerBlocks > 0 ? QString::number(peerBlocks) : tr("unknown"))
                          .arg(status));
+
+        if(!showProgress)
+            return;
 
         QRectF progressRect(textRect.left(), textRect.bottom() - 18, textRect.width(), 8);
         painter.setPen(Qt::NoPen);
