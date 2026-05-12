@@ -170,10 +170,10 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     frameBlocks->setContentsMargins(0,0,0,0);
     // frameBlocks->setMinimumWidth(56);
     // frameBlocks->setMaximumWidth(56);
-    frameBlocks->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    frameBlocks->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     QHBoxLayout *frameBlocksLayout = new QHBoxLayout(frameBlocks);
-    frameBlocksLayout->setContentsMargins(6,0,6,0);
-    frameBlocksLayout->setSpacing(6);
+    frameBlocksLayout->setContentsMargins(4,0,4,0);
+    frameBlocksLayout->setSpacing(4);
     labelEncryptionIcon = new QLabel();
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
@@ -189,6 +189,7 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     frameBlocksLayout->addWidget(labelConnectionsIcon);
     frameBlocksLayout->addWidget(labelConnectionsStatus);
     frameBlocksLayout->addWidget(labelBlocksIcon);
+    frameBlocksLayout->addWidget(labelBlocksStatus);
 
 
         QTimer *timerStakingIcon = new QTimer(labelStakingIcon);
