@@ -10,7 +10,14 @@
 #include "guiconstants.h"
 
 #include <QAbstractItemDelegate>
+#include <QFrame>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QPainter>
+#include <QSizePolicy>
+#include <QStyle>
+#include <QVBoxLayout>
 
 #define DECORATION_SIZE 54
 #define NUM_ITEMS 7
@@ -107,9 +114,16 @@ OverviewPage::OverviewPage(QWidget *parent) :
     currentUnconfirmedBalance(-1),
     currentImmatureBalance(-1),
     txdelegate(new TxViewDelegate()),
-    filter(0)
+    filter(0),
+    labelHeroBalance(0),
+    labelHeroStake(0),
+    labelHeroUnconfirmed(0),
+    labelHeroTransactions(0),
+    labelHeroWalletStatus(0),
+    labelHeroResearchStatus(0)
 {
     ui->setupUi(this);
+    createHeroPanel();
 
     QFont amountFont = GUIUtil::tabularAmountFont();
     amountFont.setBold(true);
@@ -140,6 +154,105 @@ OverviewPage::OverviewPage(QWidget *parent) :
     showOutOfSyncWarning(true);
 }
 
+static QLabel *createHeroLabel(const QString &objectName, const QString &text)
+{
+    QLabel *label = new QLabel(text);
+    label->setObjectName(objectName);
+    label->setTextFormat(Qt::PlainText);
+    return label;
+}
+
+static QFrame *createMetricCard(const QString &title, QLabel *valueLabel)
+{
+    QFrame *card = new QFrame();
+    card->setObjectName("overviewMetricCard");
+    card->setFrameShape(QFrame::StyledPanel);
+    QVBoxLayout *layout = new QVBoxLayout(card);
+    layout->setContentsMargins(12, 10, 12, 10);
+    layout->setSpacing(4);
+
+    QLabel *titleLabel = createHeroLabel("overviewMetricTitle", title);
+    valueLabel->setObjectName("overviewMetricValue");
+    layout->addWidget(titleLabel);
+    layout->addWidget(valueLabel);
+    return card;
+}
+
+void OverviewPage::createHeroPanel()
+{
+    QFrame *heroFrame = new QFrame(this);
+    heroFrame->setObjectName("overviewHeroFrame");
+    heroFrame->setFrameShape(QFrame::StyledPanel);
+    heroFrame->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+
+    QVBoxLayout *heroLayout = new QVBoxLayout(heroFrame);
+    heroLayout->setContentsMargins(18, 16, 18, 16);
+    heroLayout->setSpacing(12);
+
+    QHBoxLayout *headerLayout = new QHBoxLayout();
+    headerLayout->setSpacing(10);
+
+    QLabel *eyebrowLabel = createHeroLabel("overviewHeroEyebrow", tr("CURECOIN RESEARCH WALLET"));
+    headerLayout->addWidget(eyebrowLabel);
+    headerLayout->addStretch();
+
+    labelHeroWalletStatus = createHeroLabel("overviewHeroStatusWarning", tr("SYNCING"));
+    labelHeroResearchStatus = createHeroLabel("overviewHeroStatusInfo", tr("RESEARCH READY"));
+    headerLayout->addWidget(labelHeroWalletStatus);
+    headerLayout->addWidget(labelHeroResearchStatus);
+    heroLayout->addLayout(headerLayout);
+
+    QLabel *captionLabel = createHeroLabel("overviewHeroCaption", tr("Available Balance"));
+    heroLayout->addWidget(captionLabel);
+
+    labelHeroBalance = createHeroLabel("overviewHeroBalance", QString("0 CURE"));
+    labelHeroBalance->setCursor(Qt::IBeamCursor);
+    labelHeroBalance->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    heroLayout->addWidget(labelHeroBalance);
+
+    QLabel *subtitleLabel = createHeroLabel("overviewHeroSubtitle", tr("Monitor wallet funds, staking readiness, and research activity from one control surface."));
+    subtitleLabel->setWordWrap(true);
+    heroLayout->addWidget(subtitleLabel);
+
+    QGridLayout *metricsLayout = new QGridLayout();
+    metricsLayout->setContentsMargins(0, 0, 0, 0);
+    metricsLayout->setHorizontalSpacing(10);
+    metricsLayout->setVerticalSpacing(10);
+
+    labelHeroStake = createHeroLabel("overviewMetricValue", QString("0 CURE"));
+    labelHeroUnconfirmed = createHeroLabel("overviewMetricValue", QString("0 CURE"));
+    labelHeroTransactions = createHeroLabel("overviewMetricValue", QString("0"));
+    metricsLayout->addWidget(createMetricCard(tr("Stake"), labelHeroStake), 0, 0);
+    metricsLayout->addWidget(createMetricCard(tr("Unconfirmed"), labelHeroUnconfirmed), 0, 1);
+    metricsLayout->addWidget(createMetricCard(tr("Transactions"), labelHeroTransactions), 0, 2);
+    heroLayout->addLayout(metricsLayout);
+
+    QFont heroFont = GUIUtil::tabularAmountFont();
+    heroFont.setBold(true);
+    heroFont.setPointSize(qMax(heroFont.pointSize() + 8, 18));
+    labelHeroBalance->setFont(heroFont);
+
+    QFont metricFont = GUIUtil::tabularAmountFont();
+    metricFont.setBold(true);
+    labelHeroStake->setFont(metricFont);
+    labelHeroUnconfirmed->setFont(metricFont);
+    labelHeroTransactions->setFont(metricFont);
+
+    ui->verticalLayout_2->insertWidget(0, heroFrame);
+}
+
+void OverviewPage::refreshHeroStatus(bool outOfSync)
+{
+    if(!labelHeroWalletStatus)
+        return;
+
+    labelHeroWalletStatus->setObjectName(outOfSync ? "overviewHeroStatusWarning" : "overviewHeroStatusOk");
+    labelHeroWalletStatus->setText(outOfSync ? tr("SYNCING") : tr("SYNCED"));
+    labelHeroWalletStatus->style()->unpolish(labelHeroWalletStatus);
+    labelHeroWalletStatus->style()->polish(labelHeroWalletStatus);
+    labelHeroWalletStatus->update();
+}
+
 void OverviewPage::handleTransactionClicked(const QModelIndex &index)
 {
     if(filter)
@@ -162,6 +275,12 @@ void OverviewPage::setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBa
     ui->labelStake->setText(curecoinUnits::formatWithUnit(unit, stake));
     ui->labelUnconfirmed->setText(curecoinUnits::formatWithUnit(unit, unconfirmedBalance));
     ui->labelImmature->setText(curecoinUnits::formatWithUnit(unit, immatureBalance));
+    if(labelHeroBalance)
+        labelHeroBalance->setText(curecoinUnits::formatWithUnit(unit, balance));
+    if(labelHeroStake)
+        labelHeroStake->setText(curecoinUnits::formatWithUnit(unit, stake));
+    if(labelHeroUnconfirmed)
+        labelHeroUnconfirmed->setText(curecoinUnits::formatWithUnit(unit, unconfirmedBalance));
 
     // only show immature (newly mined) balance if it's non-zero, so as not to complicate things
     // for the non-mining users
@@ -173,6 +292,8 @@ void OverviewPage::setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBa
 void OverviewPage::setNumTransactions(int count)
 {
     ui->labelNumTransactions->setText(QLocale::system().toString(count));
+    if(labelHeroTransactions)
+        labelHeroTransactions->setText(QLocale::system().toString(count));
 }
 
 void OverviewPage::setModel(WalletModel *model)
@@ -223,4 +344,5 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
 {
     ui->labelWalletStatus->setVisible(fShow);
     ui->labelTransactionsStatus->setVisible(fShow);
+    refreshHeroStatus(fShow);
 }

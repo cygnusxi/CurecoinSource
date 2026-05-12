@@ -4,6 +4,7 @@
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
+class QLabel;
 class QModelIndex;
 QT_END_NAMESPACE
 
@@ -43,6 +44,16 @@ private:
 
     TxViewDelegate *txdelegate;
     TransactionFilterProxy *filter;
+
+    QLabel *labelHeroBalance;
+    QLabel *labelHeroStake;
+    QLabel *labelHeroUnconfirmed;
+    QLabel *labelHeroTransactions;
+    QLabel *labelHeroWalletStatus;
+    QLabel *labelHeroResearchStatus;
+
+    void createHeroPanel();
+    void refreshHeroStatus(bool outOfSync);
 
 private slots:
     void updateDisplayUnit();

@@ -57,8 +57,72 @@ QFrame[frameShape="6"] {
     border-radius: 8px;
 }
 
+QFrame#overviewHeroFrame {
+    background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
+                                stop: 0 #101923, stop: 0.45 #162532, stop: 1 #0c1219);
+    border: 1px solid #2eb6e8;
+    border-radius: 10px;
+}
+
+QFrame#overviewMetricCard {
+    background-color: #111c26;
+    border: 1px solid #2d4656;
+    border-radius: 8px;
+}
+
 QLabel {
     background: transparent;
+}
+
+QLabel#overviewHeroEyebrow {
+    color: #7fd8ff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+QLabel#overviewHeroCaption,
+QLabel#overviewMetricTitle {
+    color: #9fb3c1;
+}
+
+QLabel#overviewHeroBalance {
+    color: #ffffff;
+    font-family: "Cascadia Mono", "Consolas", "Monospace";
+}
+
+QLabel#overviewHeroSubtitle {
+    color: #b5c4cf;
+}
+
+QLabel#overviewMetricValue {
+    color: #f5fbff;
+    font-family: "Cascadia Mono", "Consolas", "Monospace";
+}
+
+QLabel#overviewHeroStatusWarning,
+QLabel#overviewHeroStatusInfo,
+QLabel#overviewHeroStatusOk {
+    border-radius: 10px;
+    font-weight: bold;
+    padding: 4px 10px;
+}
+
+QLabel#overviewHeroStatusWarning {
+    background-color: #2c1b20;
+    border: 1px solid #ff6b6b;
+    color: #ff9b9b;
+}
+
+QLabel#overviewHeroStatusInfo {
+    background-color: #122833;
+    border: 1px solid #2eb6e8;
+    color: #9ee8ff;
+}
+
+QLabel#overviewHeroStatusOk {
+    background-color: #142a25;
+    border: 1px solid #3adc96;
+    color: #8dffc8;
 }
 
 QLabel#labelWalletStatus,
