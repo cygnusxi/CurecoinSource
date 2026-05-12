@@ -45,6 +45,21 @@ QToolBar {
     padding: 6px;
 }
 
+QToolBar QToolButton {
+    margin: 2px;
+    min-height: 34px;
+}
+
+QToolBar QToolButton:checked {
+    background-color: #193445;
+    border-color: #2eb6e8;
+    color: #ffffff;
+}
+
+QToolBar QToolButton:checked:hover {
+    background-color: #21485f;
+}
+
 QStatusBar {
     border-top: 1px solid #303640;
 }
@@ -68,6 +83,12 @@ QFrame#overviewMetricCard {
     background-color: #111c26;
     border: 1px solid #2d4656;
     border-radius: 8px;
+}
+
+QWidget#overviewNetworkPanel {
+    background-color: #07121c;
+    border: 1px solid #2eb6e8;
+    border-radius: 10px;
 }
 
 QLabel {
@@ -123,6 +144,14 @@ QLabel#overviewHeroStatusOk {
     background-color: #142a25;
     border: 1px solid #3adc96;
     color: #8dffc8;
+}
+
+QLabel#overviewEmptyState {
+    background-color: #111c26;
+    border: 1px dashed #2d4656;
+    border-radius: 8px;
+    color: #9fb3c1;
+    padding: 28px;
 }
 
 QLabel#labelWalletStatus,
@@ -316,4 +345,26 @@ QProgressBar {
 QProgressBar::chunk {
     background-color: #2eb6e8;
     border-radius: 6px;
+}
+
+QTextEdit#rpcTerminalOutput {
+    background-color: #050b11;
+    border: 1px solid #2eb6e8;
+    border-radius: 8px;
+    color: #d8f3ff;
+    padding: 10px;
+    selection-background-color: #2eb6e8;
+    selection-color: #071014;
+}
+
+QLineEdit#rpcTerminalInput {
+    background-color: #071014;
+    border: 1px solid #2eb6e8;
+    border-radius: 7px;
+    color: #d8f3ff;
+    padding: 8px 10px;
+}
+
+QLineEdit#rpcTerminalInput:focus {
+    border-color: #80e2ff;
 }

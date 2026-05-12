@@ -495,6 +495,7 @@ void curecoinGUI::setClientModel(ClientModel *clientModel)
 
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getNumBlocksOfPeers());
         connect(clientModel, &ClientModel::numBlocksChanged, this, &curecoinGUI::setNumBlocks);
+        overviewPage->setClientModel(clientModel);
 
         // Report errors from network/worker thread
         connect(clientModel, &ClientModel::error, this, &curecoinGUI::error);

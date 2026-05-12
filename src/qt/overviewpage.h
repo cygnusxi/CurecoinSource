@@ -11,7 +11,9 @@ QT_END_NAMESPACE
 namespace Ui {
     class OverviewPage;
 }
+class ClientModel;
 class WalletModel;
+class NetworkSyncPanel;
 class TxViewDelegate;
 class TransactionFilterProxy;
 
@@ -24,6 +26,7 @@ public:
     explicit OverviewPage(QWidget *parent = 0);
     ~OverviewPage();
 
+    void setClientModel(ClientModel *model);
     void setModel(WalletModel *model);
     void showOutOfSyncWarning(bool fShow);
 
@@ -36,6 +39,7 @@ signals:
 
 private:
     Ui::OverviewPage *ui;
+    ClientModel *clientModel;
     WalletModel *model;
     qint64 currentBalance;
     qint64 currentStake;
@@ -51,13 +55,22 @@ private:
     QLabel *labelHeroTransactions;
     QLabel *labelHeroWalletStatus;
     QLabel *labelHeroResearchStatus;
+    QLabel *labelRecentEmptyState;
+    NetworkSyncPanel *networkSyncPanel;
+    int currentNumConnections;
+    int currentNumBlocks;
+    int currentNumBlocksOfPeers;
 
     void createHeroPanel();
+    void createNetworkSyncPanel();
     void refreshHeroStatus(bool outOfSync);
+    void refreshNetworkSyncPanel();
 
 private slots:
     void updateDisplayUnit();
     void handleTransactionClicked(const QModelIndex &index);
+    void updateNetworkConnections(int count);
+    void updateNetworkBlocks(int count, int countOfPeers);
 };
 
 #endif // OVERVIEWPAGE_H

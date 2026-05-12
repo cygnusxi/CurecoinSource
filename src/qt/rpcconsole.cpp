@@ -199,6 +199,8 @@ RPCConsole::RPCConsole(QWidget *parent) :
     historyPtr(0)
 {
     ui->setupUi(this);
+    ui->messagesWidget->setObjectName("rpcTerminalOutput");
+    ui->lineEdit->setObjectName("rpcTerminalInput");
 
 #ifndef Q_OS_MAC
     ui->openDebugLogfileButton->setIcon(QIcon(":/icons/export"));
@@ -208,6 +210,8 @@ RPCConsole::RPCConsole(QWidget *parent) :
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
     ui->messagesWidget->installEventFilter(this);
+    ui->messagesWidget->setFont(GUIUtil::tabularAmountFont());
+    ui->lineEdit->setFont(GUIUtil::tabularAmountFont());
 
     connect(ui->clearButton, &QPushButton::clicked, this, &RPCConsole::clear);
 
@@ -339,15 +343,18 @@ void RPCConsole::clear()
 
     // Set default style sheet
     ui->messagesWidget->document()->setDefaultStyleSheet(
-                "table { }"
-                "td.time { color: #808080; padding-top: 3px; } "
-                "td.message { font-family: Monospace; font-size: 12px; } "
-                "td.cmd-request { color: #006060; } "
-                "td.cmd-error { color: red; } "
-                "b { color: #006060; } "
+                "table { margin: 2px 0 6px 0; }"
+                "td.time { color: #6fa8c8; padding-top: 4px; font-family: Monospace; } "
+                "td.icon { padding-top: 2px; } "
+                "td.message { color: #d8f3ff; font-family: Monospace; font-size: 12px; padding: 4px 6px; } "
+                "td.cmd-request { color: #6ee7ff; font-weight: bold; } "
+                "td.cmd-reply { color: #d8f3ff; } "
+                "td.cmd-error { color: #ff6b7a; font-weight: bold; } "
+                "td.misc { color: #a8c7d8; } "
+                "b { color: #7de6ff; } "
                 );
 
-    message(CMD_REPLY, (tr("Welcome to the Curecoin RPC console.") + "<br>" +
+    message(CMD_REPLY, (QString("<b>") + tr("Curecoin Research Terminal") + QString("</b><br>") +
                         tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
                         tr("Type <b>help</b> for an overview of available commands.")), true);
 }
