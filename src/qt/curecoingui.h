@@ -71,6 +71,10 @@ private:
     QLabel *labelConnectionsIcon;
     QLabel *labelBlocksIcon;
     QLabel *labelStakingIcon;
+    QLabel *labelEncryptionStatus;
+    QLabel *labelConnectionsStatus;
+    QLabel *labelBlocksStatus;
+    QLabel *labelStakingStatus;
     QLabel *progressBarLabel;
     QProgressBar *progressBar;
 
@@ -116,6 +120,7 @@ private:
     /** Create system tray (notification) icon */
     void createTrayIcon();
     void updateProgressBarStyle();
+    QLabel *createStatusPill(const QString &objectName);
 
 public slots:
     /** Set number of connections shown in the UI */

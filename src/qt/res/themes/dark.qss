@@ -64,6 +64,32 @@ QStatusBar {
     border-top: 1px solid #303640;
 }
 
+QLabel#statusPillOk,
+QLabel#statusPillWarning,
+QLabel#statusPillNeutral {
+    border-radius: 9px;
+    font-weight: bold;
+    padding: 3px 8px;
+}
+
+QLabel#statusPillOk {
+    background-color: #142a25;
+    border: 1px solid #3adc96;
+    color: #8dffc8;
+}
+
+QLabel#statusPillWarning {
+    background-color: #2c2415;
+    border: 1px solid #d9a441;
+    color: #ffd17a;
+}
+
+QLabel#statusPillNeutral {
+    background-color: #17232d;
+    border: 1px solid #3a5364;
+    color: #b5c4cf;
+}
+
 QFrame#overviewWalletFrame,
 QFrame#overviewRecentFrame,
 QFrame[frameShape="6"] {
