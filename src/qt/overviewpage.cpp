@@ -6,6 +6,7 @@
 #include "curecoinunits.h"
 #include "optionsmodel.h"
 #include "transactiontablemodel.h"
+#include "transactionrecord.h"
 #include "transactionfilterproxy.h"
 #include "guiutil.h"
 #include "guiconstants.h"
@@ -184,7 +185,9 @@ public:
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
         QString address = index.data(Qt::DisplayRole).toString();
         qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
-        bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
+        int confirmationDepth = qMax(0, index.data(TransactionTableModel::ConfirmationDepthRole).toInt());
+        bool spendable = confirmationDepth > 0;
+        bool confirmed = confirmationDepth >= TransactionRecord::NumConfirmations;
         QVariant value = index.data(Qt::ForegroundRole);
         QColor foreground = option.palette.color(QPalette::Text);
         if(qVariantCanConvert<QColor>(value))
@@ -193,7 +196,7 @@ public:
         }
 
         QColor directionColor = amount < 0 ? QColor(255, 75, 95) : QColor(80, 230, 170);
-        if(!confirmed)
+        if(!spendable)
             directionColor = QColor(160, 170, 180);
 
         QColor cardColor = baseCard;
@@ -241,7 +244,7 @@ public:
         {
             foreground = COLOR_NEGATIVE;
         }
-        else if(!confirmed)
+        else if(!spendable)
         {
             foreground = COLOR_UNCONFIRMED;
         }
@@ -251,7 +254,7 @@ public:
         }
         painter->setPen(foreground);
         QString amountText = curecoinUnits::formatWithUnit(unit, amount, true);
-        if(!confirmed)
+        if(!spendable)
         {
             amountText = QString("[") + amountText + QString("]");
         }
@@ -261,7 +264,13 @@ public:
         painter->setFont(amountFont);
         painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
 
-        QString statusText = confirmed ? tr("CONFIRMED") : tr("PENDING");
+        QString statusText;
+        if(confirmed)
+            statusText = tr("CONFIRMED");
+        else if(spendable)
+            statusText = tr("VALIDATING %1/%2").arg(confirmationDepth).arg(TransactionRecord::NumConfirmations);
+        else
+            statusText = tr("PENDING");
         QRect pillRect(mainRect.right() - amountWidth - 12, mainRect.top() + 42, amountWidth, 20);
         painter->setPen(QPen(directionColor, 1));
         QColor pillFill = directionColor;
