@@ -179,11 +179,8 @@ public:
 
         QIcon icon = qvariant_cast<QIcon>(index.data(Qt::DecorationRole));
         QRect mainRect = option.rect.adjusted(6, 4, -6, -4);
-        QColor baseCard = option.palette.color(QPalette::Base);
+        const bool classicTheme = (GUIUtil::guiThemeSetting() == GUIUtil::defaultGuiTheme());
         QColor textColor = option.palette.color(QPalette::Text);
-        QColor mutedText = option.palette.color(QPalette::Mid);
-        if(!mutedText.isValid())
-            mutedText = textColor.darker(135);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
         QString address = index.data(Qt::DisplayRole).toString();
@@ -198,27 +195,53 @@ public:
             foreground = qvariant_cast<QColor>(value);
         }
 
-        QColor directionColor = amount < 0 ? QColor(255, 75, 95) : QColor(80, 230, 170);
-        if(!spendable)
-            directionColor = QColor(160, 170, 180);
+        QColor cardColor;
+        QColor borderColor;
+        QColor directionColor;
+        if(classicTheme)
+        {
+            cardColor = option.palette.color(QPalette::Button);
+            if(!cardColor.isValid())
+                cardColor = option.palette.color(QPalette::Midlight);
+            borderColor = option.palette.color(QPalette::Mid);
+            if(!borderColor.isValid())
+                borderColor = option.palette.color(QPalette::Dark);
 
-        QColor cardColor = baseCard;
-        cardColor = cardColor.lighter(108);
-        painter->setPen(QPen(directionColor, 1));
+            if(amount < 0)
+                directionColor = COLOR_NEGATIVE;
+            else if(!spendable)
+                directionColor = COLOR_UNCONFIRMED;
+            else
+                directionColor = option.palette.color(QPalette::Text);
+        }
+        else
+        {
+            QColor baseCard = option.palette.color(QPalette::Base);
+            cardColor = baseCard.lighter(108);
+            borderColor = QColor();
+            directionColor = amount < 0 ? QColor(255, 75, 95) : QColor(80, 230, 170);
+            if(!spendable)
+                directionColor = QColor(160, 170, 180);
+        }
+
+        painter->setPen(QPen(classicTheme ? borderColor : directionColor, 1));
         painter->setBrush(cardColor);
         painter->drawRoundedRect(mainRect, 8, 8);
 
         int timelineX = mainRect.left() + 18;
-        painter->setPen(QPen(directionColor, 2));
+        painter->setPen(QPen(directionColor, classicTheme ? 1 : 2));
         painter->drawLine(timelineX, option.rect.top(), timelineX, option.rect.bottom());
 
-        QColor dotGlow = directionColor;
-        dotGlow.setAlpha(70);
         painter->setPen(Qt::NoPen);
-        painter->setBrush(dotGlow);
-        painter->drawEllipse(QPoint(timelineX, mainRect.center().y()), 9, 9);
+        if(!classicTheme)
+        {
+            QColor dotGlow = directionColor;
+            dotGlow.setAlpha(70);
+            painter->setBrush(dotGlow);
+            painter->drawEllipse(QPoint(timelineX, mainRect.center().y()), 9, 9);
+        }
         painter->setBrush(directionColor);
-        painter->drawEllipse(QPoint(timelineX, mainRect.center().y()), 4, 4);
+        painter->drawEllipse(QPoint(timelineX, mainRect.center().y()), classicTheme ? 3 : 4, classicTheme ? 3 : 4);
 
         QRect iconRect(timelineX + 14, mainRect.top() + (mainRect.height() - 34) / 2, 34, 34);
         icon.paint(painter, iconRect);
@@ -239,22 +262,19 @@ public:
         QFont regularFont = painter->font();
         regularFont.setBold(false);
         painter->setFont(regularFont);
-        painter->setPen(foreground);
+        if(classicTheme && qVariantCanConvert<QColor>(value))
+            painter->setPen(qvariant_cast<QColor>(value));
+        else
+            painter->setPen(foreground);
         painter->drawText(addressRect, Qt::AlignLeft|Qt::AlignVCenter,
                           painter->fontMetrics().elidedText(address, Qt::ElideRight, addressRect.width()));
 
         if(amount < 0)
-        {
             foreground = COLOR_NEGATIVE;
-        }
         else if(!spendable)
-        {
             foreground = COLOR_UNCONFIRMED;
-        }
         else
-        {
             foreground = option.palette.color(QPalette::Text);
-        }
         painter->setPen(foreground);
         QString amountText = curecoinUnits::formatWithUnit(unit, amount, true);
         if(!spendable)
@@ -275,10 +295,18 @@ public:
         else
             statusText = tr("PENDING");
         QRect pillRect(mainRect.right() - amountWidth - 12, mainRect.top() + 42, amountWidth, 20);
-        painter->setPen(QPen(directionColor, 1));
-        QColor pillFill = directionColor;
-        pillFill.setAlpha(38);
-        painter->setBrush(pillFill);
+        if(classicTheme)
+        {
+            painter->setPen(QPen(borderColor, 1));
+            painter->setBrush(cardColor.darker(104));
+        }
+        else
+        {
+            painter->setPen(QPen(directionColor, 1));
+            QColor pillFill = directionColor;
+            pillFill.setAlpha(38);
+            painter->setBrush(pillFill);
+        }
         painter->drawRoundedRect(pillRect.adjusted(0, 0, -1, -1), 9, 9);
         painter->setPen(directionColor);
         painter->setFont(regularFont);
@@ -467,6 +495,7 @@ void OverviewPage::updateGuiTheme(const QString &themeId)
 {
     updateNetworkSyncPanelVisibility(themeId);
     refreshNetworkSyncPanel();
+    ui->listTransactions->update();
 }
 
 void OverviewPage::refreshHeroStatus(bool outOfSync)
