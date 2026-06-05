@@ -451,6 +451,21 @@ void OverviewPage::createNetworkSyncPanel()
 {
     networkSyncPanel = new NetworkSyncPanel(this);
     ui->verticalLayout_2->insertWidget(1, networkSyncPanel);
+    updateNetworkSyncPanelVisibility(GUIUtil::guiThemeSetting());
+    refreshNetworkSyncPanel();
+}
+
+void OverviewPage::updateNetworkSyncPanelVisibility(const QString &themeId)
+{
+    if(!networkSyncPanel)
+        return;
+
+    networkSyncPanel->setVisible(themeId != GUIUtil::defaultGuiTheme());
+}
+
+void OverviewPage::updateGuiTheme(const QString &themeId)
+{
+    updateNetworkSyncPanelVisibility(themeId);
     refreshNetworkSyncPanel();
 }
 
@@ -468,7 +483,7 @@ void OverviewPage::refreshHeroStatus(bool outOfSync)
 
 void OverviewPage::refreshNetworkSyncPanel()
 {
-    if(!networkSyncPanel)
+    if(!networkSyncPanel || !networkSyncPanel->isVisible())
         return;
 
     bool syncing = true;
@@ -497,6 +512,13 @@ void OverviewPage::setClientModel(ClientModel *model)
         updateNetworkBlocks(model->getNumBlocks(), model->getNumBlocksOfPeers());
         connect(model, SIGNAL(numConnectionsChanged(int)), this, SLOT(updateNetworkConnections(int)));
         connect(model, SIGNAL(numBlocksChanged(int,int)), this, SLOT(updateNetworkBlocks(int,int)));
+
+        OptionsModel *optionsModel = model->getOptionsModel();
+        if(optionsModel)
+        {
+            connect(optionsModel, SIGNAL(guiThemeChanged(QString)), this, SLOT(updateGuiTheme(QString)));
+            updateNetworkSyncPanelVisibility(optionsModel->getGuiTheme());
+        }
     }
 }
 

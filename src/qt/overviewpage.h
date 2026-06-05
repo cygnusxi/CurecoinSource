@@ -65,12 +65,14 @@ private:
     void createNetworkSyncPanel();
     void refreshHeroStatus(bool outOfSync);
     void refreshNetworkSyncPanel();
+    void updateNetworkSyncPanelVisibility(const QString &themeId);
 
 private slots:
     void updateDisplayUnit();
     void handleTransactionClicked(const QModelIndex &index);
     void updateNetworkConnections(int count);
     void updateNetworkBlocks(int count, int countOfPeers);
+    void updateGuiTheme(const QString &themeId);
 };
 
 #endif // OVERVIEWPAGE_H
