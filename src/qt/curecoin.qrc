@@ -54,6 +54,7 @@
     </qresource>
     <qresource prefix="/themes">
         <file alias="dark.qss">res/themes/dark.qss</file>
+        <file alias="blue.qss">res/themes/blue.qss</file>
     </qresource>
     <qresource prefix="/translations">
         <file alias="en">locale/curecoin_en.qm</file>

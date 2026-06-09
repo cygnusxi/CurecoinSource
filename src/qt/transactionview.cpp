@@ -15,6 +15,7 @@
 #include <QScrollBar>
 #include <QComboBox>
 #include <QDoubleValidator>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -48,6 +49,7 @@ TransactionView::TransactionView(QWidget *parent) :
 #endif
 
     dateWidget = new QComboBox(this);
+    dateWidget->setObjectName("transactionFilterCombo");
 #ifdef Q_OS_MAC
     dateWidget->setFixedWidth(121);
 #else
@@ -63,6 +65,7 @@ TransactionView::TransactionView(QWidget *parent) :
     hlayout->addWidget(dateWidget);
 
     typeWidget = new QComboBox(this);
+    typeWidget->setObjectName("transactionFilterCombo");
 #ifdef Q_OS_MAC
     typeWidget->setFixedWidth(121);
 #else
@@ -82,6 +85,7 @@ TransactionView::TransactionView(QWidget *parent) :
     hlayout->addWidget(typeWidget);
 
     addressWidget = new QLineEdit(this);
+    addressWidget->setObjectName("transactionFilterSearch");
 #if QT_VERSION >= 0x040700
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
     addressWidget->setPlaceholderText(tr("Enter address or label to search"));
@@ -89,6 +93,7 @@ TransactionView::TransactionView(QWidget *parent) :
     hlayout->addWidget(addressWidget);
 
     amountWidget = new QLineEdit(this);
+    amountWidget->setObjectName("transactionFilterAmount");
 #if QT_VERSION >= 0x040700
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
     amountWidget->setPlaceholderText(tr("Min amount"));
@@ -105,11 +110,16 @@ TransactionView::TransactionView(QWidget *parent) :
     vlayout->setContentsMargins(0,0,0,0);
     vlayout->setSpacing(0);
 
+    QFrame *filterFrame = new QFrame(this);
+    filterFrame->setObjectName("transactionFilterFrame");
+    filterFrame->setLayout(hlayout);
+
     QTableView *view = new QTableView(this);
-    vlayout->addLayout(hlayout);
+    view->setObjectName("transactionHistoryTable");
+    vlayout->addWidget(filterFrame);
     vlayout->addWidget(createDateRangeWidget());
     vlayout->addWidget(view);
-    vlayout->setSpacing(0);
+    vlayout->setSpacing(8);
     int width = view->verticalScrollBar()->sizeHint().width();
     // Cover scroll bar width with spacing
 #ifdef Q_OS_MAC

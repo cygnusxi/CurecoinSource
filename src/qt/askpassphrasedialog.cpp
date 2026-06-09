@@ -8,17 +8,20 @@
 #include <QPushButton>
 #include <QKeyEvent>
 
-AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent) :
+AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent, bool showStakingOnly) :
     QDialog(parent),
     ui(new Ui::AskPassphraseDialog),
     mode(mode),
     model(0),
-    fCapsLock(false)
+    fCapsLock(false),
+    fShowStakingOnly(showStakingOnly)
 {
     ui->setupUi(this);
     ui->passEdit1->setMaxLength(MAX_PASSPHRASE_SIZE);
     ui->passEdit2->setMaxLength(MAX_PASSPHRASE_SIZE);
     ui->passEdit3->setMaxLength(MAX_PASSPHRASE_SIZE);
+    ui->stakingOnlyCheckBox->setChecked(true);
+    ui->stakingOnlyCheckBox->setVisible(mode == Unlock && fShowStakingOnly);
     
     // Setup Caps Lock detection.
     ui->passEdit1->installEventFilter(this);
@@ -139,7 +142,7 @@ void AskPassphraseDialog::accept()
         }
         } break;
     case Unlock:
-        if(!model->setWalletLocked(false, oldpass))
+        if(!model->setWalletLocked(false, oldpass, fShowStakingOnly && ui->stakingOnlyCheckBox->isChecked()))
         {
             QMessageBox::critical(this, tr("Wallet unlock failed"),
                                   tr("The passphrase entered for the wallet decryption was incorrect."));

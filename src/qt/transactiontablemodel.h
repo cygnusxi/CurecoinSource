@@ -46,6 +46,8 @@ public:
         TxIDRole,
         /** Is transaction confirmed? */
         ConfirmedRole,
+        /** Number of confirmations in the main chain */
+        ConfirmationDepthRole,
         /** Formatted amount, without brackets when unconfirmed */
         FormattedAmountRole
     };

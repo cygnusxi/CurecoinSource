@@ -88,10 +88,17 @@ QString darkGuiTheme()
     return QString("dark");
 }
 
+QString blueGuiTheme()
+{
+    return QString("blue");
+}
+
 static QString normalizeGuiTheme(const QString &themeId)
 {
     if(themeId == darkGuiTheme())
         return darkGuiTheme();
+    if(themeId == blueGuiTheme())
+        return blueGuiTheme();
     return defaultGuiTheme();
 }
 
@@ -119,23 +126,43 @@ void applyGuiTheme(const QString &themeId)
     }
 
     QPalette palette;
-    palette.setColor(QPalette::Window, QColor(26, 29, 33));
-    palette.setColor(QPalette::WindowText, QColor(232, 234, 237));
-    palette.setColor(QPalette::Base, QColor(17, 20, 24));
-    palette.setColor(QPalette::AlternateBase, QColor(31, 36, 43));
-    palette.setColor(QPalette::ToolTipBase, QColor(34, 38, 45));
-    palette.setColor(QPalette::ToolTipText, QColor(232, 234, 237));
-    palette.setColor(QPalette::Text, QColor(232, 234, 237));
-    palette.setColor(QPalette::Button, QColor(42, 48, 56));
-    palette.setColor(QPalette::ButtonText, QColor(232, 234, 237));
-    palette.setColor(QPalette::BrightText, QColor(255, 255, 255));
-    palette.setColor(QPalette::Highlight, QColor(46, 182, 232));
-    palette.setColor(QPalette::HighlightedText, QColor(7, 16, 20));
-    palette.setColor(QPalette::Disabled, QPalette::Text, QColor(122, 130, 142));
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(122, 130, 142));
+    if(normalizedTheme == blueGuiTheme())
+    {
+        palette.setColor(QPalette::Window, QColor(13, 37, 56));
+        palette.setColor(QPalette::WindowText, QColor(237, 247, 255));
+        palette.setColor(QPalette::Base, QColor(7, 23, 37));
+        palette.setColor(QPalette::AlternateBase, QColor(15, 42, 64));
+        palette.setColor(QPalette::ToolTipBase, QColor(16, 47, 73));
+        palette.setColor(QPalette::ToolTipText, QColor(237, 247, 255));
+        palette.setColor(QPalette::Text, QColor(237, 247, 255));
+        palette.setColor(QPalette::Button, QColor(18, 58, 89));
+        palette.setColor(QPalette::ButtonText, QColor(237, 247, 255));
+        palette.setColor(QPalette::BrightText, QColor(255, 255, 255));
+        palette.setColor(QPalette::Highlight, QColor(40, 183, 255));
+        palette.setColor(QPalette::HighlightedText, QColor(6, 18, 29));
+        palette.setColor(QPalette::Disabled, QPalette::Text, QColor(127, 162, 187));
+        palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(127, 162, 187));
+    }
+    else
+    {
+        palette.setColor(QPalette::Window, QColor(26, 29, 33));
+        palette.setColor(QPalette::WindowText, QColor(232, 234, 237));
+        palette.setColor(QPalette::Base, QColor(17, 20, 24));
+        palette.setColor(QPalette::AlternateBase, QColor(31, 36, 43));
+        palette.setColor(QPalette::ToolTipBase, QColor(34, 38, 45));
+        palette.setColor(QPalette::ToolTipText, QColor(232, 234, 237));
+        palette.setColor(QPalette::Text, QColor(232, 234, 237));
+        palette.setColor(QPalette::Button, QColor(42, 48, 56));
+        palette.setColor(QPalette::ButtonText, QColor(232, 234, 237));
+        palette.setColor(QPalette::BrightText, QColor(255, 255, 255));
+        palette.setColor(QPalette::Highlight, QColor(46, 182, 232));
+        palette.setColor(QPalette::HighlightedText, QColor(7, 16, 20));
+        palette.setColor(QPalette::Disabled, QPalette::Text, QColor(122, 130, 142));
+        palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor(122, 130, 142));
+    }
     qApp->setPalette(palette);
 
-    QFile themeFile(":/themes/dark.qss");
+    QFile themeFile(QString(":/themes/%1.qss").arg(normalizedTheme));
     if(themeFile.open(QIODevice::ReadOnly | QIODevice::Text))
         qApp->setStyleSheet(QString::fromUtf8(themeFile.readAll()));
 }

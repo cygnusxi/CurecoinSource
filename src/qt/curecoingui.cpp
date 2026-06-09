@@ -76,11 +76,16 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     unlockWalletAction(0),
     lockWalletAction(0),
     aboutQtAction(0),
+    labelEncryptionStatus(0),
+    labelConnectionsStatus(0),
+    labelBlocksStatus(0),
+    labelStakingStatus(0),
     progressBarLabel(0),
     progressBar(0),
     themeActionGroup(0),
     classicThemeAction(0),
     darkThemeAction(0),
+    blueThemeAction(0),
     trayIcon(0),
     notificator(0),
     rpcConsole(0)
@@ -88,11 +93,11 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     QFontMetrics metrics(font());
     QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
     int initialWidth = qMax(1100, metrics.width("M") * 105);
-    int initialHeight = qMax(680, metrics.height() * 36);
+    int initialHeight = qMax(740, metrics.height() * 40);
     initialWidth = qMin(initialWidth, availableGeometry.width() * 9 / 10);
     initialHeight = qMin(initialHeight, availableGeometry.height() * 9 / 10);
     setMinimumSize(qMin(980, availableGeometry.width() * 8 / 10),
-                   qMin(620, availableGeometry.height() * 8 / 10));
+                   qMin(700, availableGeometry.height() * 8 / 10));
     resize(initialWidth, initialHeight);
     setWindowTitle(tr("Curecoin") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
@@ -122,7 +127,22 @@ curecoinGUI::curecoinGUI(QWidget *parent):
 
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
+    vbox->setContentsMargins(10, 10, 10, 10);
+    vbox->setSpacing(10);
+    QFrame *transactionsHeroFrame = new QFrame(this);
+    transactionsHeroFrame->setObjectName("transactionsHeroFrame");
+    QVBoxLayout *transactionsHeroLayout = new QVBoxLayout(transactionsHeroFrame);
+    transactionsHeroLayout->setContentsMargins(16, 12, 16, 12);
+    transactionsHeroLayout->setSpacing(4);
+    QLabel *transactionsHeroTitle = new QLabel(tr("TRANSACTION INTELLIGENCE"), transactionsHeroFrame);
+    transactionsHeroTitle->setObjectName("pageHeroEyebrow");
+    QLabel *transactionsHeroSubtitle = new QLabel(tr("Audit wallet activity with live filters, sortable telemetry, and export-ready history."), transactionsHeroFrame);
+    transactionsHeroSubtitle->setObjectName("pageHeroSubtitle");
+    transactionsHeroSubtitle->setWordWrap(true);
+    transactionsHeroLayout->addWidget(transactionsHeroTitle);
+    transactionsHeroLayout->addWidget(transactionsHeroSubtitle);
     transactionView = new TransactionView(this);
+    vbox->addWidget(transactionsHeroFrame);
     vbox->addWidget(transactionView);
     transactionsPage->setLayout(vbox);
 
@@ -150,23 +170,26 @@ curecoinGUI::curecoinGUI(QWidget *parent):
     frameBlocks->setContentsMargins(0,0,0,0);
     // frameBlocks->setMinimumWidth(56);
     // frameBlocks->setMaximumWidth(56);
-    frameBlocks->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    frameBlocks->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     QHBoxLayout *frameBlocksLayout = new QHBoxLayout(frameBlocks);
-    frameBlocksLayout->setContentsMargins(3,0,3,0);
-    frameBlocksLayout->setSpacing(3);
+    frameBlocksLayout->setContentsMargins(4,0,4,0);
+    frameBlocksLayout->setSpacing(4);
     labelEncryptionIcon = new QLabel();
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
     labelStakingIcon = new QLabel();
-    frameBlocksLayout->addStretch();
+    labelEncryptionStatus = createStatusPill(frameBlocks, "statusPillNeutral");
+    labelConnectionsStatus = createStatusPill(frameBlocks, "statusPillWarning");
+    labelBlocksStatus = createStatusPill(frameBlocks, "statusPillWarning");
+    labelStakingStatus = createStatusPill(frameBlocks, "statusPillNeutral");
     frameBlocksLayout->addWidget(labelEncryptionIcon);
-    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelEncryptionStatus);
     frameBlocksLayout->addWidget(labelStakingIcon);
-    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelStakingStatus);
     frameBlocksLayout->addWidget(labelConnectionsIcon);
-    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelConnectionsStatus);
     frameBlocksLayout->addWidget(labelBlocksIcon);
-    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelBlocksStatus);
 
 
         QTimer *timerStakingIcon = new QTimer(labelStakingIcon);
@@ -289,8 +312,11 @@ void curecoinGUI::createActions()
     classicThemeAction->setCheckable(true);
     darkThemeAction = new QAction(tr("Curecoin &Dark"), this);
     darkThemeAction->setCheckable(true);
+    blueThemeAction = new QAction(tr("Curecoin &Blue"), this);
+    blueThemeAction->setCheckable(true);
     themeActionGroup->addAction(classicThemeAction);
     themeActionGroup->addAction(darkThemeAction);
+    themeActionGroup->addAction(blueThemeAction);
     updateThemeActions(GUIUtil::guiThemeSetting());
     toggleHideAction = new QAction(QIcon(":/icons/curecoin"), tr("&Show / Hide"), this);
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
@@ -318,6 +344,7 @@ void curecoinGUI::createActions()
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(classicThemeAction, SIGNAL(triggered()), this, SLOT(setClassicTheme()));
     connect(darkThemeAction, SIGNAL(triggered()), this, SLOT(setDarkTheme()));
+    connect(blueThemeAction, SIGNAL(triggered()), this, SLOT(setBlueTheme()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(encryptWalletAction, SIGNAL(triggered(bool)), this, SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), this, SLOT(backupWallet()));
@@ -359,6 +386,7 @@ void curecoinGUI::createMenuBar()
     QMenu *themeMenu = settings->addMenu(tr("&Theme"));
     themeMenu->addAction(classicThemeAction);
     themeMenu->addAction(darkThemeAction);
+    themeMenu->addAction(blueThemeAction);
     settings->addSeparator();
     settings->addAction(optionsAction);
 
@@ -386,6 +414,16 @@ void curecoinGUI::createToolBars()
     QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar2->addAction(exportAction);
+}
+
+QLabel *curecoinGUI::createStatusPill(QWidget *parent, const QString &objectName)
+{
+    QLabel *label = new QLabel(parent);
+    label->setObjectName(objectName);
+    label->setTextFormat(Qt::PlainText);
+    label->setAlignment(Qt::AlignCenter);
+    label->setMinimumWidth(54);
+    return label;
 }
 
 void curecoinGUI::updateProgressBarStyle()
@@ -426,17 +464,35 @@ void curecoinGUI::setDarkTheme()
     updateThemeActions(GUIUtil::darkGuiTheme());
 }
 
+void curecoinGUI::setBlueTheme()
+{
+    if(clientModel && clientModel->getOptionsModel())
+    {
+        clientModel->getOptionsModel()->setData(clientModel->getOptionsModel()->index(OptionsModel::GuiTheme, 0), GUIUtil::blueGuiTheme());
+        return;
+    }
+
+    GUIUtil::setGuiThemeSetting(GUIUtil::blueGuiTheme());
+    updateThemeActions(GUIUtil::blueGuiTheme());
+}
+
 void curecoinGUI::updateThemeActions(const QString &themeId)
 {
-    QString normalizedTheme = themeId == GUIUtil::darkGuiTheme() ? GUIUtil::darkGuiTheme() : GUIUtil::defaultGuiTheme();
+    QString normalizedTheme = GUIUtil::defaultGuiTheme();
+    if(themeId == GUIUtil::darkGuiTheme())
+        normalizedTheme = GUIUtil::darkGuiTheme();
+    else if(themeId == GUIUtil::blueGuiTheme())
+        normalizedTheme = GUIUtil::blueGuiTheme();
 
     if(classicThemeAction)
         classicThemeAction->setChecked(normalizedTheme == GUIUtil::defaultGuiTheme());
     if(darkThemeAction)
         darkThemeAction->setChecked(normalizedTheme == GUIUtil::darkGuiTheme());
+    if(blueThemeAction)
+        blueThemeAction->setChecked(normalizedTheme == GUIUtil::blueGuiTheme());
 
     GUIUtil::applyGuiTheme(normalizedTheme);
-    GUIUtil::setTitleBarDark(this, normalizedTheme == GUIUtil::darkGuiTheme());
+    GUIUtil::setTitleBarDark(this, normalizedTheme != GUIUtil::defaultGuiTheme());
     updateProgressBarStyle();
 }
 
@@ -471,6 +527,7 @@ void curecoinGUI::setClientModel(ClientModel *clientModel)
 
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getNumBlocksOfPeers());
         connect(clientModel, &ClientModel::numBlocksChanged, this, &curecoinGUI::setNumBlocks);
+        overviewPage->setClientModel(clientModel);
 
         // Report errors from network/worker thread
         connect(clientModel, &ClientModel::error, this, &curecoinGUI::error);
@@ -511,7 +568,7 @@ void curecoinGUI::setWalletModel(WalletModel *walletModel)
                 this, SLOT(incomingTransaction(QModelIndex,int,int)));
 
         // Ask for passphrase if needed
-        connect(walletModel, &WalletModel::requireUnlock, this, &curecoinGUI::unlockWallet);
+        connect(walletModel, &WalletModel::requireUnlock, this, &curecoinGUI::unlockWalletForOperation);
     }
 }
 
@@ -591,6 +648,11 @@ void curecoinGUI::setNumConnections(int count)
     }
     labelConnectionsIcon->setPixmap(QIcon(icon).pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
     labelConnectionsIcon->setToolTip(tr("%n active connection(s) to the Curecoin network", "", count));
+    labelConnectionsStatus->setText(tr("%n peer(s)", "", count));
+    labelConnectionsStatus->setObjectName(count > 0 ? "statusPillOk" : "statusPillWarning");
+    labelConnectionsStatus->setToolTip(labelConnectionsIcon->toolTip());
+    labelConnectionsStatus->style()->unpolish(labelConnectionsStatus);
+    labelConnectionsStatus->style()->polish(labelConnectionsStatus);
 }
 
 void curecoinGUI::setNumBlocks(int count, int nTotalBlocks)
@@ -600,6 +662,10 @@ void curecoinGUI::setNumBlocks(int count, int nTotalBlocks)
     {
         progressBarLabel->setVisible(false);
         progressBar->setVisible(false);
+        labelBlocksStatus->setText(tr("Offline"));
+        labelBlocksStatus->setObjectName("statusPillWarning");
+        labelBlocksStatus->style()->unpolish(labelBlocksStatus);
+        labelBlocksStatus->style()->polish(labelBlocksStatus);
 
         return;
     }
@@ -674,6 +740,8 @@ void curecoinGUI::setNumBlocks(int count, int nTotalBlocks)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        labelBlocksStatus->setText(tr("Synced"));
+        labelBlocksStatus->setObjectName("statusPillOk");
 
         overviewPage->showOutOfSyncWarning(false);
     }
@@ -682,6 +750,9 @@ void curecoinGUI::setNumBlocks(int count, int nTotalBlocks)
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
         labelBlocksIcon->setMovie(syncIconMovie);
         syncIconMovie->start();
+        int percentDone = nTotalBlocks > 0 ? qMin(100, qMax(0, count * 100 / nTotalBlocks)) : 0;
+        labelBlocksStatus->setText(tr("Sync %1%").arg(percentDone));
+        labelBlocksStatus->setObjectName("statusPillWarning");
 
         overviewPage->showOutOfSyncWarning(true);
     }
@@ -696,6 +767,9 @@ void curecoinGUI::setNumBlocks(int count, int nTotalBlocks)
     tooltip = QString("<nobr>") + tooltip + QString("</nobr>");
 
     labelBlocksIcon->setToolTip(tooltip);
+    labelBlocksStatus->setToolTip(tooltip);
+    labelBlocksStatus->style()->unpolish(labelBlocksStatus);
+    labelBlocksStatus->style()->polish(labelBlocksStatus);
     progressBarLabel->setToolTip(tooltip);
     progressBar->setToolTip(tooltip);
 }
@@ -731,6 +805,9 @@ if (nLastCoinStakeSearchInterval && nWeight)
    // labelStakingIcon->show();
     labelStakingIcon->setPixmap(QIcon(":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
     labelStakingIcon->setToolTip(tr("Staking. <br>Your weight is %1<br>Network weight is %2<br>Estimated time to earn your next staking installment is %3").arg(nWeight).arg(nNetworkWeight).arg(text));
+    labelStakingStatus->setText(tr("Staking"));
+    labelStakingStatus->setObjectName("statusPillOk");
+    labelStakingStatus->setToolTip(labelStakingIcon->toolTip());
    } else {
     labelStakingIcon->setPixmap(QIcon(":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
     if (pwalletMain && pwalletMain->IsLocked())
@@ -742,7 +819,12 @@ if (nLastCoinStakeSearchInterval && nWeight)
     else if (!nWeight)
         labelStakingIcon->setToolTip(tr("Not staking because you don't have mature coins"));
     else
-        labelStakingIcon->setToolTip(tr("Not staking")); }
+        labelStakingIcon->setToolTip(tr("Not staking"));
+    labelStakingStatus->setText(tr("Idle"));
+    labelStakingStatus->setObjectName("statusPillNeutral");
+    labelStakingStatus->setToolTip(labelStakingIcon->toolTip()); }
+    labelStakingStatus->style()->unpolish(labelStakingStatus);
+    labelStakingStatus->style()->polish(labelStakingStatus);
 }
 
 
@@ -952,6 +1034,9 @@ void curecoinGUI::setEncryptionStatus(int status)
     {
     case WalletModel::Unencrypted:
         labelEncryptionIcon->hide();
+        labelEncryptionStatus->setText(tr("Plain"));
+        labelEncryptionStatus->setObjectName("statusPillNeutral");
+        labelEncryptionStatus->setToolTip(tr("Wallet is not encrypted"));
         encryptWalletAction->setChecked(false);
         changePassphraseAction->setEnabled(false);
         unlockWalletAction->setVisible(false);
@@ -961,10 +1046,21 @@ void curecoinGUI::setEncryptionStatus(int status)
     case WalletModel::Unlocked:
         labelEncryptionIcon->show();
         labelEncryptionIcon->setPixmap(QIcon(":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-        labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
+        if(walletModel && walletModel->isWalletUnlockedForStakingOnly())
+        {
+            labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked for staking only</b>"));
+            labelEncryptionStatus->setText(tr("Staking Only"));
+        }
+        else
+        {
+            labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
+            labelEncryptionStatus->setText(tr("Unlocked"));
+        }
+        labelEncryptionStatus->setObjectName("statusPillWarning");
+        labelEncryptionStatus->setToolTip(labelEncryptionIcon->toolTip());
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
-        unlockWalletAction->setVisible(false);
+        unlockWalletAction->setVisible(walletModel && walletModel->isWalletUnlockedForStakingOnly());
         lockWalletAction->setVisible(true);
         encryptWalletAction->setEnabled(false); // TODO: decrypt currently not supported
         break;
@@ -972,6 +1068,9 @@ void curecoinGUI::setEncryptionStatus(int status)
         labelEncryptionIcon->show();
         labelEncryptionIcon->setPixmap(QIcon(":/icons/lock_closed").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
         labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>locked</b>"));
+        labelEncryptionStatus->setText(tr("Locked"));
+        labelEncryptionStatus->setObjectName("statusPillOk");
+        labelEncryptionStatus->setToolTip(labelEncryptionIcon->toolTip());
         encryptWalletAction->setChecked(true);
         unlockWalletAction->setVisible(true);
         lockWalletAction->setVisible(false);
@@ -979,6 +1078,8 @@ void curecoinGUI::setEncryptionStatus(int status)
         encryptWalletAction->setEnabled(false); // TODO: decrypt currently not supported
         break;
     }
+    labelEncryptionStatus->style()->unpolish(labelEncryptionStatus);
+    labelEncryptionStatus->style()->polish(labelEncryptionStatus);
 }
 
 void curecoinGUI::encryptWallet(bool status)
@@ -1021,14 +1122,28 @@ void curecoinGUI::lockWallet()
 
 void curecoinGUI::unlockWallet()
 {
+    openUnlockWalletDialog(true);
+}
+
+void curecoinGUI::unlockWalletForOperation()
+{
+    openUnlockWalletDialog(false);
+}
+
+void curecoinGUI::openUnlockWalletDialog(bool showStakingOnly)
+{
     if(!walletModel)
         return;
-    // Unlock wallet when requested by wallet model
+    if(walletModel->isWalletUnlockedForStakingOnly())
+    {
+        walletModel->setWalletLocked(true);
+    }
     if(walletModel->getEncryptionStatus() == WalletModel::Locked)
     {
-        AskPassphraseDialog dlg(AskPassphraseDialog::Unlock, this);
+        AskPassphraseDialog dlg(AskPassphraseDialog::Unlock, this, showStakingOnly);
         dlg.setModel(walletModel);
         dlg.exec();
+        setEncryptionStatus(walletModel->getEncryptionStatus());
     }
 }
 

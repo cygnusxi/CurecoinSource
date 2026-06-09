@@ -1,11 +1,12 @@
-/* Curecoin Dark
-   Accent: CureCoin Blue #2eb6e8 */
+/* Curecoin Blue
+   Deep blue shell with cyan CureCoin accents. The overview logo area stays
+   on a darker navy panel so the existing blue wallet image remains visible. */
 
 QWidget {
-    background-color: #1a1d21;
-    color: #e8eaed;
-    selection-background-color: #2eb6e8;
-    selection-color: #071014;
+    background-color: #0d2538;
+    color: #edf7ff;
+    selection-background-color: #28b7ff;
+    selection-color: #06121d;
 }
 
 QMainWindow,
@@ -14,8 +15,8 @@ QMenuBar,
 QMenu,
 QStatusBar,
 QToolBar {
-    background-color: #1a1d21;
-    color: #e8eaed;
+    background-color: #0d2538;
+    color: #edf7ff;
 }
 
 QMenuBar::item {
@@ -25,12 +26,12 @@ QMenuBar::item {
 
 QMenuBar::item:selected,
 QMenu::item:selected {
-    background-color: #2a3038;
+    background-color: #143d5d;
     color: #ffffff;
 }
 
 QMenu {
-    border: 1px solid #3a3f48;
+    border: 1px solid #2d6f99;
     border-radius: 6px;
     padding: 4px;
 }
@@ -51,17 +52,17 @@ QToolBar QToolButton {
 }
 
 QToolBar QToolButton:checked {
-    background-color: #193445;
-    border-color: #2eb6e8;
+    background-color: #0f4a72;
+    border-color: #28b7ff;
     color: #ffffff;
 }
 
 QToolBar QToolButton:checked:hover {
-    background-color: #21485f;
+    background-color: #155d8e;
 }
 
 QStatusBar {
-    border-top: 1px solid #303640;
+    border-top: 1px solid #1e5578;
 }
 
 QLabel#statusPillOk,
@@ -73,47 +74,47 @@ QLabel#statusPillNeutral {
 }
 
 QLabel#statusPillOk {
-    background-color: #142a25;
-    border: 1px solid #3adc96;
-    color: #8dffc8;
+    background-color: #0c302d;
+    border: 1px solid #40e6a5;
+    color: #a5ffd8;
 }
 
 QLabel#statusPillWarning {
-    background-color: #2c2415;
-    border: 1px solid #d9a441;
-    color: #ffd17a;
+    background-color: #302915;
+    border: 1px solid #e5b84c;
+    color: #ffdb8a;
 }
 
 QLabel#statusPillNeutral {
-    background-color: #17232d;
-    border: 1px solid #3a5364;
-    color: #b5c4cf;
+    background-color: #0d2d45;
+    border: 1px solid #2d6f99;
+    color: #c2deee;
 }
 
 QFrame#overviewWalletFrame,
 QFrame#overviewRecentFrame,
 QFrame[frameShape="6"] {
-    background-color: #22262d;
-    border: 1px solid #3a3f48;
+    background-color: #102f49;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
 }
 
 QFrame#overviewHeroFrame {
     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1,
-                                stop: 0 #101923, stop: 0.45 #162532, stop: 1 #0c1219);
-    border: 1px solid #2eb6e8;
+                                stop: 0 #061828, stop: 0.5 #0d3554, stop: 1 #071421);
+    border: 1px solid #28b7ff;
     border-radius: 10px;
 }
 
 QFrame#overviewMetricCard {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
 }
 
 QWidget#overviewNetworkPanel {
-    background-color: #07121c;
-    border: 1px solid #2eb6e8;
+    background-color: #061827;
+    border: 1px solid #28b7ff;
     border-radius: 10px;
 }
 
@@ -121,15 +122,21 @@ QLabel {
     background: transparent;
 }
 
+QLabel#label_wallet_bgcoin {
+    background-color: #091927;
+    border-radius: 8px;
+    padding: 8px;
+}
+
 QLabel#overviewHeroEyebrow {
-    color: #7fd8ff;
+    color: #85dcff;
     font-weight: bold;
     letter-spacing: 1px;
 }
 
 QLabel#overviewHeroCaption,
 QLabel#overviewMetricTitle {
-    color: #9fb3c1;
+    color: #a9cee4;
 }
 
 QLabel#overviewHeroBalance {
@@ -138,11 +145,11 @@ QLabel#overviewHeroBalance {
 }
 
 QLabel#overviewHeroSubtitle {
-    color: #b5c4cf;
+    color: #c2deee;
 }
 
 QLabel#overviewMetricValue {
-    color: #f5fbff;
+    color: #ffffff;
     font-family: "Cascadia Mono", "Consolas", "Monospace";
 }
 
@@ -155,52 +162,52 @@ QLabel#overviewHeroStatusOk {
 }
 
 QLabel#overviewHeroStatusWarning {
-    background-color: #2c1b20;
-    border: 1px solid #ff6b6b;
-    color: #ff9b9b;
+    background-color: #2d1d25;
+    border: 1px solid #ff7878;
+    color: #ffaaaa;
 }
 
 QLabel#overviewHeroStatusInfo {
-    background-color: #122833;
-    border: 1px solid #2eb6e8;
-    color: #9ee8ff;
+    background-color: #0a2e47;
+    border: 1px solid #28b7ff;
+    color: #a8e8ff;
 }
 
 QLabel#overviewHeroStatusOk {
-    background-color: #142a25;
-    border: 1px solid #3adc96;
-    color: #8dffc8;
+    background-color: #0c302d;
+    border: 1px solid #40e6a5;
+    color: #a5ffd8;
 }
 
 QLabel#overviewEmptyState {
-    background-color: #111c26;
-    border: 1px dashed #2d4656;
+    background-color: #071f33;
+    border: 1px dashed #2d6f99;
     border-radius: 8px;
-    color: #9fb3c1;
+    color: #a9cee4;
     padding: 28px;
 }
 
 QFrame#transactionsHeroFrame {
     background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0,
-                                stop: 0 #101923, stop: 1 #172634);
-    border: 1px solid #2d4656;
+                                stop: 0 #061828, stop: 1 #0d3554);
+    border: 1px solid #2d6f99;
     border-radius: 10px;
 }
 
 QLabel#pageHeroEyebrow {
-    color: #7fd8ff;
+    color: #85dcff;
     font-weight: bold;
     letter-spacing: 1px;
 }
 
 QLabel#pageHeroSubtitle {
-    color: #b5c4cf;
+    color: #c2deee;
 }
 
 QLabel#labelWalletStatus,
 QLabel#labelTransactionsStatus,
 QLabel#statusLabel {
-    color: #ff6b6b;
+    color: #ff7878;
 }
 
 QLabel#labelBalance,
@@ -208,60 +215,60 @@ QLabel#labelStake,
 QLabel#labelUnconfirmed,
 QLabel#labelImmature,
 QLabel#labelNumTransactions {
-    color: #f5fbff;
+    color: #ffffff;
     font-family: "Cascadia Mono", "Consolas", "Monospace";
 }
 
 QPushButton,
 QToolButton {
-    background-color: #2a3038;
-    border: 1px solid #3f4652;
+    background-color: #123a59;
+    border: 1px solid #2d6f99;
     border-radius: 6px;
-    color: #e8eaed;
+    color: #edf7ff;
     padding: 7px 12px;
 }
 
 QPushButton:hover,
 QToolButton:hover {
-    background-color: #313844;
-    border-color: #2eb6e8;
+    background-color: #184b70;
+    border-color: #28b7ff;
 }
 
 QPushButton:pressed,
 QToolButton:pressed {
-    background-color: #21313a;
+    background-color: #0f324d;
 }
 
 QPushButton:disabled,
 QToolButton:disabled {
-    background-color: #20242a;
-    color: #7a828e;
-    border-color: #303640;
+    background-color: #0f2a40;
+    color: #7fa2bb;
+    border-color: #1e5578;
 }
 
 QLineEdit,
 QComboBox,
 QAbstractSpinBox,
 QDateTimeEdit {
-    background-color: #111418;
-    border: 1px solid #3a3f48;
+    background-color: #071725;
+    border: 1px solid #2d6f99;
     border-radius: 6px;
-    color: #e8eaed;
+    color: #edf7ff;
     padding: 6px 8px;
-    selection-background-color: #2eb6e8;
-    selection-color: #071014;
+    selection-background-color: #28b7ff;
+    selection-color: #06121d;
 }
 
 QLineEdit:focus,
 QComboBox:focus,
 QAbstractSpinBox:focus,
 QDateTimeEdit:focus {
-    border-color: #2eb6e8;
+    border-color: #49c4ff;
 }
 
 QScrollArea {
-    background-color: #171a1f;
-    border: 1px solid #303640;
+    background-color: #091927;
+    border: 1px solid #1e5578;
     border-radius: 8px;
 }
 
@@ -271,14 +278,14 @@ QScrollArea > QWidget > QWidget {
 
 QDialog#SendCoinsDialog,
 QWidget#AddressBookPage {
-    background-color: #1a1d21;
+    background-color: #0d2538;
 }
 
 QWidget#AddressBookPage QLabel#labelExplanation {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
-    color: #b5c4cf;
+    color: #c2deee;
     padding: 12px;
 }
 
@@ -287,31 +294,31 @@ QWidget#AddressBookPage QPushButton {
 }
 
 QDialog#SendCoinsDialog QLabel#labelBalance {
-    color: #f5fbff;
+    color: #ffffff;
     font-family: "Cascadia Mono", "Consolas", "Monospace";
     font-weight: bold;
 }
 
 QDialog#SendCoinsDialog QPushButton#sendButton {
-    background-color: #14506a;
-    border-color: #2eb6e8;
+    background-color: #0f69a0;
+    border-color: #28b7ff;
     color: #ffffff;
     font-weight: bold;
     min-height: 30px;
 }
 
 QDialog#SendCoinsDialog QPushButton#sendButton:hover {
-    background-color: #1f6f91;
+    background-color: #1283c9;
 }
 
 QFrame#SendCoinsEntry {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
 }
 
 QFrame#SendCoinsEntry QLabel {
-    color: #b5c4cf;
+    color: #c2deee;
 }
 
 QFrame#SendCoinsEntry QToolButton {
@@ -326,36 +333,36 @@ QDateTimeEdit::drop-down {
 }
 
 QComboBox QAbstractItemView {
-    background-color: #20242a;
-    border: 1px solid #3a3f48;
-    selection-background-color: #2eb6e8;
-    selection-color: #071014;
+    background-color: #102f49;
+    border: 1px solid #2d6f99;
+    selection-background-color: #28b7ff;
+    selection-color: #06121d;
 }
 
 QFrame#transactionFilterFrame {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
     padding: 8px;
 }
 
 QDialog#OptionsDialog {
-    background-color: #1a1d21;
+    background-color: #0d2538;
 }
 
 QLabel#settingsHeroEyebrow {
-    color: #7fd8ff;
+    color: #85dcff;
     font-weight: bold;
     letter-spacing: 1px;
 }
 
 QLabel#settingsHeroSubtitle {
-    color: #b5c4cf;
+    color: #c2deee;
 }
 
 QTabWidget#settingsTabWidget::pane {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 10px;
     padding: 10px;
 }
@@ -365,46 +372,46 @@ QTabWidget#settingsTabWidget QTabBar::tab {
 }
 
 QLabel#settingsStatusLabel {
-    color: #ff9b9b;
+    color: #ffaaaa;
 }
 
 QDialog#OptionsDialog QPushButton#okButton,
 QDialog#OptionsDialog QPushButton#applyButton {
-    background-color: #14506a;
-    border-color: #2eb6e8;
+    background-color: #0f69a0;
+    border-color: #28b7ff;
     color: #ffffff;
     font-weight: bold;
 }
 
 QDialog#OptionsDialog QPushButton#okButton:hover,
 QDialog#OptionsDialog QPushButton#applyButton:hover {
-    background-color: #1f6f91;
+    background-color: #1283c9;
 }
 
 QDialog#SignVerifyMessageDialog,
 QDialog#AboutDialog {
-    background-color: #1a1d21;
+    background-color: #0d2538;
 }
 
 QTabWidget#signatureTabWidget::pane {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 10px;
     padding: 10px;
 }
 
 QLabel#signatureInfoCard,
 QLabel#aboutBodyCard {
-    background-color: #111c26;
-    border: 1px solid #2d4656;
+    background-color: #071f33;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
-    color: #b5c4cf;
+    color: #c2deee;
     padding: 12px;
 }
 
 QPlainTextEdit#signatureMessageBox {
-    background-color: #071014;
-    border: 1px solid #2d4656;
+    background-color: #071725;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
     color: #d8f3ff;
     padding: 8px;
@@ -416,48 +423,48 @@ QLabel#signatureStatusLabel {
 }
 
 QPushButton#signaturePrimaryButton {
-    background-color: #14506a;
-    border-color: #2eb6e8;
+    background-color: #0f69a0;
+    border-color: #28b7ff;
     color: #ffffff;
     font-weight: bold;
     min-height: 30px;
 }
 
 QPushButton#signaturePrimaryButton:hover {
-    background-color: #1f6f91;
+    background-color: #1283c9;
 }
 
 QLabel#aboutBrandImage {
-    background-color: #071014;
-    border: 1px solid #2d4656;
+    background-color: #071725;
+    border: 1px solid #2d6f99;
     border-radius: 10px;
     padding: 8px;
 }
 
 QLabel#aboutTitleLabel {
-    color: #7fd8ff;
+    color: #85dcff;
     font-weight: bold;
 }
 
 QLabel#aboutVersionBadge {
-    background-color: #122833;
-    border: 1px solid #2eb6e8;
+    background-color: #0a2e47;
+    border: 1px solid #28b7ff;
     border-radius: 10px;
-    color: #9ee8ff;
+    color: #a8e8ff;
     font-family: "Cascadia Mono", "Consolas", "Monospace";
     font-weight: bold;
     padding: 4px 10px;
 }
 
 QLabel#aboutCopyrightLabel {
-    color: #b5c4cf;
+    color: #c2deee;
 }
 
 QComboBox#transactionFilterCombo,
 QLineEdit#transactionFilterSearch,
 QLineEdit#transactionFilterAmount {
-    background-color: #071014;
-    border-color: #2d4656;
+    background-color: #071725;
+    border-color: #2d6f99;
 }
 
 QCheckBox,
@@ -466,15 +473,15 @@ QRadioButton {
 }
 
 QTabWidget::pane {
-    border: 1px solid #3a3f48;
+    border: 1px solid #2d6f99;
     border-radius: 8px;
     top: -1px;
 }
 
 QTabBar::tab {
-    background-color: #20242a;
-    border: 1px solid #303640;
-    border-bottom-color: #3a3f48;
+    background-color: #102f49;
+    border: 1px solid #1e5578;
+    border-bottom-color: #2d6f99;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
     padding: 7px 12px;
@@ -482,20 +489,20 @@ QTabBar::tab {
 }
 
 QTabBar::tab:selected {
-    background-color: #2a3038;
-    border-color: #2eb6e8;
+    background-color: #184b70;
+    border-color: #28b7ff;
     color: #ffffff;
 }
 
 QTableView,
 QTreeView,
 QListView {
-    background-color: #171a1f;
-    alternate-background-color: #1f242b;
-    border: 1px solid #303640;
+    background-color: #091927;
+    alternate-background-color: #0f2a40;
+    border: 1px solid #1e5578;
     border-radius: 8px;
-    color: #e8eaed;
-    gridline-color: #303640;
+    color: #edf7ff;
+    gridline-color: #1e5578;
 }
 
 QListView {
@@ -508,7 +515,7 @@ QListView::item {
 }
 
 QListView::item:hover {
-    background-color: #242a32;
+    background-color: #123a59;
 }
 
 QTableView::item {
@@ -517,22 +524,22 @@ QTableView::item {
 
 QTableView::item:selected,
 QListView::item:selected {
-    background-color: #2eb6e8;
-    color: #071014;
+    background-color: #28b7ff;
+    color: #06121d;
 }
 
 QHeaderView::section {
-    background-color: #22262d;
+    background-color: #102f49;
     border: 0;
-    border-right: 1px solid #303640;
-    border-bottom: 1px solid #303640;
-    color: #e8eaed;
+    border-right: 1px solid #1e5578;
+    border-bottom: 1px solid #1e5578;
+    color: #edf7ff;
     padding: 7px 8px;
 }
 
 QTableView#peerTelemetryTable {
-    background-color: #081019;
-    border-color: #2eb6e8;
+    background-color: #061827;
+    border-color: #28b7ff;
 }
 
 QTableView#peerTelemetryTable::item {
@@ -540,8 +547,8 @@ QTableView#peerTelemetryTable::item {
 }
 
 QTableView#transactionHistoryTable {
-    background-color: #0c1219;
-    border-color: #2d4656;
+    background-color: #061827;
+    border-color: #2d6f99;
 }
 
 QTableView#transactionHistoryTable::item {
@@ -550,7 +557,7 @@ QTableView#transactionHistoryTable::item {
 
 QScrollBar:vertical,
 QScrollBar:horizontal {
-    background: #15181d;
+    background: #071725;
     border: 0;
     margin: 0;
 }
@@ -564,14 +571,14 @@ QScrollBar:horizontal {
 }
 
 QScrollBar::handle {
-    background: #3a3f48;
+    background: #2d6f99;
     border-radius: 6px;
     min-height: 28px;
     min-width: 28px;
 }
 
 QScrollBar::handle:hover {
-    background: #4a5360;
+    background: #3f8fbd;
 }
 
 QScrollBar::add-line,
@@ -583,37 +590,37 @@ QScrollBar::sub-page {
 }
 
 QProgressBar {
-    background-color: #111418;
-    border: 1px solid #3a3f48;
+    background-color: #071725;
+    border: 1px solid #2d6f99;
     border-radius: 7px;
-    color: #e8eaed;
+    color: #edf7ff;
     padding: 1px;
     text-align: center;
 }
 
 QProgressBar::chunk {
-    background-color: #2eb6e8;
+    background-color: #28b7ff;
     border-radius: 6px;
 }
 
 QTextEdit#rpcTerminalOutput {
-    background-color: #050b11;
-    border: 1px solid #2eb6e8;
+    background-color: #04111d;
+    border: 1px solid #28b7ff;
     border-radius: 8px;
     color: #d8f3ff;
     padding: 10px;
-    selection-background-color: #2eb6e8;
-    selection-color: #071014;
+    selection-background-color: #28b7ff;
+    selection-color: #06121d;
 }
 
 QLineEdit#rpcTerminalInput {
-    background-color: #071014;
-    border: 1px solid #2eb6e8;
+    background-color: #071725;
+    border: 1px solid #28b7ff;
     border-radius: 7px;
     color: #d8f3ff;
     padding: 8px 10px;
 }
 
 QLineEdit#rpcTerminalInput:focus {
-    border-color: #80e2ff;
+    border-color: #8de6ff;
 }

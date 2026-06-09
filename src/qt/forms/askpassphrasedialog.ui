@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>598</width>
-    <height>198</height>
+    <height>226</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -84,6 +84,16 @@
       </widget>
      </item>
      <item row="3" column="1">
+      <widget class="QCheckBox" name="stakingOnlyCheckBox">
+       <property name="text">
+        <string>Unlock for Staking Only</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
       <widget class="QLabel" name="capsLabel">
        <property name="font">
         <font>

@@ -9,6 +9,12 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
+    setMinimumSize(680, 380);
+    ui->label_4->setObjectName("aboutBrandImage");
+    ui->label->setObjectName("aboutTitleLabel");
+    ui->versionLabel->setObjectName("aboutVersionBadge");
+    ui->copyrightLabel->setObjectName("aboutCopyrightLabel");
+    ui->label_2->setObjectName("aboutBodyCard");
 }
 
 void AboutDialog::setModel(ClientModel *model)

@@ -250,7 +250,7 @@
        <item row="11" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Estimated total blocks</string>
+          <string>Initial Sync Height</string>
          </property>
         </widget>
        </item>

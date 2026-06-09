@@ -21,6 +21,16 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
     model(0)
 {
     ui->setupUi(this);
+    setMinimumSize(760, 460);
+    ui->tabWidget->setObjectName("signatureTabWidget");
+    ui->infoLabel_SM->setObjectName("signatureInfoCard");
+    ui->infoLabel_VM->setObjectName("signatureInfoCard");
+    ui->messageIn_SM->setObjectName("signatureMessageBox");
+    ui->messageIn_VM->setObjectName("signatureMessageBox");
+    ui->statusLabel_SM->setObjectName("signatureStatusLabel");
+    ui->statusLabel_VM->setObjectName("signatureStatusLabel");
+    ui->signMessageButton_SM->setObjectName("signaturePrimaryButton");
+    ui->verifyMessageButton_VM->setObjectName("signaturePrimaryButton");
 
 #if (QT_VERSION >= 0x040700)
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */

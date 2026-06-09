@@ -4,6 +4,9 @@
 
 #include "peertablemodel.h"
 #include "clientmodel.h"
+#include "guiutil.h"
+
+#include <QColor>
 
 PeerTableModel::PeerTableModel(QObject *parent)
     : QAbstractTableModel(parent),
@@ -29,9 +32,33 @@ QVariant PeerTableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= m_peers.size())
         return QVariant();
-    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
-        return QVariant();
     const PeerTableRow &row = m_peers.at(index.row());
+
+    if (role == Qt::TextAlignmentRole) {
+        switch (index.column()) {
+        case 1:
+        case 2:
+        case 4:
+            return static_cast<int>(Qt::AlignCenter);
+        default:
+            return static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter);
+        }
+    }
+
+    if (role == Qt::ForegroundRole) {
+        if (index.column() == 4)
+            return row.direction == tr("Inbound") ? QColor(64, 230, 165) : QColor(46, 182, 232);
+        if (index.column() == 1)
+            return QColor(180, 220, 238);
+        return QVariant();
+    }
+
+    if (role == Qt::FontRole && (index.column() == 0 || index.column() == 1 || index.column() == 2))
+        return GUIUtil::tabularAmountFont();
+
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
     switch (index.column()) {
     case 0: return row.address;
     case 1: return row.ping;
