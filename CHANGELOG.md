@@ -407,3 +407,55 @@ Build, Packaging, and Release Metadata:
 - Added SECURITY.md for repository security reporting guidance
 - Added Debian control metadata for package builds
 
+2.5.2.1 Qt Wallet Modernization and Linux Packaging
+
+Major Qt wallet refresh with a third theme, hero dashboard, network sync visualization, staking-unlock improvements, and expanded Linux build packaging.
+
+Qt Themes and Overview UI:
+
+- Added Curecoin Blue as a third selectable GUI theme alongside Classic and Curecoin Dark
+- Added overview hero dashboard panel with metric cards for balance, stake, unconfirmed balance, transaction count, and wallet/research status
+- Added animated Network Sync panel on the overview page for Dark and Blue themes showing peer connections, block progress, and sync state
+- Redesigned recent-transaction list into a timeline/card view with glowing timeline dots, direction-colored amounts, and CONFIRMED / VALIDATING / PENDING status pills
+- Added empty-state messaging for wallets with no recent transactions
+- Improved toolbar checked/active states, overview spacing, and hero panel sizing for Dark and Blue themes
+- Updated network sync block-height display to use the larger of local and peer-reported heights so progress never shows a stale target
+
+Status Bar and Wallet Unlock:
+
+- Added readable text status pills beside encryption, staking, peer, and sync icons
+- Added theme styling for Ok, Warning, and Neutral pill states in Dark and Blue themes
+- Added "Unlock for staking only" option to the unlock dialog
+- Separated manual wallet unlock from automatic unlock requests triggered by spend operations
+- Added staking-only unlock visibility in the status bar and encryption menu actions
+- Wallet unlock context now re-prompts when the wallet is staking-only locked for spending operations
+
+Transaction Confirmation Display:
+
+- Added ConfirmationDepthRole to TransactionTableModel
+- Overview transaction cards now show VALIDATING X/Y progress and distinguish unspendable vs confirmed states more accurately
+
+RPC Console and Debug Window:
+
+- Polished RPC console as a "Research Terminal" with monospace input/output, terminal styling hooks, and updated welcome header
+- Improved peer table styling and Debug Window theme integration
+
+Build, Packaging, and Documentation:
+
+- Added GitHub Actions Debian package and AppImage build workflow support
+- Updated Debian control metadata for packaged builds
+- Corrected -dnsseed help text to show default value of 1 instead of 0
+- Updated README and build workflow configuration
+- Updated client, display, and qmake version metadata to 2.5.2.1
+
+2.5.2.2 Classic Theme Compatibility and Overview Polish
+
+Refined overview behavior so Classic theme users keep the traditional wallet layout while modern themes retain the new dashboard features.
+
+Classic Theme Compatibility:
+
+- Hide overview Network Sync panel when Classic theme is selected; panel remains visible in Dark and Blue themes
+- Refreshed overview recent-transaction rendering in Classic theme to use palette-driven card borders, muted timeline styling, and legacy-compatible amount/status colors instead of hero-mode glow effects
+- Trigger transaction list repaint when theme changes so Classic and modern themes stay visually consistent
+- Updated client, display, and qmake version metadata to 2.5.2.2
+
