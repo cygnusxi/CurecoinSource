@@ -6,19 +6,20 @@ USE_UPNP:=1
 USE_IPV6:=1
 
 BOOST_SUFFIX?=-mgw46-mt-sd-1_54
+BDB_INCLUDE_PATH?=/c/deps/db5/include
+BDB_LIB_PATH?=/c/deps/db5/lib
 
 INCLUDEPATHS= \
  -I"/c/boost_1_54_0" \
- -I"/c/db-4.8.30.NC\build_unix" \
+ -I"$(BDB_INCLUDE_PATH)" \
  -I"/c/openssl-1.0.1e\include"
 
 LIBPATHS= \
  -L"/c/boost_1_54_0\stage\lib" \
- -L"/c/db-4.8.30.NC\build_unix" \
+ -L"$(BDB_LIB_PATH)" \
  -L"/c/openssl-1.0.1e"
 
 LIBS= \
- -l boost_system-mgw46-mt-sd-1_54 \
  -l boost_filesystem-mgw46-mt-sd-1_54 \
  -l boost_program_options-mgw46-mt-sd-1_54 \
  -l boost_thread-mgw46-mt-sd-1_54 \

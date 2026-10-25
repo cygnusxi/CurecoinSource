@@ -15,9 +15,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 #uncomment the following section to enable building on windows:
 #windows:LIBS += -lshlwapi
 #LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
-#LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
+#LIBS += -lssl -lcrypto -ldb_cxx
 #windows:LIBS += -lws2_32 -lole32 -loleaut32 -luuid -lgdi32
-#LIBS += -lboost_system-mgw46-mt-sd-1_53 -lboost_filesystem-mgw46-mt-sd-1_53 -lboost_program_options-mgw46-mt-sd-1_53 -lboost_thread-mgw46-mt-sd-1_53
+#LIBS += -lboost_filesystem-mgw46-mt-sd-1_53 -lboost_program_options-mgw46-mt-sd-1_53 -lboost_thread-mgw46-mt-sd-1_53
 #BOOST_LIB_SUFFIX=-mgw46-mt-sd-1_53
 #BOOST_INCLUDE_PATH=C:/deps/boost
 #BOOST_LIB_PATH=C:/deps/boost/stage/lib
@@ -344,16 +344,21 @@ isEmpty(BOOST_THREAD_LIB_SUFFIX) {
     BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
 }
 
-isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /opt/local/lib/db48
+isEmpty(BDB_LIB_PATH)|isEmpty(BDB_INCLUDE_PATH) {
+    macx {
+        equals(QMAKE_HOST.arch, arm64) {
+            isEmpty(BDB_LIB_PATH): BDB_LIB_PATH = /opt/homebrew/opt/berkeley-db@5/lib
+            isEmpty(BDB_INCLUDE_PATH): BDB_INCLUDE_PATH = /opt/homebrew/opt/berkeley-db@5/include
+        } else {
+            isEmpty(BDB_LIB_PATH): BDB_LIB_PATH = /usr/local/opt/berkeley-db@5/lib
+            isEmpty(BDB_INCLUDE_PATH): BDB_INCLUDE_PATH = /usr/local/opt/berkeley-db@5/include
+        }
+    }
 }
 
-isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -4.8
-}
-
-isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /opt/local/include/db48
+win32 {
+    BDB_INCLUDE_PATH = /c/deps/db5/include
+    BDB_LIB_PATH = /c/deps/db5/lib
 }
 
 isEmpty(BOOST_LIB_PATH) {
@@ -396,7 +401,7 @@ macx:QMAKE_CXXFLAGS_THREAD += -pthread
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
-LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
+LIBS += -lssl -lcrypto -ldb_cxx
 # -lgdi32 has to happen after -lcrypto (see  #681)
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
 

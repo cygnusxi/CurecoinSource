@@ -9,15 +9,23 @@
 CXX=llvm-g++
 DEPSDIR=/opt/local
 
+UNAME_MACHINE := $(shell uname -m)
+ifeq ($(UNAME_MACHINE),arm64)
+  HOMEBREW_PREFIX := /opt/homebrew
+else
+  HOMEBREW_PREFIX := /usr/local
+endif
+BDB_PREFIX ?= $(HOMEBREW_PREFIX)/opt/berkeley-db@5
+
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"$(CURDIR)"/obj \
  -I"$(DEPSDIR)/include" \
- -I"$(DEPSDIR)/include/db48"
+ -I"$(BDB_PREFIX)/include"
 
 LIBPATHS= \
  -L"$(DEPSDIR)/lib" \
- -L"$(DEPSDIR)/lib/db48"
+ -L"$(BDB_PREFIX)/lib"
 
 USE_UPNP:=1
 USE_IPV6:=1
@@ -31,8 +39,7 @@ ifdef STATIC
 TESTLIBS += \
  $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
 LIBS += \
- $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
- $(DEPSDIR)/lib/libboost_system-mt.a \
+ $(BDB_PREFIX)/lib/libdb_cxx.a \
  $(DEPSDIR)/lib/libboost_filesystem-mt.a \
  $(DEPSDIR)/lib/libboost_program_options-mt.a \
  $(DEPSDIR)/lib/libboost_thread-mt.a \
@@ -43,8 +50,7 @@ else
 TESTLIBS += \
  -lboost_unit_test_framework-mt
 LIBS += \
- -ldb_cxx-4.8 \
- -lboost_system-mt \
+ -ldb_cxx \
  -lboost_filesystem-mt \
  -lboost_program_options-mt \
  -lboost_thread-mt \

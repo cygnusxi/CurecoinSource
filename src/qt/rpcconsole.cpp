@@ -19,6 +19,61 @@
 
 #include <openssl/crypto.h>
 
+#include <boost/version.hpp>
+#include <db_cxx.h>
+
+#if USE_UPNP
+#include <miniupnpc/miniupnpc.h>
+#endif
+
+namespace {
+
+QString FormatOpenSSLVersion()
+{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+    return QString::fromLatin1(OpenSSL_version(OPENSSL_VERSION));
+#else
+    return QString::fromLatin1(SSLeay_version(SSLEAY_VERSION));
+#endif
+}
+
+QString FormatBerkeleyDBVersion()
+{
+    int major = 0, minor = 0, patch = 0;
+    const char *runtimeVer = DbEnv::version(&major, &minor, &patch);
+    const QString runtime = runtimeVer
+        ? QString::fromLatin1(runtimeVer)
+        : QString("%1.%2.%3").arg(major).arg(minor).arg(patch);
+    return QString("Runtime: %1 (Compiled: %2)")
+        .arg(runtime, QString::fromLatin1(DB_VERSION_STRING));
+}
+
+QString FormatBoostVersion()
+{
+    return QString("%1.%2.%3")
+        .arg(BOOST_VERSION / 100000)
+        .arg((BOOST_VERSION / 100) % 1000)
+        .arg(BOOST_VERSION % 100);
+}
+
+QString FormatQtVersion()
+{
+    return QString("Runtime: %1 (Compiled: %2)")
+        .arg(qVersion())
+        .arg(QT_VERSION_STR);
+}
+
+QString FormatUpnpVersion()
+{
+#if USE_UPNP
+    return QString("API %1").arg(MINIUPNPC_API_VERSION);
+#else
+    return QStringLiteral("Disabled");
+#endif
+}
+
+} // namespace
+
 // TODO: make it possible to filter out categories (esp debug messages when implemented)
 // TODO: receive errors and debug messages through ClientModel
 
@@ -241,8 +296,11 @@ RPCConsole::RPCConsole(QWidget *parent) :
     connect(peerRefreshTimer, &QTimer::timeout, peerTableModel, &PeerTableModel::refresh);
     peerRefreshTimer->start(5000); // Refresh every 5 seconds
 
-    // set OpenSSL version label
-    ui->openSSLVersion->setText(SSLeay_version(SSLEAY_VERSION));
+    ui->openSSLVersion->setText(FormatOpenSSLVersion());
+    ui->berkeleyDBVersion->setText(FormatBerkeleyDBVersion());
+    ui->boostVersion->setText(FormatBoostVersion());
+    ui->qtVersion->setText(FormatQtVersion());
+    ui->upnpVersion->setText(FormatUpnpVersion());
 
     startExecutor();
 
