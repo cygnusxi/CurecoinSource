@@ -459,3 +459,26 @@ Classic Theme Compatibility:
 - Trigger transaction list repaint when theme changes so Classic and modern themes stay visually consistent
 - Updated client, display, and qmake version metadata to 2.5.2.2
 
+2.5.3.1 Build Dependencies and Debug Window Library Versions
+
+Improved dependency visibility in the Debug Window and refreshed Berkeley DB build paths for current macOS and Windows toolchains.
+
+Debug Window:
+
+- Added Debug Window fields for Berkeley DB, Boost, Qt, and MiniUPnPc versions alongside the existing OpenSSL version
+- OpenSSL version display now uses OpenSSL_version() on OpenSSL 1.1+ builds
+- Berkeley DB label shows both runtime and compiled DB version strings
+- Qt label shows runtime and compiled Qt versions; MiniUPnPc reports API version or Disabled when UPnP is not built in
+
+Build and Linking:
+
+- Updated macOS Berkeley DB defaults to Homebrew berkeley-db@5 paths with separate arm64 (/opt/homebrew) and x86_64 (/usr/local) detection
+- Set Windows qmake Berkeley DB include/lib paths to C:/deps/db5
+- Normalized Windows MinGW makefile Berkeley DB paths to C:/deps/db5
+- Linked against -ldb_cxx without legacy db48 suffix macros in qmake and updated macOS makefile.osx accordingly
+- Removed obsolete boost_system linkage from commented and active makefile snippets where no longer required
+
+Version Metadata:
+
+- Updated client, display, and qmake version metadata to 2.5.3.1
+
