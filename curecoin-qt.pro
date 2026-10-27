@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = curecoin-qt
-VERSION = 2.5.3.1
+VERSION = 2.5.3.2
 INCLUDEPATH += src src/json src/qt
 
 # Modernized C++ Standard for newer GCC/OS support

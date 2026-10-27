@@ -482,3 +482,28 @@ Version Metadata:
 
 - Updated client, display, and qmake version metadata to 2.5.3.1
 
+2.5.3.2 QMake Build Cleanup and Berkeley DB Version Display
+
+Follow-up maintenance for Qt project configuration, translation files, and Debug Window Berkeley DB reporting.
+
+Build System (curecoin-qt.pro):
+
+- Modernized qmake project to C++17 for newer GCC and OS toolchains
+- Added Qt DBus module to the base Qt link set for optional desktop notification support
+- Consolidated global defines and enabled USE_UPNP=1 in the main DEFINES block
+- Added branded qmake build banner output showing target OS, architecture, Qt version, and platform-specific dependency paths
+- Refactored and de-duplicated curecoin-qt.pro sections (UPnP, QR code, DBus, IPv6, release/static linking, and test target blocks)
+- Improved Windows VCPKG MiniUPnP include and library path handling
+
+Translations and Generated Output:
+
+- Removed obsolete defaultcodec entries from all curecoin_*.ts locale files for cleaner lrelease/qmake output
+
+Debug Window:
+
+- Simplified Berkeley DB version formatting to numeric runtime and compiled major.minor.patch values instead of raw DB version strings
+
+Version Metadata:
+
+- Updated client, display, and qmake version metadata to 2.5.3.2
+
