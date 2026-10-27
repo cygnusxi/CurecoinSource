@@ -40,12 +40,13 @@ QString FormatOpenSSLVersion()
 QString FormatBerkeleyDBVersion()
 {
     int major = 0, minor = 0, patch = 0;
-    const char *runtimeVer = DbEnv::version(&major, &minor, &patch);
-    const QString runtime = runtimeVer
-        ? QString::fromLatin1(runtimeVer)
-        : QString("%1.%2.%3").arg(major).arg(minor).arg(patch);
-    return QString("Runtime: %1 (Compiled: %2)")
-        .arg(runtime, QString::fromLatin1(DB_VERSION_STRING));
+    DbEnv::version(&major, &minor, &patch);
+    const QString runtime = QString("%1.%2.%3").arg(major).arg(minor).arg(patch);
+    const QString compiled = QString("%1.%2.%3")
+        .arg(DB_VERSION_MAJOR)
+        .arg(DB_VERSION_MINOR)
+        .arg(DB_VERSION_PATCH);
+    return QString("Runtime: %1 (Compiled: %2)").arg(runtime, compiled);
 }
 
 QString FormatBoostVersion()
