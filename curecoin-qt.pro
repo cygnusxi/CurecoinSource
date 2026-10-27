@@ -357,8 +357,8 @@ isEmpty(BDB_LIB_PATH)|isEmpty(BDB_INCLUDE_PATH) {
 }
 
 win32 {
-    BDB_INCLUDE_PATH = /c/deps/db5/include
-    BDB_LIB_PATH = /c/deps/db5/lib
+    BDB_INCLUDE_PATH = C:/deps/db5/include
+    BDB_LIB_PATH = C:/deps/db5/lib
 }
 
 isEmpty(BOOST_LIB_PATH) {
