@@ -2,46 +2,65 @@ TEMPLATE = app
 TARGET = curecoin-qt
 VERSION = 2.5.3.1
 INCLUDEPATH += src src/json src/qt
-# Note: BOOST_ASIO_ENABLE_OLD_SERVICES removed - handled in curecoinrpc.h with version detection
-DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_ASIO_ENABLE_OLD_SERVICES
-CONFIG += no_include_pwd c++11
-QT += core gui network
+
+# Modernized C++ Standard for newer GCC/OS support
+CONFIG += no_include_pwd c++17
+QT += core gui network dbus
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets printsupport
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 }
 
-#uncomment the following section to enable building on windows:
-#windows:LIBS += -lshlwapi
-#LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
-#LIBS += -lssl -lcrypto -ldb_cxx
-#windows:LIBS += -lws2_32 -lole32 -loleaut32 -luuid -lgdi32
-#LIBS += -lboost_filesystem-mgw46-mt-sd-1_53 -lboost_program_options-mgw46-mt-sd-1_53 -lboost_thread-mgw46-mt-sd-1_53
-#BOOST_LIB_SUFFIX=-mgw46-mt-sd-1_53
-#BOOST_INCLUDE_PATH=C:/deps/boost
-#BOOST_LIB_PATH=C:/deps/boost/stage/lib
-#BDB_INCLUDE_PATH=c:/deps/db/build_unix
-#BDB_LIB_PATH=c:/deps/db/build_unix
-#OPENSSL_INCLUDE_PATH=c:/deps/ssl/include
-#OPENSSL_LIB_PATH=c:/deps/ssl
-#MINIUPNPC_LIB_PATH=c:/deps/miniupnpc
-#MINIUPNPC_INCLUDE_PATH=c:/deps
+# --- BRANDED BUILD OUTPUT ---
+!build_pass {
+    message(" ")
+    message("=======================================================")
+    message("       🧬  CURECOIN QT-WALLET BUILD SYSTEM  🧬        ")
+    message("=======================================================")
+    message("  -> Target OS:       $$system(uname -s)")
+    message("  -> Architecture:    $$QMAKE_HOST.arch")
+    message("  -> Qt Version:      $$QT_VERSION")
+    message("  -> UPNP Enabled:    $$USE_UPNP")
+    message("  -> IPv6 Enabled:    $$USE_IPV6")
+    message("-------------------------------------------------------")
 
-# --- VCPKG Integration ---
+    win32 {
+        message("  [Windows / MSYS2 Build Environment Detected]")
+        message("  -> BDB 5.3 Path:    C:/deps/db5")
+        message("  -> Compiler:        MinGW-w64 (g++)")
+    }
+
+    linux {
+        message("  [Linux Build Environment Detected]")
+        message("  -> BDB 5.3 Path:    System Default or /usr/local")
+        message("  -> Boost Modules:   Header-only (1.90+ compatible)")
+    }
+
+    macx {
+        message("  [macOS Build Environment Detected]")
+        message("  -> BDB 5.3 Path:    Homebrew (/opt/homebrew/opt/berkeley-db@5)")
+        message("  -> Platform:        $$QMAKE_MAC_SDK")
+    }
+
+    message("=======================================================")
+    message(" ")
+}
+# ----------------------------
+
+# Global Defines
+DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_THREAD_PROVIDES_GENERIC_SHARED_MUTEX_ON_WIN __NO_SYSTEM_INCLUDES BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_ASIO_ENABLE_OLD_SERVICES USE_UPNP=1
+
+# --- VCPKG Integration (Windows) ---
 win32 {
-    # 1. Tell the code we are using the static version of the library
     DEFINES += MINIUPNP_STATICLIB
-    # 2. Refine the LIBS to ensure static linking
     VCPKG_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
-    LIBS += $$VCPKG_ROOT/lib/libminiupnpc.a -liphlpapi
+    INCLUDEPATH += $$VCPKG_ROOT/include
+    LIBS += -L$$VCPKG_ROOT/lib -lminiupnpc -liphlpapi
 }
 !win32 {
-    # Linux/Mac just needs the standard library link
     LIBS += -lminiupnpc
 }
-# Keep the existing UPNP defines global
-DEFINES += USE_UPNP=1
 # -------------------------
 
 OBJECTS_DIR = build
@@ -50,12 +69,9 @@ UI_DIR = build
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
-    # Mac: compile for modern macOS (10.13+, 64-bit only)
     macx:QMAKE_CXXFLAGS += -mmacosx-version-min=10.13
 
     !windows:!macx {
-        # Linux: static link
-        # MODIFIED: Only attempt strict static linking on non-ARM systems
         !contains(QT_ARCH, arm):!contains(QT_ARCH, arm64) {
             LIBS += -Wl,-Bstatic
         }
@@ -63,39 +79,23 @@ contains(RELEASE, 1) {
 }
 
 !win32 {
-# for extra security against potential buffer overflows: enable GCCs Stack Smashing Protection
-QMAKE_CXXFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
-QMAKE_LFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
-# We need to exclude this for Windows cross compile with MinGW 4.2.x, as it will result in a non-working executable!
-# This can be enabled for Windows, when we switch to MinGW >= 4.4.x.
+    QMAKE_CXXFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
+    QMAKE_LFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
 }
-# for extra security on Windows: enable ASLR and DEP via GCC linker flags
+
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 
-# use: qmake "USE_QRCODE=1"
-# libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
 contains(USE_QRCODE, 1) {
     message(Building with QRCode support)
     DEFINES += USE_QRCODE
     LIBS += -lqrencode -lpthread
 }
 
-# --- UPNP DISABLED FORCEFULLY ---
-# We are disabling UPNP to avoid miniwget.h errors
-message(Building without UPNP support)
-DEFINES += USE_UPNP=1
-# -------------------------------
-
-# use: qmake "USE_DBUS=1"
 contains(USE_DBUS, 1) {
     message(Building with DBUS (Freedesktop notifications) support)
     DEFINES += USE_DBUS
-    QT += dbus
 }
 
-# use: qmake "USE_IPV6=1" ( enabled by default; default)
-#  or: qmake "USE_IPV6=0" (disabled by default)
-#  or: qmake "USE_IPV6=-" (not supported)
 contains(USE_IPV6, -) {
     message(Building without IPv6 support)
 } else {
@@ -110,8 +110,6 @@ contains(curecoin_NEED_QT_PLUGINS, 1) {
     QTPLUGIN += qcncodecs qjpcodecs qtwcodecs qkrcodecs qtaccessiblewidgets
 }
 
-
-# regenerate src/build.h
 !windows|contains(USE_BUILD_INFO, 1) {
     genbuild.depends = FORCE
     genbuild.commands = cd $$PWD; /bin/sh share/genbuild.sh $$OUT_PWD/build/build.h
@@ -121,17 +119,14 @@ contains(curecoin_NEED_QT_PLUGINS, 1) {
     DEFINES += HAVE_BUILD_INFO
 }
 
-# --- MODIFIED FOR RASPBERRY PI SUPPORT ---
-# Prevent SSE2 flags on ARM architecture (Raspberry Pi)
 !contains(QT_ARCH, arm):!contains(QT_ARCH, arm64) {
     QMAKE_CXXFLAGS += -msse2
     QMAKE_CFLAGS += -msse2
 }
-# -----------------------------------------
 
 QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+QMAKE_CXXFLAGS += -Wno-deprecated-declarations
 
-# Input
 DEPENDPATH += src src/json src/qt
 HEADERS += src/qt/curecoingui.h \
     src/qt/transactiontablemodel.h \
@@ -285,34 +280,23 @@ FORMS += \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui
 
-##### Fix for non static msys2 mingw64 compile
-### Force windres to look in the correct directory for icons/images
-#windows:QMAKE_RC += --include-dir=src/qt/res
-
-### Fix for MSYS2 path translation issues
-#windows:QMAKE_RC += -O coff
-##### End fix msys2
-
 contains(USE_QRCODE, 1) {
-HEADERS += src/qt/qrcodedialog.h
-SOURCES += src/qt/qrcodedialog.cpp
-FORMS += src/qt/forms/qrcodedialog.ui
+    HEADERS += src/qt/qrcodedialog.h
+    SOURCES += src/qt/qrcodedialog.cpp
+    FORMS += src/qt/forms/qrcodedialog.ui
 }
 
 contains(curecoin_QT_TEST, 1) {
-SOURCES += src/qt/test/test_main.cpp \
-    src/qt/test/uritests.cpp
-HEADERS += src/qt/test/uritests.h
-DEPENDPATH += src/qt/test
-QT += testlib
-TARGET = curecoin-qt_test
-DEFINES += curecoin_QT_TEST
+    SOURCES += src/qt/test/test_main.cpp \
+        src/qt/test/uritests.cpp
+    HEADERS += src/qt/test/uritests.h
+    DEPENDPATH += src/qt/test
+    QT += testlib
+    TARGET = curecoin-qt_test
+    DEFINES += curecoin_QT_TEST
 }
 
-CODECFORTR = UTF-8
-
-# for lrelease/lupdate
-# also add new translations to src/qt/curecoin.qrc under translations/
+# --- TRANSLATION COMPILER (Modernized & Silenced) ---
 TRANSLATIONS = $$files(src/qt/locale/curecoin_*.ts)
 
 isEmpty(QMAKE_LRELEASE) {
@@ -320,24 +304,21 @@ isEmpty(QMAKE_LRELEASE) {
     else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 isEmpty(QM_DIR):QM_DIR = $$PWD/src/qt/locale
-# automatically build translations, so they can be included in resource file
+
 TSQM.name = lrelease ${QMAKE_FILE_IN}
 TSQM.input = TRANSLATIONS
 TSQM.output = $$QM_DIR/${QMAKE_FILE_BASE}.qm
-TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
+TSQM.commands = $$QMAKE_LRELEASE -silent ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
 TSQM.CONFIG = no_link
 QMAKE_EXTRA_COMPILERS += TSQM
+# ----------------------------------------------------
 
-# "Other files" to show in Qt Creator
 OTHER_FILES += \
     doc/*.rst doc/*.txt doc/README README.md res/curecoin-qt.rc src/test/*.cpp src/test/*.h src/qt/test/*.cpp src/qt/test/*.h
 
-# platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     macx:BOOST_LIB_SUFFIX = -mt
     win32:BOOST_LIB_SUFFIX = -mt
-    # Modern Boost versions (1.70+) may not need specific suffixes
-    # windows:BOOST_LIB_SUFFIX = -mgw44-mt-s-1_50
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -373,12 +354,6 @@ windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/curecoin-qt.rc
 
 windows:!contains(MINGW_THREAD_BUGFIX, 0) {
-    # At least qmake's win32-g++-cross profile is missing the -lmingwthrd
-    # thread-safety flag. GCC has -mthreads to enable this, but it doesn't
-    # work with static linking. -lmingwthrd must come BEFORE -lmingw, so
-    # it is prepended to QMAKE_LIBS_QT_ENTRY.
-    # It can be turned off with MINGW_THREAD_BUGFIX=0, just in case it causes
-    # any problems on some untested qmake profile now or in the future.
     DEFINES += _MT
     QMAKE_LIBS_QT_ENTRY = -lmingwthrd $$QMAKE_LIBS_QT_ENTRY
 }
@@ -398,48 +373,21 @@ macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread
 
-# Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
 LIBS += -lssl -lcrypto -ldb_cxx
-# -lgdi32 has to happen after -lcrypto (see  #681)
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
 
-# --- MODIFIED FOR RASPBERRY PI SUPPORT ---
-# Use Dynamic linking for Boost on ARM (Pi), Static for others.
-# If we force static on Pi, we usually fail to find the libraries.
 contains(QT_ARCH, arm)|contains(QT_ARCH, arm64) {
     LIBS += -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
 } else {
     LIBS += -Wl,-Bstatic -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX -Wl,-Bdynamic
 }
-# -----------------------------------------
 
 windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
 
 contains(RELEASE, 1) {
     !windows:!macx {
-        # Linux: turn dynamic linking back on for c/c++ runtime libraries
         LIBS += -Wl,-Bdynamic
     }
 }
-
-system($$QMAKE_LRELEASE -silent $$_PRO_FILE_)
-
-# Suppress OpenSSL 3.0 deprecation warnings
-QMAKE_CXXFLAGS += -Wno-deprecated-declarations
-
-# --- EXACT MINIUPNPC PATHS ---
-win32 {
-    # Pointing directly to the folder from your screenshot
-    MINIUPNPC_ROOT = C:/vcpkg/packages/miniupnpc_x64-mingw-static
-    # Tell the compiler where to find miniwget.h
-    INCLUDEPATH += $$MINIUPNPC_ROOT/include
-    # Tell the linker where to find libminiupnpc.a
-    LIBS += -L$$MINIUPNPC_ROOT/lib -lminiupnpc -liphlpapi
-    # CRITICAL: Tell the headers we are linking statically (fixes the __imp_ errors)
-    DEFINES += MINIUPNP_STATICLIB
-}
-
-DEFINES += USE_UPNP=1
-# -----------------------------
