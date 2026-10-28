@@ -1627,18 +1627,28 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     bool fEnforceBIP30 = true; // Always active in curecoin
     bool fStrictPayToScriptHash = true; // Always active in curecoin
 
-    // assumeValid: skip script/sig verification for blocks that are ancestors of the assumed-valid block (IBD speedup)
-    // PoW, PoS kernel, coinstake, and block structure are NEVER skipped - only standard tx script verification
+    // assumeValid / checkpoint IBD speedup: skip standard tx script/sig verification for blocks at or
+    // below the latest checkpoint or ancestors of hashAssumeValid. PoW, PoS kernel, coinstake, and
+    // block structure are NEVER skipped.
     bool fScriptChecks = true;
-    if (hashAssumeValid != 0 && mapBlockIndex.count(hashAssumeValid))
+    if (hashAssumeValid != 0 && pindex->nHeight <= Checkpoints::GetTotalBlocksEstimate())
+    {
+        fScriptChecks = false;
+    }
+    else if (hashAssumeValid != 0 && mapBlockIndex.count(hashAssumeValid))
     {
         const CBlockIndex* pindexAssumeValid = mapBlockIndex[hashAssumeValid];
-        for (const CBlockIndex* p = pindexAssumeValid; p; p = p->pprev)
-            if (p == pindex)
+        if (pindex->nHeight <= pindexAssumeValid->nHeight)
+        {
+            for (const CBlockIndex* p = pindexAssumeValid; p && p->nHeight >= pindex->nHeight; p = p->pprev)
             {
-                fScriptChecks = false;
-                break;
+                if (p == pindex)
+                {
+                    fScriptChecks = false;
+                    break;
+                }
             }
+        }
     }
 
     //// issue here: it doesn't know the version

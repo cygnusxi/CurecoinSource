@@ -282,3 +282,4 @@ Makefile.Debug
 object_script.curecoin-qt.Debug
 *.Release
 *.Debug
+diffs.txt

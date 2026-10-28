@@ -83,16 +83,24 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     if (GetBoolArg("-privdb", true))
         nEnvFlags |= DB_PRIVATE;
 
-    // Database cache size in MB; default 450MB for modern performance
-    int64 nDbCache = GetArg("-dbcache", 450);
+    // Database cache size in MB; default 256MB (split into 4 regions if > 128MB to reduce mutex contention)
+    int64 nDbCache = GetArg("-dbcache", 256);
     if (nDbCache < 1)
         nDbCache = 1;
+    int nCacheRegions = (nDbCache > 128) ? 4 : 1;
+
+    // Log buffer and max log file size: BDB requires lg_max >= 4 * lg_bsize
+    int64 nDbLogSize = GetArg("-dblogsize", 100);
+    if (nDbLogSize < 64)
+        nDbLogSize = 64;
+    if (nDbLogSize > 2048)
+        nDbLogSize = 2048;
+
     // Safe conversion MB->bytes: BDB set_cachesize(gbytes, bytes, ncache)
-    // bytes = (nDbCache % 1024) * 1048576 stays within u_int32_t
     dbenv.set_lg_dir(pathLogDir.string().c_str());
-    dbenv.set_cachesize((u_int32_t)(nDbCache / 1024), (u_int32_t)((nDbCache % 1024) * 1048576), 1);
-    dbenv.set_lg_bsize(33554432);  // 32MB log buffer for improved IBD write performance
-    dbenv.set_lg_max(10485760);
+    dbenv.set_cachesize((u_int32_t)(nDbCache / 1024), (u_int32_t)((nDbCache % 1024) * 1048576), nCacheRegions);
+    dbenv.set_lg_max((u_int32_t)nDbLogSize * 1048576);
+    dbenv.set_lg_bsize(8 * 1048576);
     dbenv.set_lk_max_locks(10000);
     dbenv.set_lk_max_objects(10000);
     dbenv.set_errfile(fopen(pathErrorFile.string().c_str(), "a")); /// debug
