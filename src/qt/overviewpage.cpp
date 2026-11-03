@@ -247,10 +247,27 @@ public:
         icon.paint(painter, iconRect);
 
         int contentLeft = iconRect.right() + 12;
-        int amountWidth = qMin(170, qMax(100, mainRect.width() / 3));
-        QRect amountRect(mainRect.right() - amountWidth - 12, mainRect.top() + 12, amountWidth, 24);
-        QRect dateRect(contentLeft, mainRect.top() + 10, amountRect.left() - contentLeft - 10, 22);
-        QRect addressRect(contentLeft, mainRect.top() + 35, amountRect.left() - contentLeft - 10, 22);
+        const int amountRightMargin = 12;
+        const int contentAmountGap = 10;
+        const int minLeftContent = 72;
+
+        QString amountText = curecoinUnits::formatWithUnit(unit, amount, true);
+        if(!spendable)
+            amountText = QString("[") + amountText + QString("]");
+
+        QFont amountFont = GUIUtil::tabularAmountFont();
+        amountFont.setBold(true);
+        QFontMetrics amountFm(amountFont);
+        const int amountTextWidth = amountFm.horizontalAdvance(amountText);
+        const int amountPadding = 8;
+        const int maxAmountWidth = qMax(0, mainRect.width() - contentLeft - minLeftContent - amountRightMargin - contentAmountGap);
+        int amountWidth = qMin(maxAmountWidth, amountTextWidth + amountPadding);
+        amountWidth = qMax(amountWidth, qMin(100, maxAmountWidth));
+
+        QRect amountRect(mainRect.right() - amountWidth - amountRightMargin, mainRect.top() + 12, amountWidth, 24);
+        const int leftContentWidth = qMax(0, amountRect.left() - contentLeft - contentAmountGap);
+        QRect dateRect(contentLeft, mainRect.top() + 10, leftContentWidth, 22);
+        QRect addressRect(contentLeft, mainRect.top() + 35, leftContentWidth, 22);
 
         painter->setPen(textColor);
         QFont titleFont = painter->font();
@@ -269,23 +286,17 @@ public:
         painter->drawText(addressRect, Qt::AlignLeft|Qt::AlignVCenter,
                           painter->fontMetrics().elidedText(address, Qt::ElideRight, addressRect.width()));
 
+        QColor amountColor;
         if(amount < 0)
-            foreground = COLOR_NEGATIVE;
+            amountColor = COLOR_NEGATIVE;
         else if(!spendable)
-            foreground = COLOR_UNCONFIRMED;
+            amountColor = COLOR_UNCONFIRMED;
         else
-            foreground = option.palette.color(QPalette::Text);
-        painter->setPen(foreground);
-        QString amountText = curecoinUnits::formatWithUnit(unit, amount, true);
-        if(!spendable)
-        {
-            amountText = QString("[") + amountText + QString("]");
-        }
-
-        QFont amountFont = GUIUtil::tabularAmountFont();
-        amountFont.setBold(true);
+            amountColor = option.palette.color(QPalette::Text);
+        painter->setPen(amountColor);
         painter->setFont(amountFont);
-        painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
+        const QString amountDisplay = amountFm.elidedText(amountText, Qt::ElideLeft, amountRect.width());
+        painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountDisplay);
 
         QString statusText;
         if(confirmed)
@@ -294,7 +305,7 @@ public:
             statusText = tr("VALIDATING %1/%2").arg(confirmationDepth).arg(TransactionRecord::NumConfirmations);
         else
             statusText = tr("PENDING");
-        QRect pillRect(mainRect.right() - amountWidth - 12, mainRect.top() + 42, amountWidth, 20);
+        QRect pillRect(mainRect.right() - amountWidth - amountRightMargin, mainRect.top() + 42, amountWidth, 20);
         if(classicTheme)
         {
             painter->setPen(QPen(borderColor, 1));
